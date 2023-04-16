@@ -3,9 +3,6 @@
 	import { onMount } from 'svelte';
 	import {
 		Navbar,
-		NavBrand,
-		NavLi,
-		NavUl,
 		NavHamburger,
 		Sidebar,
 		SidebarGroup,
@@ -15,6 +12,9 @@
 		CloseButton,
 	} from 'flowbite-svelte';
 	import { sineIn } from 'svelte/easing';
+  import type { Room } from '../db/rooms';
+
+  export let rooms: Room[] = [];
 
 	let transitionParams = {
 		x: -320,
@@ -51,14 +51,11 @@
 		drawerHidden = false;
 	};
 	$: activeUrl = $page.url.pathname;
-	let spanClass = 'pl-2 self-center text-md text-gray-900 whitespace-nowrap dark:text-white';
-	let divClass = 'w-full md:block md:w-auto pr-8';
-	let ulClass = 'flex flex-col p-4 mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-lg md:font-medium';
 </script>
 
 <svelte:window bind:innerWidth={width} />
-<Navbar let:hidden let:toggle>
-    <NavHamburger on:click={toggleDrawer} btnClass='ml-3 lg:hidden' />
+<Navbar let:hidden let:toggle navClass='lg:hidden'>
+    <NavHamburger on:click={toggleDrawer} btnClass='ml-3' />
 </Navbar>
 <Drawer
     transitionType='fly'
@@ -76,19 +73,20 @@
     <Sidebar asideClass='w-54'>
         <SidebarWrapper divClass='overflow-y-auto py-4 px-3 rounded dark:bg-gray-800'>
             <SidebarGroup>
+                {#each rooms as room (room.id)}
                 <SidebarItem
-                    label='About'
-                    href='/room/1'
-                    {spanClass}
+                    label={room.name}
+                    href={`/room/${room.id}`}
+                    spanClass='pl-2 self-center text-md text-gray-900 whitespace-nowrap dark:text-white'
                     on:click={toggleSide}
-                    active={activeUrl === '/room/1'}
+                    active={activeUrl === `/room/${room.id}`}
                 />
+                    {/each}
             </SidebarGroup>
         </SidebarWrapper>
     </Sidebar>
 </Drawer>
-<div class='flex px-4 mx-auto w-full'>
-    <main class='lg:ml-72 w-full mx-auto'>
-        <slot />
-    </main>
-</div>
+
+<main class='lg:ml-72 h-full mx-auto'>
+    <slot />
+</main>

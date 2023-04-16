@@ -4,27 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cbfef0df-9027-4fa8-b504-5f8b6c584124" name="Changes" comment="rooms">
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lib/components/SideNav.svelte" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lib/db/rooms.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lib/supabase.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lib/utils.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/routes/(app)/+layout.svelte" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/routes/(app)/+page.svelte" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.svelte" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.ts" afterDir="false" />
+    <list default="true" id="cbfef0df-9027-4fa8-b504-5f8b6c584124" name="Changes" comment="rooms route">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.prettierrc" beforeDir="false" afterPath="$PROJECT_DIR$/.prettierrc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/database.d.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/+layout.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/+layout.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/+layout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/+layout.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/+page.svelte" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/auth/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(auth)/auth/+page.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/SideNav.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/SideNav.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/db/rooms.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/db/rooms.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/(app)/+layout.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/+layout.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/(app)/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/+page.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,7 +83,7 @@
       <option name="presentableId" value="Default" />
       <updated>1681669635630</updated>
       <workItem from="1681669637332" duration="1021000" />
-      <workItem from="1681671810337" duration="5242000" />
+      <workItem from="1681671810337" duration="7848000" />
     </task>
     <task id="LOCAL-00001" summary="rooms">
       <created>1681669947945</created>
@@ -118,7 +106,14 @@
       <option name="project" value="LOCAL" />
       <updated>1681670054552</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="rooms route">
+      <created>1681677181588</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1681677181588</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -126,6 +121,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="rooms" />
-    <option name="LAST_COMMIT_MESSAGE" value="rooms" />
+    <MESSAGE value="rooms route" />
+    <option name="LAST_COMMIT_MESSAGE" value="rooms route" />
   </component>
 </project>

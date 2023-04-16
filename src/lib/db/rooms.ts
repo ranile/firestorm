@@ -1,5 +1,5 @@
 import type { Supabase } from '../supabase';
-import type { PostgrestSingleResponse, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { REALTIME_LISTEN_TYPES } from '@supabase/realtime-js/src/RealtimeChannel';
 import type { Database } from '../../database';
 import type { UnionFromValues } from '../utils';
@@ -32,3 +32,4 @@ export function subscrieToRoomMembers(supabase: Supabase, callback: (rooms: Real
         .subscribe();
 }
 
+export type Room = Required<Awaited<ReturnType<typeof getRoomById>>>
