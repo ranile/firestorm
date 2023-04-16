@@ -1,4 +1,4 @@
-// src/routes/+layout.ts
+// src/routes/+page.ts
 import {
     PUBLIC_SUPABASE_ANON_KEY,
     PUBLIC_SUPABASE_URL

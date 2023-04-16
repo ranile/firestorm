@@ -5,23 +5,38 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cbfef0df-9027-4fa8-b504-5f8b6c584124" name="Changes" comment="rooms">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/firestorm.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/supabase/migrations/20230416183132_rooms.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lib/components/SideNav.svelte" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lib/db/rooms.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lib/supabase.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lib/utils.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/routes/(app)/+layout.svelte" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/routes/(app)/+page.svelte" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.svelte" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.prettierrc" beforeDir="false" afterPath="$PROJECT_DIR$/.prettierrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/+page.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/database.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/database.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/+layout.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/+layout.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/+layout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/+layout.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/+page.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/auth/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(auth)/auth/+page.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -43,12 +58,14 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "master",
+    "last_opened_file_path": "/home/hamza/code/firestorm/src/routes/(auth)/auth",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "prettierjs.PrettierConfiguration.Package": "/home/hamza/code/firestorm/node_modules/prettier",
+    "ts.external.directory.path": "/home/hamza/code/firestorm/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -57,6 +74,18 @@
     ]
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/routes/(auth)/auth" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/routes/(app)/room" />
+      <recent name="$PROJECT_DIR$/src/routes" />
+      <recent name="$PROJECT_DIR$/src/routes/(auth)" />
+      <recent name="$PROJECT_DIR$/src/routes/(app)" />
+      <recent name="$PROJECT_DIR$/src/lib/components" />
+    </key>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -65,8 +94,31 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1681669635630</updated>
-      <workItem from="1681669637332" duration="303000" />
+      <workItem from="1681669637332" duration="1021000" />
+      <workItem from="1681671810337" duration="5242000" />
     </task>
+    <task id="LOCAL-00001" summary="rooms">
+      <created>1681669947945</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1681669947945</updated>
+    </task>
+    <task id="LOCAL-00002" summary="rooms">
+      <created>1681669957139</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1681669957139</updated>
+    </task>
+    <task id="LOCAL-00003" summary="rooms">
+      <created>1681670054552</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1681670054552</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
