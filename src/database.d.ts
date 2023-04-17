@@ -34,6 +34,29 @@ export interface Database {
   }
   public: {
     Tables: {
+      messages: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string
+          id: string
+          room_id: string
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string
+          id?: string
+          room_id: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          room_id?: string
+        }
+      }
       profiles: {
         Row: {
           avatar: string | null

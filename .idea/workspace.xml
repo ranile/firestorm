@@ -4,17 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cbfef0df-9027-4fa8-b504-5f8b6c584124" name="Changes" comment="rooms route">
-      <change afterPath="$PROJECT_DIR$/src/lib/components/ProfileDropdown.svelte" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lib/db/users.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+    <list default="true" id="cbfef0df-9027-4fa8-b504-5f8b6c584124" name="Changes" comment="profiles">
+      <change afterPath="$PROJECT_DIR$/src/lib/db/messages.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lib/utils/messageChunks.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lib/utils/messageChunks.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/MessageList.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/database.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/database.d.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/components/SideNav.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/SideNav.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.test.ts" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/db/rooms.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/db/rooms.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/routes/(app)/+layout.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/+layout.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(app)/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/+page.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,6 +27,7 @@
       <list>
         <option value="TypeScript File" />
         <option value="ProfileDropdown" />
+        <option value="MessageList" />
       </list>
     </option>
   </component>
@@ -77,6 +79,93 @@
       <recent name="$PROJECT_DIR$/src/lib/components" />
     </key>
   </component>
+  <component name="RunManager" selected="Vitest.chunkArray.messages are by single author and more than a minute apart">
+    <configuration name="chunkArray.messages are by single author and more than a minute apart" type="JavaScriptTestRunnerVitest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <vitest-package value="$PROJECT_DIR$/node_modules/vitest" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/src/lib/utils/messageChunks.test.ts" />
+      <test-names>
+        <test-name value="chunkArray" />
+        <test-name value="messages are by single author and more than a minute apart" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="index.test-&gt;chunkArray" type="PlaywrightConfigurationType" factoryName="Playwright-support" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="envs">
+        <map />
+      </option>
+      <option name="myPlaywrightRunSettings">
+        <PlaywrightRunSettings>
+          <option name="configKind" value="JS" />
+          <option name="allNames">
+            <list>
+              <option value="chunkArray" />
+            </list>
+          </option>
+          <option name="specsDir" />
+          <option name="specFile" value="$PROJECT_DIR$/src/index.test.ts" />
+          <option name="testName" value="chunkArray" />
+          <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+          <option name="envs">
+            <map />
+          </option>
+          <option name="additionalParams" value="" />
+          <option name="browser" />
+          <option name="passParentEnvs" value="true" />
+          <option name="nodeJsRef" value="project" />
+          <option name="npmRef" value="Project" />
+          <option name="playwrightPackageRef" value="$PROJECT_DIR$/node_modules/@playwright/test" />
+          <option name="kind" value="TEST" />
+          <option name="pageAutoSelection" value="true" />
+          <option name="focusToIde" value="true" />
+          <option name="generateComment" value="true" />
+          <option name="insertAtCursor" value="false" />
+        </PlaywrightRunSettings>
+      </option>
+      <option name="passParentEnvs" value="true" />
+      <option name="programParameters" value="" />
+      <option name="projectPathOnTarget" />
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <option name="workingDirectory" value="$PROJECT_DIR$" />
+      <option name="configKind" value="JS" />
+      <option name="allNames">
+        <list>
+          <option value="chunkArray" />
+        </list>
+      </option>
+      <option name="specsDir" />
+      <option name="specFile" value="$PROJECT_DIR$/src/index.test.ts" />
+      <option name="testName" value="chunkArray" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <option name="envs">
+        <map />
+      </option>
+      <option name="additionalParams" value="" />
+      <option name="browser" />
+      <option name="passParentEnvs" value="true" />
+      <option name="nodeJsRef" value="project" />
+      <option name="npmRef" value="Project" />
+      <option name="playwrightPackageRef" value="$PROJECT_DIR$/node_modules/@playwright/test" />
+      <option name="kind" value="TEST" />
+      <option name="pageAutoSelection" value="true" />
+      <option name="focusToIde" value="true" />
+      <option name="generateComment" value="true" />
+      <option name="insertAtCursor" value="false" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Vitest.chunkArray.messages are by single author and more than a minute apart" />
+        <item itemvalue="Playwright.index.test-&gt;chunkArray" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -88,7 +177,7 @@
       <workItem from="1681669637332" duration="1021000" />
       <workItem from="1681671810337" duration="7848000" />
       <workItem from="1681726056862" duration="190000" />
-      <workItem from="1681751110241" duration="2939000" />
+      <workItem from="1681751110241" duration="13108000" />
     </task>
     <task id="LOCAL-00001" summary="rooms">
       <created>1681669947945</created>
@@ -118,7 +207,14 @@
       <option name="project" value="LOCAL" />
       <updated>1681677181588</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="profiles">
+      <created>1681754322411</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1681754322411</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -127,6 +223,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="rooms" />
     <MESSAGE value="rooms route" />
-    <option name="LAST_COMMIT_MESSAGE" value="rooms route" />
+    <MESSAGE value="profiles" />
+    <option name="LAST_COMMIT_MESSAGE" value="profiles" />
   </component>
 </project>

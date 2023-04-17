@@ -35,7 +35,7 @@
     onMount(() => {
         let sub;
         if (data.session) {
-            sub = subscribeToRoomMembers(data.supabase, handleRoomMemberChange);
+            sub = subscribeToRoomMembers(data.supabase, handleRoomMemberChange, data.session.user.id);
         }
 
         return () => sub?.unsubscribe();

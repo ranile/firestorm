@@ -15,18 +15,19 @@ export async function getRoomById(supabase: Supabase, id: string) {
     const rooms = await supabase.from('rooms').select('*')
         .eq('id', id)
         .limit(1)
+        .order('created_at', { ascending: false })
         .single();
     return rooms.data;
 }
 
 export function subscribeToRoomMembers(supabase: Supabase, callback: (rooms: RealtimePostgresChangesPayload<UnionFromValues<Database['public']['Tables']['room_members']>>) => void, uid: string) {
-  console.log(typeof callback, callback);
     return supabase.channel('table-db-changes')
         .on(REALTIME_LISTEN_TYPES.POSTGRES_CHANGES,
             {
                 event: '*',
                 schema: 'public',
                 table: 'room_members',
+                filter: `member_id=eq.${uid}`,
             },
           callback
         )

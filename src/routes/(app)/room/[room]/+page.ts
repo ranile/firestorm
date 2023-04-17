@@ -1,6 +1,7 @@
 import type { PageLoad } from './$types';
 import { getRoomById } from '$lib/db/rooms';
 import { error } from '@sveltejs/kit';
+import { getMessages } from '../../../../lib/db/messages';
 
 export const load = (async ({ params, parent }) => {
   const data = await parent();
@@ -10,6 +11,7 @@ export const load = (async ({ params, parent }) => {
     throw error(404, 'Not found');
   }
   return {
-    room
+    room,
+    messages: await getMessages(data.supabase, params.room),
   };
 }) satisfies PageLoad;
