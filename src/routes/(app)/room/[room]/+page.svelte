@@ -14,7 +14,7 @@
   <div class='row-start-auto'>
     <div class='flex p-4 sm:p-6 items-center gap-2'>
       <img
-        src='https://unsplash.com/photos/IF9TK5Uy-KI/download?ixid=MnwxMjA3fDB8MXxzZWFyY2h8Nnx8YXZhdGFyfGVufDB8fHx8MTY4MTYzMTgwOQ&force=true&w=640'
+        src=''
         alt='avatar' class='w-10 h-10 rounded-full' />
       <p class='font-normal text-gray-700 dark:text-gray-400 leading-tight'>
         Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.

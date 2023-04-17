@@ -34,6 +34,23 @@ export interface Database {
   }
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          avatar: string | null
+          id: string
+          username: string | null
+        }
+        Insert: {
+          avatar?: string | null
+          id: string
+          username?: string | null
+        }
+        Update: {
+          avatar?: string | null
+          id?: string
+          username?: string | null
+        }
+      }
       room_members: {
         Row: {
           joined_at: string

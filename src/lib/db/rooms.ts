@@ -3,6 +3,7 @@ import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { REALTIME_LISTEN_TYPES } from '@supabase/realtime-js/src/RealtimeChannel';
 import type { Database } from '../../database';
 import type { UnionFromValues } from '../utils';
+import { writable } from 'svelte/store';
 
 export async function getRooms(supabase: Supabase) {
     const rooms = await supabase.from('rooms').select('*');
@@ -18,18 +19,19 @@ export async function getRoomById(supabase: Supabase, id: string) {
     return rooms.data;
 }
 
-export function subscrieToRoomMembers(supabase: Supabase, callback: (rooms: RealtimePostgresChangesPayload<UnionFromValues<Database['public']['Tables']['room_members']>>) => void, uid: string) {
+export function subscribeToRoomMembers(supabase: Supabase, callback: (rooms: RealtimePostgresChangesPayload<UnionFromValues<Database['public']['Tables']['room_members']>>) => void, uid: string) {
+  console.log(typeof callback, callback);
     return supabase.channel('table-db-changes')
         .on(REALTIME_LISTEN_TYPES.POSTGRES_CHANGES,
             {
                 event: '*',
                 schema: 'public',
                 table: 'room_members',
-                filter: `member_id=eq.${uid}`
             },
-            callback
+          callback
         )
         .subscribe();
 }
 
 export type Room = Required<Awaited<ReturnType<typeof getRoomById>>>
+export const rooms = writable<Room[]>([]);

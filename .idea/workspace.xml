@@ -5,14 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cbfef0df-9027-4fa8-b504-5f8b6c584124" name="Changes" comment="rooms route">
+      <change afterPath="$PROJECT_DIR$/src/lib/components/ProfileDropdown.svelte" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lib/db/users.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/database.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/database.d.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/SideNav.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/SideNav.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/db/rooms.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/db/rooms.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/routes/(app)/+layout.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/+layout.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/routes/(app)/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/+page.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,6 +25,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="TypeScript File" />
+        <option value="ProfileDropdown" />
       </list>
     </option>
   </component>
@@ -40,28 +43,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "/home/hamza/code/firestorm/src/routes/(auth)/auth",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "prettierjs.PrettierConfiguration.Package": "/home/hamza/code/firestorm/node_modules/prettier",
-    "ts.external.directory.path": "/home/hamza/code/firestorm/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/hamza/code/firestorm/src/routes/(auth)/auth&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/home/hamza/code/firestorm/node_modules/prettier&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/hamza/code/firestorm/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/routes/(auth)/auth" />
@@ -84,6 +87,8 @@
       <updated>1681669635630</updated>
       <workItem from="1681669637332" duration="1021000" />
       <workItem from="1681671810337" duration="7848000" />
+      <workItem from="1681726056862" duration="190000" />
+      <workItem from="1681751110241" duration="2939000" />
     </task>
     <task id="LOCAL-00001" summary="rooms">
       <created>1681669947945</created>
