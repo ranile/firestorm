@@ -60,30 +60,21 @@ export function chunkMessagesArray(chunkSize: number, messages: Message[]): Mess
 }
 
 export interface GroupedMessage {
-  author_id: string;
+  authorId: string;
+  firstMessage: string;
   messages: { id: string, content: string; created_at: string; }[];
 }
 
 export function groupMessagesByAuthor(chunks: Message[][]): GroupedMessage[] {
-  const groupedMessages: { [authorId: string]: { content: string; created_at: string; id: string }[] } = {};
-
-  for (let i = 0; i < chunks.length; i++) {
-    const chunk = chunks[i];
-
-    for (const message of chunk) {
-      const authorId = message.author_id;
-      const content = message.content;
-      const created_at = message.created_at;
-
-      if (!groupedMessages[authorId]) {
-        groupedMessages[authorId] = [];
-      }
-
-      groupedMessages[authorId].push({ content, created_at, id: message.id });
-    }
-  }
-
-  return Object.entries(groupedMessages).map(([author_id, messages]) => ({ author_id, messages }));
+  return chunks.map((chunk) => {
+    const authorId = chunk[0].author_id;
+    const messages = chunk.map((message) => ({
+      id: message.id,
+      content: message.content,
+      created_at: message.created_at
+    }));
+    return { authorId, messages, firstMessage: messages[0].created_at };
+  })
 }
 
 export function groupMessages(messages: Message[]) {

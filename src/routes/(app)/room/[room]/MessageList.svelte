@@ -2,15 +2,14 @@
 
     import type { Message } from '$lib/db/messages';
     import { groupMessages } from '$lib/utils/messageChunks';
+    import MessagesChunk from './MessagesChunk.svelte';
 
     export let messages: Message[] = [];
-    $: grouped = groupMessages(messages).map(chunk => ({ ...chunk, firstMessage: chunk.messages[0].created_at }));
+    $: grouped = groupMessages(messages);
+
 </script>
 <div class='flex flex-col p-4 sm:p-6 gap-2'>
     {#each grouped as chunk (chunk.firstMessage)}
-        <p>{chunk.author_id}</p>
-        {#each chunk.messages as message (message.id)}
-            <p>{message.content}</p>
-        {/each}
+        <MessagesChunk {chunk} />
     {/each}
 </div>

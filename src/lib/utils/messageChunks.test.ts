@@ -119,7 +119,8 @@ describe('groupMessagesByAuthor', () => {
 
     const expected: GroupedMessage[] = [
         {
-          author_id: '1',
+          authorId: '1',
+          firstMessage: '2022-04-18T12:00:00.000Z',
           messages: [
             { content: 'Hello', created_at: '2022-04-18T12:00:00.000Z', id: '1' },
             { content: 'How are you?', created_at: '2022-04-18T12:01:00.000Z', id: '2' }
@@ -129,6 +130,35 @@ describe('groupMessagesByAuthor', () => {
     ;
 
     const result = groupMessagesByAuthor(chunks);
+    expect(result).toEqual(expected);
+  });
+
+  it('should not group messages by same author but in different consecutive chunks', () => {
+    const messages = generateMessages(2).map((message, i) => ({
+      ...message,
+      author_id: '1',
+      created_at: new Date(2022, 0, 1, i, 0).toISOString()
+    }));
+    const chunks: Message[][] = chunkMessagesArray(1, messages)
+    const expected: GroupedMessage[] = [
+        {
+          authorId: '1',
+          firstMessage: messages[0].created_at,
+          messages: [
+            { content: messages[0].content, created_at: messages[0].created_at, id: messages[0].id },
+          ]
+        },
+      {
+          authorId: '1',
+          firstMessage: messages[1].created_at,
+          messages: [
+            { content: messages[1].content, created_at: messages[1].created_at, id: messages[1].id },
+          ]
+      }
+    ];
+
+    const result = groupMessagesByAuthor(chunks);
+    console.log(result);
     expect(result).toEqual(expected);
   });
 
@@ -142,7 +172,8 @@ describe('groupMessagesByAuthor', () => {
     const result = groupMessagesByAuthor(chunks);
     const expected = [
       {
-        author_id: '1',
+        authorId: '1',
+        firstMessage: '2022-04-18T12:00:00.000Z',
         messages: [
           { content: 'Message 1', created_at: '2022-04-18T12:00:00.000Z', id: '1' },
           { content: 'Message 2', created_at: '2022-04-18T12:00:00.000Z', id: '2' },
@@ -151,7 +182,8 @@ describe('groupMessagesByAuthor', () => {
         ]
       },
       {
-        author_id: '2',
+        authorId: '2',
+        firstMessage: '2022-04-18T12:00:00.000Z',
         messages: [
           { content: 'Message 5', created_at: '2022-04-18T12:00:00.000Z', id: '5' },
           { content: 'Message 6', created_at: '2022-04-18T12:00:00.000Z', id: '6' },
