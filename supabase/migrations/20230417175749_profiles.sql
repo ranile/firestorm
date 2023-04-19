@@ -1,6 +1,3 @@
-CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_new_user();
-
-
 create table "public"."profiles" (
     "id" uuid not null,
     "username" text,
@@ -58,4 +55,5 @@ to public
 using ((auth.uid() = id));
 
 
+CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 

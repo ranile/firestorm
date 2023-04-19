@@ -1,5 +1,5 @@
 <script lang='ts'>
-    import SideNav from '$lib/components/SideNav.svelte';
+    import SideNav from '$lib/components/SideNav/SideNav.svelte';
     import type { LayoutData } from './$types';
     import { onMount } from 'svelte';
     import { getRooms, subscribeToRoomMembers, getRoomById } from '$lib/db/rooms';

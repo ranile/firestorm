@@ -12,6 +12,5 @@ export const load = (async ({ params, parent }) => {
   }
   return {
     room,
-    messages: await getMessages(data.supabase, params.room),
   };
 }) satisfies PageLoad;

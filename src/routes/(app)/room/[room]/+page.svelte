@@ -5,10 +5,16 @@
     import MessageList from './MessageList.svelte';
     import type { Messages } from '$lib/db/messages';
     import { onMount } from 'svelte';
+    import { getMessages } from '../../../../lib/db/messages';
 
     export let data: PageData;
     let value = '';
-    let messages: Messages = data.messages;
+    let messages: Messages = [];
+    $: {
+        getMessages(data.supabase, data.room.id).then((m) => {
+            messages = m;
+        });
+    }
 
     onMount(() => {
         subscribeToRoomMessages(data.supabase, data.room.id, (payload) => {

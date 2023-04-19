@@ -9,11 +9,14 @@
         SidebarItem,
         SidebarWrapper,
         Drawer,
-        CloseButton
+        CloseButton, Button
     } from 'flowbite-svelte';
     import { sineIn } from 'svelte/easing';
-    import { rooms } from '../db/rooms';
-    import ProfileDropdown from './ProfileDropdown.svelte';
+    import { rooms } from '../../db/rooms';
+    import Plus from "svelte-material-icons/Plus.svelte";
+    import ProfileDropdown from '../ProfileDropdown.svelte';
+    import CreateRoomModal from './CreateRoomModal.svelte';
+    import { createRoomModalState } from './store';
 
     export let signout: () => void;
 
@@ -75,8 +78,11 @@
     </div>
     <Sidebar asideClass='w-54'>
         <SidebarWrapper divClass='overflow-y-auto py-4 px-3 rounded dark:bg-gray-800 flex flex-col gap-2'>
-            <SidebarGroup>
+            <SidebarGroup ulClass='flex justify-between px-4'>
                 <ProfileDropdown signout={signout} />
+                <Button pill={true} on:click={() => createRoomModalState.set(true)}>
+                    <Plus />
+                </Button>
             </SidebarGroup>
             <SidebarGroup>
                 {#each $rooms as room (room.id)}
@@ -92,6 +98,8 @@
         </SidebarWrapper>
     </Sidebar>
 </Drawer>
+
+<CreateRoomModal />
 
 <main class='lg:ml-72 h-full mx-auto'>
     <slot />
