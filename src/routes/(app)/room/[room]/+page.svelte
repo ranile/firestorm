@@ -5,8 +5,9 @@
     import MessageList from './MessageList.svelte';
     import type { Messages } from '$lib/db/messages';
     import { onMount } from 'svelte';
-    import { getMessages } from '../../../../lib/db/messages';
+    import { getMessages } from '$lib/db/messages';
     import { OutboundSession } from 'moe';
+    import { currentRoom } from '$lib/utils';
 
     export let data: PageData;
     let value = '';
@@ -15,6 +16,10 @@
         getMessages(data.supabase, data.room.id).then((m) => {
             messages = m;
         });
+    }
+
+    $: {
+        currentRoom.set(data.room);
     }
 
     let outbound: OutboundSession | undefined
@@ -42,8 +47,7 @@
 </script>
 
 <div class='grid h-full grid-cols-1'>
-    <h1 class='text-2xl font-bold '>{data.room.name}</h1>
-    <div class='row-start-auto overflow-y-auto'>
+    <div class='row-start-auto overflow-y-auto text-white'>
         <MessageList {messages} roomId={data.room.id} />
     </div>
     <div class='self-end mb-4 p-2 flex gap-2'>
@@ -62,6 +66,6 @@
 
 <style>
     div.grid {
-        grid-template-rows: 3rem 1fr 5rem;
+        grid-template-rows: 1fr 5rem;
     }
 </style>

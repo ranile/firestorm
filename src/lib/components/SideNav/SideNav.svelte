@@ -16,7 +16,8 @@
     import Plus from "svelte-material-icons/Plus.svelte";
     import ProfileDropdown from '../ProfileDropdown.svelte';
     import CreateRoomModal from './CreateRoomModal.svelte';
-    import { createRoomModalState } from './store';
+    import { createRoomModalState, updateRoomModalState } from './store';
+    import { currentRoom } from '../../utils';
 
     export let signout: () => void;
 
@@ -60,8 +61,13 @@
 </script>
 
 <svelte:window bind:innerWidth={width} />
-<Navbar let:hidden let:toggle navClass='lg:hidden'>
-    <NavHamburger on:click={toggleDrawer} btnClass='ml-3' />
+<Navbar let:hidden let:toggle navClass='lg:ml-64'>
+    <NavHamburger on:click={toggleDrawer} btnClass='ml-3 lg:hidden' />
+    {#if $currentRoom !== null}
+        <button class='text-2xl font-bold px-4 py-2' on:click={() => updateRoomModalState.set(true)}>
+            {$currentRoom.name}
+        </button>
+    {/if}
 </Navbar>
 <Drawer
     transitionType='fly'
@@ -70,7 +76,7 @@
     bind:hidden={drawerHidden}
     bind:activateClickOutside
     width='w-64'
-    class='overflow-scroll pb-32 dark:bg-gray-900'
+    class='overflow-scroll w-64 pb-32 dark:bg-gray-900'
     id='sidebar'
 >
     <div class='flex items-center'>
@@ -101,12 +107,12 @@
 
 <CreateRoomModal />
 
-<main class='lg:ml-72 mx-auto'>
+<main class='lg:ml-64 mx-auto'>
     <slot />
 </main>
 
 <style>
     main {
-        height: calc(100% - 40px);
+        height: calc(100% - 48px);
     }
 </style>

@@ -1,6 +1,6 @@
-<script lang="ts">
+<script lang='ts'>
     import { Button, Input, Label } from 'flowbite-svelte';
-    import { signup } from './utils';
+    import { signup, view } from './utils';
 
     export let supabase;
     const onSubmit = async (e) => {
@@ -9,7 +9,12 @@
         const email = data.get('email') as string;
         const password = data.get('password') as string;
 
-        signup(supabase, username, email, password).then(console.log)
+        signup(supabase, username, email, password);
+    };
+
+    const loginView = (e: MouseEvent) => {
+        e.preventDefault();
+        view.set('sign-in');
     };
 </script>
 
@@ -29,9 +34,13 @@
     </Label>
     <Button type='submit' class='w-full1'>Sign up</Button>
     <p class='text-sm font-light text-gray-500 dark:text-gray-400'>
-        Already have an account? <a
-        href='/'
-        class='font-medium text-primary-600 hover:underline dark:text-primary-500'>Sign in</a
-    >
+        Already have an account?
+        <a
+            href='/'
+            class='font-medium text-primary-600 hover:underline dark:text-primary-500'
+            on:click={loginView}
+        >
+            Sign in
+        </a>
     </p>
 </form>

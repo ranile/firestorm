@@ -16,7 +16,7 @@
             rooms.set(r);
         });
         getUserProfile(data.supabase, data.session).then(p => {
-            profile.set(p);
+            profile.set({ ...p, email: data.session.user.email });
         });
     }
 

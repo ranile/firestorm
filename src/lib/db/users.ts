@@ -20,4 +20,4 @@ export async function getUserProfileById(supabase: Supabase, userId: string) {
 
 export type Profile = Required<Awaited<ReturnType<typeof getUserProfileById>>>
 
-export const profile = writable<Profile | null>(null);
+export const profile = writable<Profile & { email: string } | null>(null);
