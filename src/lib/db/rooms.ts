@@ -5,12 +5,21 @@ import type { Database } from '../../database';
 import type { UnionFromValues } from '../utils';
 import { writable } from 'svelte/store';
 import { getSession } from '../supabase';
+import { OutboundSession } from 'moe';
+import { browser } from '$app/environment';
 
 export async function getRooms(supabase: Supabase) {
     const rooms = await supabase.from('rooms').select('*');
     return rooms.data ?? [];
 }
 
+export function initRoomEncryption() {
+  if (!browser) { return }
+  const outboundSession = new OutboundSession();
+  const arr = new Uint8Array(32).map(() => 1);
+  const pickle = outboundSession.pickle(arr);
+  return { pickle, sessionKey: outboundSession.session_key() }
+}
 
 export async function getRoomById(supabase: Supabase, id: string) {
     const rooms = await supabase.from('rooms').select('*')
@@ -30,9 +39,14 @@ export async function createRoom(supabase: Supabase, name: string) {
     if (room.error) {
         throw room.error;
     }
-    // todo session = createRoomSession(); save session.pickle in localstorage
+
+    const sess = initRoomEncryption();
+    if (sess === undefined) {
+      throw Error('executed on server environment')
+    }
+    localStorage.setItem(`${room.data.id}:pickle`, sess.pickle);
     const member = await supabase.from('room_members')
-      .insert({ room_id: room.data.id, member_id: session.user.id  })
+      .insert({ room_id: room.data.id, member_id: session.user.id, session_key: sess.sessionKey })
       .select()
       .single();
 

@@ -1,11 +1,12 @@
 <script lang='ts'>
     import { supabase } from '$lib/supabase';
-    import { get as getAuthor } from './authors';
+    import { get as getAuthor, getInboundSession } from './authors';
     import type { GroupedMessage } from '$lib/utils/messageChunks';
     import type { Profile } from '$lib/db/users';
     import { onMount } from 'svelte';
-    import { Avatar } from 'flowbite-svelte';
 
+
+    export let roomId: string;
     export let chunk: GroupedMessage;
     const timestamp = new Date(chunk.messages[0].created_at);
     let author: Profile;
@@ -15,6 +16,10 @@
         });
 
     });
+    const decrypt = async (content: string) => {
+        const sess = await getInboundSession(supabase, chunk.authorId, roomId)
+        return sess.decrypt(content)
+    };
 </script>
 
 <div class='relative'>
@@ -29,7 +34,9 @@
         <div class='messages'>
             {#each chunk.messages as message}
                 <div class=''>
-                    {message.content}
+                    {#await decrypt(message.content) then content}
+                        <p>{content}</p>
+                    {/await}
                 </div>
             {/each}
         </div>

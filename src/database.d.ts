@@ -79,33 +79,67 @@ export interface Database {
           joined_at: string
           member_id: string
           room_id: string
+          session_key: string | null
         }
         Insert: {
           joined_at?: string
           member_id: string
           room_id: string
+          session_key?: string | null
         }
         Update: {
           joined_at?: string
           member_id?: string
           room_id?: string
+          session_key?: string | null
         }
       }
       rooms: {
         Row: {
           created_at: string
+          created_by: string | null
           id: string
           name: string
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           id?: string
           name: string
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           id?: string
           name?: string
+        }
+      }
+      user_identity_keys: {
+        Row: {
+          id: string
+          identity_key: string
+        }
+        Insert: {
+          id: string
+          identity_key: string
+        }
+        Update: {
+          id?: string
+          identity_key?: string
+        }
+      }
+      user_one_time_keys: {
+        Row: {
+          id: string
+          one_time_key: string
+        }
+        Insert: {
+          id: string
+          one_time_key: string
+        }
+        Update: {
+          id?: string
+          one_time_key?: string
         }
       }
     }

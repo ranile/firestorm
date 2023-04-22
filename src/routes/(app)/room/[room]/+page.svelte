@@ -6,6 +6,7 @@
     import type { Messages } from '$lib/db/messages';
     import { onMount } from 'svelte';
     import { getMessages } from '../../../../lib/db/messages';
+    import { OutboundSession } from 'moe';
 
     export let data: PageData;
     let value = '';
@@ -16,18 +17,25 @@
         });
     }
 
+    let outbound: OutboundSession | undefined
+
     onMount(() => {
         subscribeToRoomMessages(data.supabase, data.room.id, (payload) => {
             if (payload.eventType === 'INSERT') {
                 messages = [...messages, payload.new]
             }
         })
+
+        const PICKLE_KEY = new Uint8Array(32).map(() => 1);
+
+        const pickle = localStorage.getItem(`${data.room.id}:pickle`);
+        outbound = pickle ? OutboundSession.from_pickle(pickle, PICKLE_KEY) : undefined;
     })
 
     const sendMessage = (e: Event) => {
         e.preventDefault()
         const roomId = data.room.id;
-        const content = value;
+        const content = outbound ? outbound.encrypt(value) : value;
         const uid = data.session.user.id
         createMessage(data.supabase, roomId, uid, content).then(() => value = '')
     };
@@ -36,7 +44,7 @@
 <div class='grid h-full grid-cols-1'>
     <h1 class='text-2xl font-bold '>{data.room.name}</h1>
     <div class='row-start-auto overflow-y-auto'>
-        <MessageList {messages} />
+        <MessageList {messages} roomId={data.room.id} />
     </div>
     <div class='self-end mb-4 p-2 flex gap-2'>
         <Textarea bind:value class='' rows='1' placeholder='Your message...' />
