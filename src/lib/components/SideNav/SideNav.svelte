@@ -70,14 +70,14 @@
     bind:hidden={drawerHidden}
     bind:activateClickOutside
     width='w-64'
-    class='overflow-scroll pb-32'
+    class='overflow-scroll pb-32 dark:bg-gray-900'
     id='sidebar'
 >
     <div class='flex items-center'>
         <CloseButton on:click={() => (drawerHidden = true)} class='mb-4 dark:text-white lg:hidden' />
     </div>
     <Sidebar asideClass='w-54'>
-        <SidebarWrapper divClass='overflow-y-auto py-4 px-3 rounded dark:bg-gray-800 flex flex-col gap-2'>
+        <SidebarWrapper divClass='overflow-y-auto py-4 px-3 rounded dark:bg-gray-900 flex flex-col gap-2'>
             <SidebarGroup ulClass='flex justify-between px-4'>
                 <ProfileDropdown signout={signout} />
                 <Button pill={true} on:click={() => createRoomModalState.set(true)}>
@@ -101,6 +101,12 @@
 
 <CreateRoomModal />
 
-<main class='lg:ml-72 h-full mx-auto'>
+<main class='lg:ml-72 mx-auto'>
     <slot />
 </main>
+
+<style>
+    main {
+        height: calc(100% - 40px);
+    }
+</style>

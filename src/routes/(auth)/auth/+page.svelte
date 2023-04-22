@@ -1,9 +1,10 @@
-<script lang="ts">
+<script lang='ts'>
     import type { PageData } from './$types';
-    import { Auth } from '@supabase/auth-ui-svelte'
-    import { ThemeSupa } from '@supabase/auth-ui-shared'
     import { browser } from '$app/environment';
+    import { Button, Checkbox, Label, Input } from 'flowbite-svelte';
     import { goto } from '$app/navigation';
+    import SignIn from './SignIn.svelte';
+    import SignUp from './SignUp.svelte';
 
     export let data: PageData;
 
@@ -18,6 +19,9 @@
     }
 </script>
 
-<div class="w-2/6 m-auto">
-    <Auth supabaseClient={data.supabase} appearance={{ theme: ThemeSupa }} />
+<div class='flex w-full md:h-full'>
+    <div class='rounded-lg shadow mx-auto md:my-auto sm:max-w-md md:border md:dark:border-gray-700 space-y-4 md:space-y-6 p-8'>
+        <SignUp supabase={data.supabase} />
+<!--        <SignIn />-->
+    </div>
 </div>
