@@ -1,7 +1,7 @@
 import type { Profile } from '../../../../lib/db/users';
 import { getUserProfileById } from '../../../../lib/db/users';
 import type { Supabase } from '../../../../lib/supabase';
-import { InboundSession } from '../../../../../../e2ee/moe/pkg';
+import { InboundSession } from 'moe';
 
 const authors: { [key: string]: Profile } = {};
 
