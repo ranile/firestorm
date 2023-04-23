@@ -76,18 +76,21 @@ export interface Database {
       }
       room_members: {
         Row: {
+          join_state: Database["public"]["Enums"]["member_join_state"]
           joined_at: string
           member_id: string
           room_id: string
           session_key: string | null
         }
         Insert: {
+          join_state?: Database["public"]["Enums"]["member_join_state"]
           joined_at?: string
           member_id: string
           room_id: string
           session_key?: string | null
         }
         Update: {
+          join_state?: Database["public"]["Enums"]["member_join_state"]
           joined_at?: string
           member_id?: string
           room_id?: string
@@ -144,7 +147,25 @@ export interface Database {
       }
     }
     Views: {
-      [_ in never]: never
+      room_members_with_users: {
+        Row: {
+          avatar: string | null
+          email: string | null
+          id: string | null
+          join_state: Database["public"]["Enums"]["member_join_state"] | null
+          joined_at: string | null
+          room_id: string | null
+          username: string | null
+        }
+      }
+      users_with_profiles: {
+        Row: {
+          avatar: string | null
+          email: string | null
+          id: string | null
+          username: string | null
+        }
+      }
     }
     Functions: {
       is_member_of: {
@@ -156,7 +177,7 @@ export interface Database {
       }
     }
     Enums: {
-      [_ in never]: never
+      member_join_state: "invited" | "joined"
     }
     CompositeTypes: {
       [_ in never]: never

@@ -3,18 +3,28 @@
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
+  <component name="CargoProjects">
+    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="cbfef0df-9027-4fa8-b504-5f8b6c584124" name="Changes" comment="create rooms">
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+    <list default="true" id="cbfef0df-9027-4fa8-b504-5f8b6c584124" name="Changes" comment="auth works + improve styles">
+      <change afterPath="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings/+layout.svelte" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings/+page.svelte" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings/+page.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/SideNav/SideNav.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/SideNavGeneric.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/SideNav/store.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/SideNav/store.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/db/rooms.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/db/rooms.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(app)/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/+page.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/db/users.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/db/users.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/supabase.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/supabase.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/utils.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/(app)/+layout.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/+layout.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/MessagesChunk.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/MessagesChunk.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/authors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/authors.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/+layout.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/+layout.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/vite.config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -29,6 +39,8 @@
         <option value="ProfileDropdown" />
         <option value="MessageList" />
         <option value="MessagesChunk" />
+        <option value="OpenDrawerHamburger" />
+        <option value="+layout.svelte" />
       </list>
     </option>
   </component>
@@ -42,37 +54,41 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2OWHtvUDk4vZVz63M50R7LbKBVk" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/hamza/code/firestorm/src/lib/components/SideNav&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;org.rust.cargo.project.model.PROJECT_DISCOVERY&quot;: &quot;true&quot;,
-    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/home/hamza/code/firestorm/node_modules/prettier&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/home/hamza/code/firestorm/node_modules/typescript/lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/home/hamza/code/firestorm/src/lib/components",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
+    "prettierjs.PrettierConfiguration.Package": "/home/hamza/code/firestorm/node_modules/prettier",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
+    "ts.external.directory.path": "/home/hamza/code/firestorm/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;postgresql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/lib/components/SideNav" />
+      <recent name="$PROJECT_DIR$/src/lib/components" />
+      <recent name="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings" />
       <recent name="$PROJECT_DIR$/src/routes/(auth)/auth" />
+      <recent name="$PROJECT_DIR$/src/lib/components/SideNav" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/lib/components/SideNav" />
@@ -82,7 +98,7 @@
       <recent name="$PROJECT_DIR$/src/routes/(app)" />
     </key>
   </component>
-  <component name="RunManager" selected="Vitest.chunkArray.messages are by single author and more than a minute apart">
+  <component name="RunManager" selected="Vitest.splitWith">
     <configuration name="chunkArray.messages are by single author and more than a minute apart" type="JavaScriptTestRunnerVitest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <vitest-package value="$PROJECT_DIR$/node_modules/vitest" />
@@ -93,6 +109,18 @@
       <test-names>
         <test-name value="chunkArray" />
         <test-name value="messages are by single author and more than a minute apart" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="splitWith" type="JavaScriptTestRunnerVitest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <vitest-package value="$PROJECT_DIR$/node_modules/vitest" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/src/lib/utils.ts" />
+      <test-names>
+        <test-name value="splitWith" />
       </test-names>
       <method v="2" />
     </configuration>
@@ -164,6 +192,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Vitest.splitWith" />
         <item itemvalue="Vitest.chunkArray.messages are by single author and more than a minute apart" />
         <item itemvalue="Playwright.index.test-&gt;chunkArray" />
       </list>
@@ -190,6 +219,8 @@
       <workItem from="1681905148142" duration="7258000" />
       <workItem from="1682110917032" duration="4357000" />
       <workItem from="1682165270026" duration="555000" />
+      <workItem from="1682168824385" duration="9619000" />
+      <workItem from="1682246883841" duration="15876000" />
     </task>
     <task id="LOCAL-00001" summary="rooms">
       <created>1681669947945</created>
@@ -254,19 +285,72 @@
       <option name="project" value="LOCAL" />
       <updated>1681922850663</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="add rudimentary encryption">
+      <created>1682169609196</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1682169609196</updated>
+    </task>
+    <task id="LOCAL-00011" summary="include moe crate in source tree">
+      <created>1682170421014</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1682170421014</updated>
+    </task>
+    <task id="LOCAL-00012" summary="custom auth page + dark mode">
+      <created>1682173954075</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1682173954075</updated>
+    </task>
+    <task id="LOCAL-00013" summary="custom auth page + dark mode">
+      <created>1682173966290</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1682173966290</updated>
+    </task>
+    <task id="LOCAL-00014" summary="auth works + improve styles">
+      <created>1682178305646</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1682178305646</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/crates" />
+    </ignored-roots>
     <MESSAGE value="rooms" />
     <MESSAGE value="rooms route" />
     <MESSAGE value="profiles" />
     <MESSAGE value="messages" />
     <MESSAGE value="messages 2" />
     <MESSAGE value="create rooms" />
-    <option name="LAST_COMMIT_MESSAGE" value="create rooms" />
+    <MESSAGE value="add rudimentary encryption" />
+    <MESSAGE value="include moe crate in source tree" />
+    <MESSAGE value="custom auth page + dark mode" />
+    <MESSAGE value="auth works + improve styles" />
+    <option name="LAST_COMMIT_MESSAGE" value="auth works + improve styles" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/routes/(auth)/auth/SignIn.svelte</url>
+          <line>29</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

@@ -14,11 +14,13 @@ export async function getRooms(supabase: Supabase) {
 }
 
 export function initRoomEncryption() {
-  if (!browser) { return }
-  const outboundSession = new OutboundSession();
-  const arr = new Uint8Array(32).map(() => 1);
-  const pickle = outboundSession.pickle(arr);
-  return { pickle, sessionKey: outboundSession.session_key() }
+    if (!browser) {
+        return;
+    }
+    const outboundSession = new OutboundSession();
+    const arr = new Uint8Array(32).map(() => 1);
+    const pickle = outboundSession.pickle(arr);
+    return { pickle, sessionKey: outboundSession.session_key() };
 }
 
 export async function getRoomById(supabase: Supabase, id: string) {
@@ -30,27 +32,35 @@ export async function getRoomById(supabase: Supabase, id: string) {
     return rooms.data;
 }
 
+export async function getRoomMembers(supabase: Supabase, roomId: string) {
+    const members = await supabase.from('room_members_with_users').select('*').eq('room_id', roomId);
+    if (members.error) {
+        throw members.error;
+    }
+    return members.data;
+}
+
 export async function createRoom(supabase: Supabase, name: string) {
     const session = await getSession();
     const room = await supabase.from('rooms')
-      .insert({ name, created_by: session.user.id })
-      .select()
-      .single();
+        .insert({ name, created_by: session.user.id })
+        .select()
+        .single();
     if (room.error) {
         throw room.error;
     }
 
     const sess = initRoomEncryption();
     if (sess === undefined) {
-      throw Error('executed on server environment')
+        throw Error('executed on server environment');
     }
     localStorage.setItem(`${room.data.id}:pickle`, sess.pickle);
     const member = await supabase.from('room_members')
-      .insert({ room_id: room.data.id, member_id: session.user.id, session_key: sess.sessionKey })
-      .select()
-      .single();
+        .insert({ room_id: room.data.id, member_id: session.user.id, session_key: sess.sessionKey, join_state: 'member' })
+        .select()
+        .single();
 
-    return { room: room.data, member: member.data }
+    return { room: room.data, member: member.data };
 
 }
 
@@ -61,11 +71,48 @@ export function subscribeToRoomMembers(supabase: Supabase, callback: (rooms: Rea
                 event: '*',
                 schema: 'public',
                 table: 'room_members',
-                filter: `member_id=eq.${uid}`,
+                filter: `member_id=eq.${uid}`
             },
-          callback
+            callback
         )
         .subscribe();
+}
+
+export async function inviteMember(supabase: Supabase, roomId: string, userId: string) {
+    const { data, error } = await supabase.from('room_members').insert({
+        room_id: roomId,
+        member_id: userId
+    }).select().single();
+    if (error) {
+        throw error;
+    }
+    return data;
+}
+
+export async function getRoomMemberForRoom(supabase: Supabase, roomId: string, userId: string) {
+    const member = await supabase.from('room_members').select('*').eq('room_id', roomId).eq('member_id', userId).single();
+    if (member.error) {
+        throw member.error;
+    }
+
+    return member.data;
+}
+
+export async function joinRoom(supabase: Supabase, roomId: string) {
+    const session = await getSession(supabase);
+    const sess = initRoomEncryption();
+    if (sess === undefined) {
+        throw Error('executed on server environment');
+    }
+    const member = await supabase.from('room_members')
+        .update({ session_key: sess.sessionKey, join_state: 'joined' })
+        .match({ room_id: roomId, member_id: session.user.id })
+        .select()
+        .single();
+    console.log('member', member, sess.sessionKey);
+    localStorage.setItem(`${roomId}:pickle`, sess.pickle);
+
+    return member.data;
 }
 
 export type Room = Required<Awaited<ReturnType<typeof getRoomById>>>

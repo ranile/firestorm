@@ -38,5 +38,6 @@
 <style lang="postcss">
     :global(html) {
         background-color: theme(colors.gray.800);
+        color: theme(colors.white)
     }
 </style>
