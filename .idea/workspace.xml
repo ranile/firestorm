@@ -7,25 +7,18 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cbfef0df-9027-4fa8-b504-5f8b6c584124" name="Changes" comment="auth works + improve styles">
-      <change afterPath="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings/+layout.svelte" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings/+page.svelte" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings/+page.ts" afterDir="false" />
+    <list default="true" id="cbfef0df-9027-4fa8-b504-5f8b6c584124" name="Changes" comment="basic functionality works">
+      <change beforePath="$PROJECT_DIR$/.eslintrc.cjs" beforeDir="false" afterPath="$PROJECT_DIR$/.eslintrc.cjs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/components/SideNav/SideNav.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/SideNavGeneric.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/components/SideNav/store.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/SideNav/store.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/db/rooms.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/db/rooms.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/db/users.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/db/users.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/supabase.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/supabase.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/utils.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/routes/(app)/+layout.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/+layout.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/(app)/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/+page.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/MessagesChunk.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/MessagesChunk.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/authors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/authors.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/+layout.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/+layout.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/vite.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/(auth)/auth/SignIn.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(auth)/auth/SignIn.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/(auth)/auth/SignUp.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(auth)/auth/SignUp.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings/+page.svelte" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -220,7 +213,7 @@
       <workItem from="1682110917032" duration="4357000" />
       <workItem from="1682165270026" duration="555000" />
       <workItem from="1682168824385" duration="9619000" />
-      <workItem from="1682246883841" duration="15876000" />
+      <workItem from="1682246883841" duration="19512000" />
     </task>
     <task id="LOCAL-00001" summary="rooms">
       <created>1681669947945</created>
@@ -320,7 +313,21 @@
       <option name="project" value="LOCAL" />
       <updated>1682178305646</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="room member invites">
+      <created>1682281194382</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1682281194382</updated>
+    </task>
+    <task id="LOCAL-00016" summary="basic functionality works">
+      <created>1682329326215</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1682329326215</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -340,14 +347,16 @@
     <MESSAGE value="include moe crate in source tree" />
     <MESSAGE value="custom auth page + dark mode" />
     <MESSAGE value="auth works + improve styles" />
-    <option name="LAST_COMMIT_MESSAGE" value="auth works + improve styles" />
+    <MESSAGE value="room member invites" />
+    <MESSAGE value="basic functionality works" />
+    <option name="LAST_COMMIT_MESSAGE" value="basic functionality works" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/src/routes/(auth)/auth/SignIn.svelte</url>
-          <line>29</line>
+          <line>30</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

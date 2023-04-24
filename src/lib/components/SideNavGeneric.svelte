@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
     import { onMount } from 'svelte';
     import {
         Navbar,
@@ -45,41 +45,44 @@
     const toggleDrawer = () => {
         drawerHidden = false;
     };
-
 </script>
 
 <svelte:window bind:innerWidth={width} />
 <Drawer
-    transitionType='fly'
+    transitionType="fly"
     {backdrop}
     {transitionParams}
     bind:hidden={drawerHidden}
     bind:activateClickOutside
-    width='w-64'
-    class='overflow-scroll w-64 pb-32 dark:bg-gray-900'
-    id='sidebar'
+    width="w-64"
+    class="overflow-scroll w-64 pb-32 dark:bg-gray-900"
+    id="sidebar"
 >
-    <div class='flex items-center'>
-        <CloseButton on:click={() => (drawerHidden = true)} class='mb-4 dark:text-white lg:hidden' />
+    <div class="flex items-center">
+        <CloseButton
+            on:click={() => (drawerHidden = true)}
+            class="mb-4 dark:text-white lg:hidden"
+        />
     </div>
-    <Sidebar asideClass='w-54'>
-        <SidebarWrapper divClass='overflow-y-auto py-4 px-3 rounded dark:bg-gray-900 flex flex-col gap-2'>
-            <SidebarGroup ulClass='flex justify-between px-4'>
-                <slot name='sidebar-header' />
+    <Sidebar asideClass="w-54">
+        <SidebarWrapper
+            divClass="overflow-y-auto py-4 px-3 rounded dark:bg-gray-900 flex flex-col gap-2"
+        >
+            <SidebarGroup ulClass="flex justify-between px-4">
+                <slot name="sidebar-header" />
             </SidebarGroup>
             <SidebarGroup>
-                <slot name='sidebar-content' />
+                <slot name="sidebar-content" />
             </SidebarGroup>
-            <slot name='sidebar-extras' />
+            <slot name="sidebar-extras" />
         </SidebarWrapper>
     </Sidebar>
 </Drawer>
 
-
-<main class='lg:ml-64 mx-auto'>
-    <Navbar navClass='h-12'>
-        <NavHamburger on:click={toggleDrawer} btnClass='ml-3 lg:hidden' />
-        <slot name='navbar' />
+<main class="lg:ml-64 mx-auto">
+    <Navbar navClass="h-12">
+        <NavHamburger on:click={toggleDrawer} btnClass="ml-3 lg:hidden" />
+        <slot name="navbar" />
     </Navbar>
     <slot />
 </main>

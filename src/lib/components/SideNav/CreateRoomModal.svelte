@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Button, Modal, Label, Input } from 'flowbite-svelte'
+    import { Button, Modal, Label, Input } from 'flowbite-svelte';
     import { createRoomModalState } from './store';
     import { createRoom } from '../../db/rooms';
     import { supabase } from '../../supabase';
@@ -7,10 +7,10 @@
 
     let name = '';
     let onCreateClick = async () => {
-        const { room } = await createRoom(supabase, name)
-        await goto(`/room/${room.id}`)
-        createRoomModalState.set(false)
-    }
+        const { room } = await createRoom(supabase, name);
+        await goto(`/room/${room.id}`);
+        createRoomModalState.set(false);
+    };
 </script>
 
 <Modal bind:open={$createRoomModalState} size="xs" class="w-full">
@@ -18,7 +18,12 @@
         <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Create a room</h3>
         <Label class="space-y-2">
             <span>Name</span>
-            <Input bind:value={name} name="name" placeholder="What do you want to call your room?" required />
+            <Input
+                bind:value={name}
+                name="name"
+                placeholder="What do you want to call your room?"
+                required
+            />
         </Label>
         <Button type="submit" class="w-full1">Create</Button>
     </form>

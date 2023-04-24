@@ -24,28 +24,28 @@ export async function getInboundSession(supabase: Supabase, authorId: string, ro
     //
     // const cached = sessionKeys[roomId][authorId]
     // if (cached) return cached
-    const key = await supabase.from('room_members')
+    const key = await supabase
+        .from('room_members')
         .select('*')
         .eq('member_id', authorId)
         .eq('room_id', roomId)
         .limit(1)
-        .single()
-
+        .single();
 
     if (key.error) {
         throw key.error;
     }
 
-    const sessionKey = key.data.session_key
+    const sessionKey = key.data.session_key;
     if (sessionKey === null) {
-        throw Error('attempted to get inbound session for a room without end-to-end encryption')
+        throw Error('attempted to get inbound session for a room without end-to-end encryption');
     }
     console.log(roomId, authorId, sessionKey);
 
-    let session =  new InboundSession(sessionKey)
+    let session = new InboundSession(sessionKey);
     return {
         authorId,
         roomId,
-        session//: sessionKeys[roomId][authorId]
-    }
+        session //: sessionKeys[roomId][authorId]
+    };
 }

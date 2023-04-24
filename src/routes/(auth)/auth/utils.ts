@@ -9,7 +9,12 @@ export function signin(supabase: Supabase, email: string, password: string) {
     return supabase.auth.signInWithPassword({ email, password });
 }
 
-export async function signup(supabase: Supabase, username: string, email: string, password: string) {
+export async function signup(
+    supabase: Supabase,
+    username: string,
+    email: string,
+    password: string
+) {
     const auth = await supabase.auth.signUp({ email, password });
     console.log(auth);
     if (auth.data.user === null) {
