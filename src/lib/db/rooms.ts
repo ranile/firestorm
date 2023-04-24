@@ -56,7 +56,7 @@ export async function createRoom(supabase: Supabase, name: string) {
     }
     localStorage.setItem(`${room.data.id}:pickle`, sess.pickle);
     const member = await supabase.from('room_members')
-        .insert({ room_id: room.data.id, member_id: session.user.id, session_key: sess.sessionKey, join_state: 'member' })
+        .insert({ room_id: room.data.id, member_id: session.user.id, session_key: sess.sessionKey, join_state: 'joined' })
         .select()
         .single();
 

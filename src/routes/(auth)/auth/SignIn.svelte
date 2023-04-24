@@ -14,7 +14,7 @@
 
     const signupView = (e: MouseEvent) => {
         e.preventDefault();
-        view.set('sign-in');
+        view.set('sign-up');
     };
 
 </script>

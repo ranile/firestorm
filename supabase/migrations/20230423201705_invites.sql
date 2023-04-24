@@ -1,16 +1,8 @@
 create type "public"."member_join_state" as enum ('invited', 'joined');
 
-alter table "public"."room_members" drop constraint "room_members_pkey";
-
-drop index if exists "public"."room_members_pkey";
-
 alter table "public"."room_members" add column "join_state" member_join_state not null default 'invited'::member_join_state;
 
 alter table "public"."room_members" add column "session_key" text;
-
-CREATE UNIQUE INDEX room_members_pkey ON public.room_members USING btree (room_id, member_id, join_state);
-
-alter table "public"."room_members" add constraint "room_members_pkey" PRIMARY KEY using index "room_members_pkey";
 
 create or replace view "public"."room_members_with_users" as  SELECT room_members.room_id,
     room_members.join_state,
@@ -47,6 +39,3 @@ as permissive
 for insert
 to authenticated
 with check (is_member_of(auth.uid(), room_id));
-
-
-

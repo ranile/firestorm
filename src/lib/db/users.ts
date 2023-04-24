@@ -21,8 +21,7 @@ export async function getUserProfileById(supabase: Supabase, userId: string) {
 
 export async function findUser(supabase: Supabase, query: string) {
     const user = await supabase.from('users_with_profiles').select('*')
-        .filter('email', 'eq', query)
-            // .or(`username=eq.user123,email=(eq.(${query}))`)
+        .or(`username.eq."${query}",email.eq."${query}"`)
         .single();
     if (user.error) {
         throw user.error;

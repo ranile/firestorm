@@ -26,7 +26,6 @@
             <SignIn supabase={data.supabase} />
         {:else if $view === 'sign-up'}
             <SignUp supabase={data.supabase} />
-
         {/if}
     </div>
 </div>
