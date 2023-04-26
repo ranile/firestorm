@@ -6,7 +6,6 @@ import type { UnionFromValues } from '../utils';
 import { writable } from 'svelte/store';
 import { getSession } from '../supabase';
 import { OutboundSession } from 'moe';
-import { browser } from '$app/environment';
 
 export async function getRooms(supabase: Supabase) {
     const rooms = await supabase.from('rooms').select('*');
@@ -140,7 +139,6 @@ export async function joinRoom(supabase: Supabase, roomId: string) {
         .match({ room_id: roomId, member_id: session.user.id })
         .select()
         .single();
-    console.log('member', member, sess.sessionKey);
     localStorage.setItem(`${roomId}:pickle`, sess.pickle);
 
     return member.data;

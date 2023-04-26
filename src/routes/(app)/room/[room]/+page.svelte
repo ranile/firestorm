@@ -7,7 +7,6 @@
     import { onMount } from 'svelte';
     import { joinRoom } from '$lib/db/rooms';
     import { OutboundSession } from 'moe';
-    import { currentRoom } from '$lib/utils';
     import { browser } from '$app/environment';
 
     export let data: PageData;
@@ -22,7 +21,6 @@
     }
 
     $: {
-        currentRoom.set(data.room);
         invited = data.invited;
     }
 
@@ -51,7 +49,7 @@
         const roomId = data.room.id;
         const content = outbound.encrypt(value);
         const uid = data.session?.user.id;
-        if (uid !== undefined) {
+        if (uid === undefined) {
             throw Error('User not logged in');
         }
         createMessage(data.supabase, roomId, uid!, content).then(() => (value = ''));

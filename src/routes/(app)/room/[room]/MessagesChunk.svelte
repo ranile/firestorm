@@ -15,13 +15,8 @@
         });
     });
     const decrypt = async (content: string) => {
-        const {
-            roomId: rid,
-            authorId,
-            session: sess
-        } = await getInboundSession(supabase, chunk.authorId, roomId);
-        console.log(rid, authorId);
-        return sess.decrypt(content);
+        const sess = await getInboundSession(supabase, chunk.authorId, roomId);
+        return sess.session.decrypt(content);
     };
 </script>
 

@@ -20,7 +20,7 @@
     let width = 0;
     let backdrop = false;
     let activateClickOutside = true;
-    export let drawerHidden = false;
+    let drawerHidden = false;
     $: if (width >= breakPoint) {
         drawerHidden = false;
         activateClickOutside = false;
@@ -37,11 +37,6 @@
             activateClickOutside = true;
         }
     });
-    export const toggleSide = () => {
-        if (width < breakPoint) {
-            drawerHidden = !drawerHidden;
-        }
-    };
     const toggleDrawer = () => {
         drawerHidden = false;
     };
@@ -68,7 +63,7 @@
         <SidebarWrapper
             divClass="overflow-y-auto py-4 px-3 rounded dark:bg-gray-900 flex flex-col gap-2"
         >
-            <SidebarGroup ulClass="flex justify-between px-4">
+            <SidebarGroup ulClass="flex justify-between px-2">
                 <slot name="sidebar-header" />
             </SidebarGroup>
             <SidebarGroup>
@@ -80,10 +75,10 @@
 </Drawer>
 
 <main class="lg:ml-64 mx-auto">
-    <Navbar navClass="h-12">
+    <nav class="bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-100 dark:border-gray-700 h-12">
         <NavHamburger on:click={toggleDrawer} btnClass="ml-3 lg:hidden" />
         <slot name="navbar" />
-    </Navbar>
+    </nav>
     <slot />
 </main>
 

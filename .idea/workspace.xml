@@ -7,18 +7,12 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cbfef0df-9027-4fa8-b504-5f8b6c584124" name="Changes" comment="basic functionality works">
-      <change beforePath="$PROJECT_DIR$/.eslintrc.cjs" beforeDir="false" afterPath="$PROJECT_DIR$/.eslintrc.cjs" afterDir="false" />
+    <list default="true" id="cbfef0df-9027-4fa8-b504-5f8b6c584124" name="Changes" comment="check + lint">
+      <change beforePath="$PROJECT_DIR$/.idea/firestorm.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/firestorm.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/db/rooms.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/db/rooms.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/db/users.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/db/users.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/utils.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(app)/+layout.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/+layout.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(app)/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/+page.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(auth)/auth/SignIn.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(auth)/auth/SignIn.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(auth)/auth/SignUp.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(auth)/auth/SignUp.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings/+page.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/svelte.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/svelte.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,6 +48,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
@@ -213,7 +208,8 @@
       <workItem from="1682110917032" duration="4357000" />
       <workItem from="1682165270026" duration="555000" />
       <workItem from="1682168824385" duration="9619000" />
-      <workItem from="1682246883841" duration="19512000" />
+      <workItem from="1682246883841" duration="22065000" />
+      <workItem from="1682522656201" duration="31000" />
     </task>
     <task id="LOCAL-00001" summary="rooms">
       <created>1681669947945</created>
@@ -327,7 +323,14 @@
       <option name="project" value="LOCAL" />
       <updated>1682329326215</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="check + lint">
+      <created>1682331415588</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1682331415588</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -349,14 +352,15 @@
     <MESSAGE value="auth works + improve styles" />
     <MESSAGE value="room member invites" />
     <MESSAGE value="basic functionality works" />
-    <option name="LAST_COMMIT_MESSAGE" value="basic functionality works" />
+    <MESSAGE value="check + lint" />
+    <option name="LAST_COMMIT_MESSAGE" value="check + lint" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/src/routes/(auth)/auth/SignIn.svelte</url>
-          <line>30</line>
+          <line>28</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

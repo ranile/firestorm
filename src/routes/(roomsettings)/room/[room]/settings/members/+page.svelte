@@ -1,9 +1,9 @@
 <script lang="ts">
-    import type { PageData } from './$types';
+    import type { PageData } from '../../../../../../../.svelte-kit/types/src/routes';
     import { Avatar, Button, Input, Label, Modal } from 'flowbite-svelte';
     import Plus from 'svelte-material-icons/AccountPlus.svelte';
-    import { inviteMember } from '../../../../../lib/db/rooms';
-    import { findUser } from '../../../../../lib/db/users';
+    import { inviteMember } from '../../../../../../lib/db/rooms';
+    import { findUser } from '../../../../../../lib/db/users';
 
     export let data: PageData;
 

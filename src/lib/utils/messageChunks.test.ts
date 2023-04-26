@@ -143,7 +143,6 @@ describe('groupMessagesByAuthor', () => {
         ];
 
         const result = groupMessagesByAuthor(chunks);
-        console.log(result);
         expect(result).toEqual(expected);
     });
 

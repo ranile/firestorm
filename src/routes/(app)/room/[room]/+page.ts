@@ -1,22 +1,24 @@
 import type { PageLoad } from './$types';
-import { getRoomById, getRoomMemberForRoom } from '$lib/db/rooms';
 import { error } from '@sveltejs/kit';
 
-// TODO: consider not re-fetching data here
-export const load = (async ({ params, parent }) => {
+export const load = (async ({ parent }) => {
     const data = await parent();
-    const room = await getRoomById(data.supabase, params.room);
-    if (room === null) {
-        console.log(room);
-        throw error(404, 'Not found');
+    const joined = data.joined.find((room) => room.id === data.currentRoomId)
+    if (joined) {
+        return {
+            room: joined,
+            invited: false
+        }
     }
-    const member = await getRoomMemberForRoom(
-        data.supabase,
-        room.id,
-        data.session?.user.id ?? 'always authenticated'
-    );
-    return {
-        room,
-        invited: member.join_state === 'invited'
-    };
+
+    const invited = data.invited.find((room) => room.id === data.currentRoomId)
+    if (invited) {
+        return {
+            room: invited,
+            invited: true
+        }
+    }
+
+    throw error(404, 'Room not found');
+
 }) satisfies PageLoad;
