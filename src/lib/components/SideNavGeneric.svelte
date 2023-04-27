@@ -75,7 +75,9 @@
 </Drawer>
 
 <main class="lg:ml-64 mx-auto">
-    <nav class="bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-100 dark:border-gray-700 h-12">
+    <nav
+        class="bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-100 dark:border-gray-700 h-12"
+    >
         <NavHamburger on:click={toggleDrawer} btnClass="ml-3 lg:hidden" />
         <slot name="navbar" />
     </nav>

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Button, Input, Label } from 'flowbite-svelte';
     import { signup, view } from './utils';
-    import type { Supabase } from '../../../lib/supabase';
+    import type { Supabase } from '$lib/supabase';
 
     export let supabase: Supabase;
     const onSubmit = async (e: SubmitEvent) => {

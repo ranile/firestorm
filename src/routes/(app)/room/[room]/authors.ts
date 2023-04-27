@@ -1,6 +1,6 @@
-import type { Profile } from '../../../../lib/db/users';
-import { getUserProfileById } from '../../../../lib/db/users';
-import type { Supabase } from '../../../../lib/supabase';
+import type { Profile } from '$lib/db/users';
+import { getUserProfileById } from '$lib/db/users';
+import type { Supabase } from '$lib/supabase';
 import { InboundSession } from 'moe';
 
 const authors: { [key: string]: Profile } = {};

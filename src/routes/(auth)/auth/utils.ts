@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import type { Supabase } from '../../../lib/supabase';
+import type { Supabase } from '$lib/supabase';
 
 export type View = 'sign-in' | 'sign-up' | 'forgot-password';
 

@@ -1,15 +1,34 @@
 import type { Supabase } from '../supabase';
-import type { RealtimePostgresChangesPayload, Session } from '@supabase/supabase-js';
+import { getSession } from '../supabase';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { REALTIME_LISTEN_TYPES } from '@supabase/realtime-js/src/RealtimeChannel';
 import type { Database } from '../../database';
 import type { UnionFromValues } from '../utils';
 import { writable } from 'svelte/store';
-import { getSession } from '../supabase';
 import { OutboundSession } from 'moe';
 
-export async function getRooms(supabase: Supabase) {
-    const rooms = await supabase.from('rooms').select('*');
-    return rooms.data ?? [];
+export async function getRoomsWithMember(supabase: Supabase, memberId: string) {
+    const rooms = await supabase
+        .from('rooms')
+        .select(`*, room_members(joined_at, join_state)`)
+        .eq('room_members.member_id', memberId);
+
+    if (rooms.error) {
+        throw rooms.error;
+    }
+
+    return rooms.data.map((room) => {
+        if (room.room_members === null) {
+            throw new Error('there must be at least one room member');
+        }
+        const member = Array.isArray(room.room_members) ? room.room_members[0] : room.room_members;
+        return {
+            ...room,
+            membership: {
+                ...member
+            }
+        };
+    });
 }
 
 export function initRoomEncryption() {
@@ -145,4 +164,9 @@ export async function joinRoom(supabase: Supabase, roomId: string) {
 }
 
 export type Room = Database['public']['Tables']['rooms']['Row'];
-export const rooms = writable<Room[]>([]);
+interface Membership {
+    joined_at: string;
+    join_state: 'joined' | 'invited';
+}
+
+export const rooms = writable<(Room & { membership: Membership })[]>([]);

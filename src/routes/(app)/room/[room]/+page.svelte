@@ -8,26 +8,24 @@
     import { joinRoom } from '$lib/db/rooms';
     import { OutboundSession } from 'moe';
     import { browser } from '$app/environment';
+    import { rooms } from '$lib/db/rooms';
 
     export let data: PageData;
     let value = '';
     let messages: Message[] = [];
-    let invited = false;
+    $: room = $rooms.find((room) => room.id === data.currentRoomId)!; // this is checked in +layout.ts and will never be undefined
+    $: invited = room?.membership.join_state === 'invited';
 
     $: {
-        getMessages(data.supabase, data.room.id).then((m) => {
+        getMessages(data.supabase, room.id).then((m) => {
             messages = m;
         });
-    }
-
-    $: {
-        invited = data.invited;
     }
 
     let outbound: OutboundSession | undefined;
 
     onMount(() => {
-        subscribeToRoomMessages(data.supabase, data.room.id, (payload) => {
+        subscribeToRoomMessages(data.supabase, room.id, (payload) => {
             if (payload.eventType === 'INSERT') {
                 messages = [...messages, payload.new as Message];
             }
@@ -37,7 +35,7 @@
     $: if (browser) {
         const PICKLE_KEY = new Uint8Array(32).map(() => 1);
 
-        const pickle = localStorage.getItem(`${data.room.id}:pickle`);
+        const pickle = localStorage.getItem(`${room.id}:pickle`);
         outbound = pickle ? OutboundSession.from_pickle(pickle, PICKLE_KEY) : undefined;
     }
 
@@ -46,7 +44,7 @@
         if (outbound === undefined) {
             throw Error('Outbound session not initialized');
         }
-        const roomId = data.room.id;
+        const roomId = room.id;
         const content = outbound.encrypt(value);
         const uid = data.session?.user.id;
         if (uid === undefined) {
@@ -56,14 +54,14 @@
     };
     const onJoinRoomClick = async () => {
         console.log('Joining room');
-        await joinRoom(data.supabase, data.room.id);
+        await joinRoom(data.supabase, room.id);
         invited = false;
     };
 </script>
 
 <div class="grid h-full grid-cols-1">
     <div class="row-start-auto overflow-y-auto text-white">
-        <MessageList {messages} roomId={data.room.id} />
+        <MessageList {messages} roomId={room.id} />
     </div>
     <div class="self-end mb-4 p-2 flex gap-2">
         {#if invited}
