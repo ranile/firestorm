@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Button, SidebarItem } from 'flowbite-svelte';
+    import SidebarItem from '../../../../../lib/components/SideNav/SidebarItem.svelte';
     import AccountGroup from 'svelte-material-icons/AccountGroup.svelte';
     import Back from 'svelte-material-icons/ArrowLeft.svelte';
     import SideNav from '$lib/components/SideNavGeneric.svelte';
@@ -35,8 +35,7 @@
     </svelte:fragment>
 
     <svelte:fragment slot="sidebar-content">
-        <!-- TODO: figure out why active isn't reactive-->
-        <SidebarItem label="Overview" active={false} href={toNavigateBase + 'overview'}>
+        <SidebarItem label="Overview" active={$page.url.pathname.includes('overview')} href={toNavigateBase + 'overview'}>
             <svelte:fragment slot="icon">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -52,10 +51,9 @@
             </svelte:fragment>
         </SidebarItem>
 
-        <SidebarItem label="Members" active={false} href={toNavigateBase + 'members'}>
+        <SidebarItem label="Members" active={$page.url.pathname.includes('members')} href={toNavigateBase + 'members'}>
             <AccountGroup slot="icon" size="1.5em" />
         </SidebarItem>
     </svelte:fragment>
-
     <slot />
 </SideNav>

@@ -7,15 +7,10 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cbfef0df-9027-4fa8-b504-5f8b6c584124" name="Changes" comment="refactor + optimizations">
-      <change beforePath="$PROJECT_DIR$/.idea/firestorm.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/firestorm.iml" afterDir="false" />
+    <list default="true" id="cbfef0df-9027-4fa8-b504-5f8b6c584124" name="Changes" comment="more cleanup">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/db/rooms.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/db/rooms.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(app)/+layout.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/+layout.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(app)/+layout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/+layout.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(app)/room/[room]/+page.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings/members/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings/members/+page.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings/+layout.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings/+layout.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings/overview/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(roomsettings)/room/[room]/settings/overview/+page.svelte" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -214,7 +209,7 @@
       <workItem from="1682246883841" duration="22065000" />
       <workItem from="1682522656201" duration="31000" />
       <workItem from="1682533931113" duration="8625000" />
-      <workItem from="1682606218571" duration="2062000" />
+      <workItem from="1682606218571" duration="3867000" />
     </task>
     <task id="LOCAL-00001" summary="rooms">
       <created>1681669947945</created>
@@ -342,7 +337,14 @@
       <option name="project" value="LOCAL" />
       <updated>1682541772728</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="more cleanup">
+      <created>1682608463322</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1682608463322</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -366,7 +368,8 @@
     <MESSAGE value="basic functionality works" />
     <MESSAGE value="check + lint" />
     <MESSAGE value="refactor + optimizations" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor + optimizations" />
+    <MESSAGE value="more cleanup" />
+    <option name="LAST_COMMIT_MESSAGE" value="more cleanup" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

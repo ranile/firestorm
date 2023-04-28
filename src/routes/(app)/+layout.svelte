@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { SidebarItem, Button, SidebarGroup } from 'flowbite-svelte';
+    import { Button } from 'flowbite-svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import ProfileDropdown from '$lib/components/ProfileDropdown.svelte';
     import { onMount } from 'svelte';
@@ -11,6 +11,7 @@
     import type { LayoutData } from './$types';
     import { goto, invalidate } from '$app/navigation';
     import CreateRoomModal from '$lib/components/SideNav/CreateRoomModal.svelte';
+    import SidebarItem from '$lib/components/SideNav/SidebarItem.svelte';
     import type { RealtimeChannel } from '@supabase/supabase-js';
 
     export let data: LayoutData;
@@ -74,18 +75,17 @@
 
     <svelte:fragment slot="sidebar-extras">
         {#if invited.length !== 0}
-            <SidebarGroup border>
-                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Invites</h3>
+            <hr />
+            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Invites</h3>
 
-                {#each invited as room (room.id)}
-                    <SidebarItem
-                        label={room.name}
-                        href={`/room/${room.id}`}
-                        spanClass="pl-2 self-center text-md text-gray-900 whitespace-nowrap dark:text-white"
-                        active={activeUrl === `/room/${room.id}`}
-                    />
-                {/each}
-            </SidebarGroup>
+            {#each invited as room (room.id)}
+                <SidebarItem
+                    label={room.name}
+                    href={`/room/${room.id}`}
+                    spanClass="pl-2 self-center text-md text-gray-900 whitespace-nowrap dark:text-white"
+                    active={activeUrl === `/room/${room.id}`}
+                />
+            {/each}
         {/if}
     </svelte:fragment>
     <slot />
