@@ -35,7 +35,11 @@
     </svelte:fragment>
 
     <svelte:fragment slot="sidebar-content">
-        <SidebarItem label="Overview" active={$page.url.pathname.includes('overview')} href={toNavigateBase + 'overview'}>
+        <SidebarItem
+            label="Overview"
+            active={$page.url.pathname.includes('overview')}
+            href={toNavigateBase + 'overview'}
+        >
             <svelte:fragment slot="icon">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +55,11 @@
             </svelte:fragment>
         </SidebarItem>
 
-        <SidebarItem label="Members" active={$page.url.pathname.includes('members')} href={toNavigateBase + 'members'}>
+        <SidebarItem
+            label="Members"
+            active={$page.url.pathname.includes('members')}
+            href={toNavigateBase + 'members'}
+        >
             <AccountGroup slot="icon" size="1.5em" />
         </SidebarItem>
     </svelte:fragment>

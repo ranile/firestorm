@@ -67,7 +67,6 @@
             <SidebarItem
                 label={room.name}
                 href={`/room/${room.id}`}
-                spanClass="pl-2 self-center text-md text-gray-900 whitespace-nowrap dark:text-white"
                 active={activeUrl === `/room/${room.id}`}
             />
         {/each}
@@ -82,7 +81,6 @@
                 <SidebarItem
                     label={room.name}
                     href={`/room/${room.id}`}
-                    spanClass="pl-2 self-center text-md text-gray-900 whitespace-nowrap dark:text-white"
                     active={activeUrl === `/room/${room.id}`}
                 />
             {/each}
