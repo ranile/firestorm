@@ -5,10 +5,20 @@ import type { Database } from '../database';
 import { setSupabase } from '$lib/supabase';
 import { getUserProfile, profile } from '$lib/db/users';
 import { browser } from '$app/environment';
+import { goto } from '$app/navigation';
+import { redirect } from '@sveltejs/kit';
 
 const { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } = env
 
-export const load: LayoutLoad = async ({ fetch, data, depends }) => {
+async function navigate(where: string) {
+    if (browser) {
+        await goto(where);
+    } else {
+        throw redirect(307, where);
+    }
+}
+
+export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
     depends('supabase:auth');
 
     const supabase = createSupabaseLoadClient<Database>({
@@ -24,7 +34,15 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
     if (session !== null) {
         const fetched = await getUserProfile(supabase, session);
+        const where = fetched.username === null ? '/auth/onboarding' : '/'
         profile.set({ ...fetched, email: data.session?.user.email ?? '' });
+        if (url.pathname.startsWith('/auth') && url.pathname !== where) {
+            await navigate(where)
+        }
+    } else {
+        if (url.pathname !== '/auth') {
+            await navigate('/auth');
+        }
     }
 
     setSupabase(supabase);
