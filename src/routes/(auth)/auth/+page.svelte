@@ -1,7 +1,6 @@
 <script lang="ts">
     import type { PageData } from './$types';
     import { browser } from '$app/environment';
-    import { Button, Checkbox, Label, Input } from 'flowbite-svelte';
     import { goto } from '$app/navigation';
     import SignIn from './SignIn.svelte';
     import SignUp from './SignUp.svelte';
@@ -13,7 +12,7 @@
         // IMPORTANT: detect login was successful
         // supabase sveltekit auth ui does not work otherwise
         const hasSession = data?.session;
-        if (hasSession) {
+        if (hasSession && browser) {
             goto('/');
         }
     }

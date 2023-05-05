@@ -5,7 +5,7 @@
     "scripts": {
         "dev": "PUBLIC_SUPABASE_URL=http://localhost:54321 PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0 vite dev",
         "wasm:build": "cd crates/moe && wasm-pack build --target bundler",
-        "wasm:link": "cd pkg && npm link && cd ../../.. && npm link moe",
+        "wasm:link": "cd crates/moe/pkg && npm link && cd ../../.. && npm link moe",
         "wasm": "npm run wasm:build && npm run wasm:link",
         "build": "vite build",
         "preview": "vite preview",
@@ -23,6 +23,7 @@
         "@sveltejs/kit": "^1.5.0",
         "@typescript-eslint/eslint-plugin": "^5.45.0",
         "@typescript-eslint/parser": "^5.45.0",
+        "@vitejs/plugin-basic-ssl": "^1.0.1",
         "autoprefixer": "^10.4.14",
         "eslint": "^8.28.0",
         "eslint-config-prettier": "^8.5.0",

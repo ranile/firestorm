@@ -7,7 +7,7 @@
 
     let name = '';
     let onCreateClick = async () => {
-        const { room } = await createRoom(supabase, name);
+        const { room } = await createRoom(name);
         await goto(`/room/${room.id}`);
         createRoomModalState.set(false);
     };

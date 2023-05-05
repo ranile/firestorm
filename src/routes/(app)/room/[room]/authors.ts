@@ -40,7 +40,6 @@ export async function getInboundSession(supabase: Supabase, authorId: string, ro
     if (sessionKey === null) {
         throw Error('attempted to get inbound session for a room without end-to-end encryption');
     }
-    console.log(roomId, authorId, sessionKey);
 
     let session = new InboundSession(sessionKey);
     return {

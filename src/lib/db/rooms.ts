@@ -1,10 +1,10 @@
 import type { Supabase } from '../supabase';
-import { getSession } from '../supabase';
+import { getSession, supabase } from '../supabase';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { REALTIME_LISTEN_TYPES } from '@supabase/realtime-js/src/RealtimeChannel';
 import type { Database } from '../../database';
 import type { UnionFromValues } from '../utils';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { OutboundSession } from 'moe';
 
 export async function getRoomsWithMember(supabase: Supabase, memberId: string) {
@@ -63,9 +63,9 @@ export async function getRoomMembers(supabase: Supabase, roomId: string) {
     return members.data;
 }
 
-export async function createRoom(supabase: Supabase, name: string) {
+export async function createRoom(name: string) {
     const session = await getSession();
-    const room = await supabase
+    const room = await get(supabase)!
         .from('rooms')
         .insert({ name, created_by: session.user.id })
         .select()
@@ -79,7 +79,7 @@ export async function createRoom(supabase: Supabase, name: string) {
         throw Error('executed on server environment');
     }
     localStorage.setItem(`${room.data.id}:pickle`, sess.pickle);
-    const member = await supabase
+    const member = await get(supabase)!
         .from('room_members')
         .insert({
             room_id: room.data.id,

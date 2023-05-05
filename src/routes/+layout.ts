@@ -4,6 +4,7 @@ import type { LayoutLoad } from './$types';
 import type { Database } from '../database';
 import { setSupabase } from '$lib/supabase';
 import { getUserProfile, profile } from '$lib/db/users';
+import { browser } from '$app/environment';
 
 const { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } = env
 
@@ -27,5 +28,15 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
     }
 
     setSupabase(supabase);
+    if (browser && session) {
+        const sw = await navigator.serviceWorker.ready
+        sw.active?.postMessage({
+            op: 'init',
+            supabaseUrl: PUBLIC_SUPABASE_URL,
+            supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+            accessToken: session.access_token,
+            refreshToken: session.refresh_token
+        })
+    }
     return { supabase, session };
 };

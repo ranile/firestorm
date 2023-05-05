@@ -1,13 +1,15 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '../database';
+import { get, writable } from 'svelte/store';
 
-export let supabase: Supabase;
+export const supabase = writable<Supabase | null>(null);
 
 export function setSupabase(supa: Supabase) {
-    supabase = supa;
+    supabase.set(supa);
 }
 
-export async function getSession(supa = supabase) {
+export async function getSession(supa = get(supabase)) {
+    if (supa === null) { throw new Error('Supabase not initialized'); }
     const {
         data: { session }
     } = await supa.auth.getSession();

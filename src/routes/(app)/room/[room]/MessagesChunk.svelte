@@ -10,12 +10,12 @@
     const timestamp = new Date(chunk.messages[0].created_at);
     let author: Profile;
     onMount(() => {
-        getAuthor(supabase, chunk.authorId).then((a) => {
+        getAuthor($supabase!, chunk.authorId).then((a) => {
             author = a;
         });
     });
     const decrypt = async (content: string) => {
-        const sess = await getInboundSession(supabase, chunk.authorId, roomId);
+        const sess = await getInboundSession($supabase!, chunk.authorId, roomId);
         return sess.session.decrypt(content);
     };
 </script>

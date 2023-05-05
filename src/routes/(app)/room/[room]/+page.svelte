@@ -25,11 +25,15 @@
     let outbound: OutboundSession | undefined;
 
     onMount(() => {
-        subscribeToRoomMessages(data.supabase, room.id, (payload) => {
+        const channel = new BroadcastChannel('sw-messages');
+        channel.addEventListener?.('message', (event) => {
+            const payload = event.data
             if (payload.eventType === 'INSERT') {
                 messages = [...messages, payload.new as Message];
             }
-        });
+        })
+
+        return () => channel.close()
     });
 
     $: if (browser) {
