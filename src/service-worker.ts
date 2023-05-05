@@ -18,9 +18,27 @@ sw.addEventListener('message', async (event: ExtendableMessageEvent) => {
     await main(supabase);
 });
 
+async function checkClientIsVisible() {
+    const windowClients = await sw.clients.matchAll();
+
+    for (const windowClient of windowClients) {
+        if ((windowClient as WindowClient).visibilityState === "visible") { return true }
+    }
+
+    return false;
+}
+
+sw.addEventListener('push', (event) => {
+    console.log('rooms');
+})
+
+
 const channel = new BroadcastChannel('sw-messages');
 async function main(supabase: Supabase) {
     await subscribeToRoomMessages(supabase, 'all_rooms', (event) => {
+        if (!checkClientIsVisible()) {
+            sw.registration.showNotification('New message')
+        }
         channel.postMessage(event)
     });
 }

@@ -44,7 +44,7 @@
 {#if !drawerHidden}
     <div
         use:clickOutside={() => !isLarge && !drawerHidden && toggleDrawer()}
-        class="overflow-y-auto z-50 p-4 bg-white dark:bg-gray-800 w-64 fixed inset-y-0 left-0 overflow-scroll w-64 pb-32 dark:bg-gray-900"
+        class="overflow-x-hidden overflow-y-auto z-50 p-4 bg-white dark:bg-gray-800 w-64 fixed inset-y-0 left-0 overflow-scroll w-64 pb-32 dark:bg-gray-900"
         transition:slide={transitionParams}
         tabindex="-1"
         {id}
