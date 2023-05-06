@@ -47,7 +47,7 @@
 </script>
 
 <div class='flex w-full md:h-full'>
-    <div class='rounded-lg shadow mx-auto md:my-auto min-w-[32rem] md:border md:dark:border-gray-700 space-y-4 md:space-y-6 p-8'>
+    <div class='rounded-lg shadow mx-auto md:my-auto min-w-auth-card md:border md:dark:border-gray-700 space-y-4 md:space-y-6 p-8'>
         <Auth supabaseClient={data.supabase} appearance={{ theme }} theme='dark' magicLink={true} redirectTo='/auth/onboarding' />
     </div>
 </div>

@@ -5,7 +5,11 @@ export default {
         './node_modules/flowbite-svelte/**/*.{html,js,svelte,ts}'
     ],
     theme: {
-        extend: {}
+        extend: {
+            minWidth: {
+                'auth-card': '32rem'
+            }
+        }
     },
     plugins: [require('flowbite/plugin')],
     darkMode: 'class'
