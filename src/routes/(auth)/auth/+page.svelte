@@ -26,10 +26,10 @@
                 buttonPadding: tailwindTheme.spacing['2'],
             },
             fontSizes: {
-                baseBodySize: tailwindTheme.fontSize.sm,
-                baseInputSize: tailwindTheme.fontSize.sm,
-                baseLabelSize: tailwindTheme.fontSize.sm,
-                baseButtonSize: tailwindTheme.fontSize.sm,
+                baseBodySize: tailwindTheme.fontSize.sm[0],
+                baseInputSize: tailwindTheme.fontSize.sm[0],
+                baseLabelSize: tailwindTheme.fontSize.sm[0],
+                baseButtonSize: tailwindTheme.fontSize.sm[0],
             },
             borderWidths: {
                 buttonBorderWidth: tailwindTheme.borderWidth.DEFAULT,

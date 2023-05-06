@@ -1,7 +1,7 @@
 <script lang='ts'>
-    import { Button, Fileupload, Label, Input, Avatar, Helper } from 'flowbite-svelte';
+    import { Button, Input, Avatar, Helper } from 'flowbite-svelte';
     import PlusCircle from 'svelte-material-icons/PlusCircle.svelte';
-    import type { PageData } from '$lib/types';
+    import type { PageData } from './$types';
     import { goto } from '$app/navigation';
 
     export let data: PageData;
@@ -19,7 +19,7 @@
             inputErrorMessage = 'Username is required';
             return;
         }
-        const userId = data.session.user.id;
+        const userId = data.session!.user.id;
         let avatarUrl: string | null = null;
         if (files !== undefined && files.length !== 0) {
             const avatarFile = files.item(0)!;
@@ -32,15 +32,10 @@
                 console.error(upload.error);
                 errorMessage = upload.error.message;
             }
-            console.log(upload.data);
             const path = data.supabase
                 .storage
                 .from('avatars')
-                .getPublicUrl(upload.data.path)
-            if (path.error) {
-                console.error(path.error);
-                errorMessage = path.error.message;
-            }
+                .getPublicUrl(upload.data!.path)
             avatarUrl = path.data.publicUrl
         }
         await data.supabase.from('profiles').update({ username, avatar: avatarUrl }).eq('id', userId);
@@ -80,7 +75,3 @@
     </main>
 
 </div>
-
-
-<!--<Label class="pb-2">Upload file</Label>-->
-<!--<Fileupload bind:files={files} />-->
