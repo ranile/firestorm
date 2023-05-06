@@ -11,13 +11,12 @@ export const load = (async ({ params, parent, depends }) => {
     const roomsWithMember = await getRoomsWithMember(supabase, session.user.id);
     rooms.set(roomsWithMember);
     if (params.room === undefined) {
-        return
+        return;
     }
     const currentRoom = roomsWithMember.find((room) => room.id === params.room);
     if (currentRoom === undefined) {
         throw error(404, 'room not found');
     }
-
 
     return {
         currentRoomId: params.room

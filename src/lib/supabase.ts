@@ -9,11 +9,13 @@ export function setSupabase(supa: Supabase) {
 }
 
 export async function getSession(supa = get(supabase)) {
-    if (supa === null) { throw new Error('Supabase not initialized'); }
+    if (supa === null) {
+        throw new Error('Supabase not initialized');
+    }
     const {
         data: { session }
     } = await supa.auth.getSession();
     if (session === null) throw new Error('No session found');
     return session;
 }
-export type Supabase = SupabaseClient<Database, 'public'>;
+export type Supabase = SupabaseClient<Database, 'public', Database['public']>;

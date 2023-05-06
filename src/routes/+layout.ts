@@ -8,7 +8,7 @@ import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { redirect } from '@sveltejs/kit';
 
-const { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } = env
+const { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } = env;
 
 async function navigate(where: string) {
     if (browser) {
@@ -34,10 +34,10 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
 
     if (session !== null) {
         const fetched = await getUserProfile(supabase, session);
-        const where = fetched.username === null ? '/auth/onboarding' : '/'
+        const where = fetched.username === null ? '/auth/onboarding' : '/';
         profile.set({ ...fetched, email: data.session?.user.email ?? '' });
         if (url.pathname.startsWith('/auth') && url.pathname !== where) {
-            await navigate(where)
+            await navigate(where);
         }
     } else {
         if (url.pathname !== '/auth') {
@@ -47,14 +47,14 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
 
     setSupabase(supabase);
     if (browser && session) {
-        const sw = await navigator.serviceWorker.ready
+        const sw = await navigator.serviceWorker.ready;
         sw.active?.postMessage({
             op: 'init',
             supabaseUrl: PUBLIC_SUPABASE_URL,
             supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
             accessToken: session.access_token,
             refreshToken: session.refresh_token
-        })
+        });
     }
     return { supabase, session };
 };

@@ -11,6 +11,12 @@ jobs:
         with:
           node-version: 16
       - run: npm install
+
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+      - run: npm run wasm
+
       - run: npm run check
       - run: npm run lint
 
