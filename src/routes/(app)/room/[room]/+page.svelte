@@ -1,26 +1,19 @@
 <script lang="ts">
     import type { PageData } from './$types';
     import { Button, Textarea, ToolbarButton } from 'flowbite-svelte';
-    import { createMessage, subscribeToRoomMessages, getMessages } from '$lib/db/messages';
+    import { createMessage } from '$lib/db/messages';
     import MessageList from './MessageList.svelte';
     import type { Message } from '$lib/db/messages';
     import { onMount } from 'svelte';
     import { joinRoom } from '$lib/db/rooms';
     import { OutboundSession } from 'moe';
     import { browser } from '$app/environment';
-    import { rooms } from '$lib/db/rooms';
 
     export let data: PageData;
     let value = '';
-    let messages: Message[] = [];
-    $: room = $rooms.find((room) => room.id === data.currentRoomId)!; // this is checked in +layout.ts and will never be undefined
-    $: invited = room?.membership.join_state === 'invited';
-
-    $: {
-        getMessages(data.supabase, room.id).then((m) => {
-            messages = m;
-        });
-    }
+    let messages: Message[] = data.messages;
+    $: room = data.room;
+    let invited = room?.membership.join_state === 'invited';
 
     let outbound: OutboundSession | undefined;
 
@@ -29,7 +22,10 @@
         channel.addEventListener?.('message', (event) => {
             const payload = event.data;
             if (payload.eventType === 'INSERT') {
-                messages = [...messages, payload.new as Message];
+                console.info('received new message event', payload);
+                const newMessage = payload.new as Message;
+                // todo decrypt new message's ciphertext
+                messages = [...messages, newMessage];
             }
         });
 
@@ -65,7 +61,7 @@
 
 <div class="grid h-full grid-cols-1">
     <div class="row-start-auto overflow-y-auto text-white">
-        <MessageList {messages} roomId={room.id} />
+        <MessageList {messages} />
     </div>
     <div class="self-end mb-4 p-2 flex gap-2">
         {#if invited}

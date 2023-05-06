@@ -11,10 +11,13 @@ const sw = self as unknown as ServiceWorkerGlobalScope;
 
 sw.addEventListener('message', async (event: ExtendableMessageEvent) => {
     const supabase = createClient(event.data.supabaseUrl, event.data.supabaseKey);
-    await supabase.auth.setSession({
+    const sess = await supabase.auth.setSession({
         access_token: event.data.accessToken,
         refresh_token: event.data.refreshToken
     });
+
+    console.log('session expires in', sess.data.session.expires_in);
+
     await main(supabase);
 });
 
@@ -40,6 +43,7 @@ async function main(supabase: Supabase) {
         if (!checkClientIsVisible()) {
             sw.registration.showNotification('New message');
         }
+        console.info('received new message; sending event', event);
         channel.postMessage(event);
     });
 }

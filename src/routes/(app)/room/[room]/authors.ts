@@ -48,3 +48,12 @@ export async function getInboundSession(supabase: Supabase, authorId: string, ro
         session //: sessionKeys[roomId][authorId]
     };
 }
+
+/*
+
+    $: decrypt = async (content: string, authorId: string, roomId: string) => {
+        const sess = await getInboundSession(data.supabase, authorId, room.id);
+        return sess.session.decrypt(content);
+    };
+
+*/
