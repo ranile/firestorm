@@ -12,6 +12,7 @@ export async function get(supabase: Supabase, id: string): Promise<Profile> {
     const cached = authors[id];
     if (cached) return cached;
 
+    console.info('cache miss for author; fetching from supabase', id);
     const profile = await getUserProfileById(supabase, id);
     authors[id] = profile;
     return profile;

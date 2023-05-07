@@ -99,7 +99,7 @@ describe('groupMessagesByAuthor', () => {
         const expected: GroupedMessage[] = [
             {
                 authorId: '1',
-                firstMessage: '2022-04-18T12:00:00.000Z',
+                firstMessageTimestamp: '2022-04-18T12:00:00.000Z',
                 messages: [
                     { content: 'Hello', created_at: '2022-04-18T12:00:00.000Z', id: '1' },
                     { content: 'How are you?', created_at: '2022-04-18T12:01:00.000Z', id: '2' }
@@ -120,7 +120,7 @@ describe('groupMessagesByAuthor', () => {
         const expected: GroupedMessage[] = [
             {
                 authorId: '1',
-                firstMessage: messages[0].created_at,
+                firstMessageTimestamp: messages[0].created_at,
                 messages: [
                     {
                         content: messages[0].content,
@@ -131,7 +131,7 @@ describe('groupMessagesByAuthor', () => {
             },
             {
                 authorId: '1',
-                firstMessage: messages[1].created_at,
+                firstMessageTimestamp: messages[1].created_at,
                 messages: [
                     {
                         content: messages[1].content,
@@ -157,7 +157,7 @@ describe('groupMessagesByAuthor', () => {
         const expected = [
             {
                 authorId: '1',
-                firstMessage: '2022-04-18T12:00:00.000Z',
+                firstMessageTimestamp: '2022-04-18T12:00:00.000Z',
                 messages: [
                     { content: 'Message 1', created_at: '2022-04-18T12:00:00.000Z', id: '1' },
                     { content: 'Message 2', created_at: '2022-04-18T12:00:00.000Z', id: '2' },
@@ -167,7 +167,7 @@ describe('groupMessagesByAuthor', () => {
             },
             {
                 authorId: '2',
-                firstMessage: '2022-04-18T12:00:00.000Z',
+                firstMessageTimestamp: '2022-04-18T12:00:00.000Z',
                 messages: [
                     { content: 'Message 5', created_at: '2022-04-18T12:00:00.000Z', id: '5' },
                     { content: 'Message 6', created_at: '2022-04-18T12:00:00.000Z', id: '6' },
@@ -175,7 +175,7 @@ describe('groupMessagesByAuthor', () => {
                     { content: 'Message 8', created_at: '2022-04-18T12:00:00.000Z', id: '8' }
                 ]
             }
-        ];
+        ] satisfies GroupedMessage[];
         expect(result).toEqual(expected);
     });
 });

@@ -8,7 +8,7 @@
 </script>
 
 <div class="flex flex-col p-4 sm:p-6 gap-2">
-    {#each grouped as chunk (chunk.firstMessage)}
+    {#each grouped as chunk (chunk.firstMessageTimestamp)}
         <MessagesChunk {chunk} />
     {/each}
 </div>

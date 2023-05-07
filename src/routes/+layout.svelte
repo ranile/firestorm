@@ -39,4 +39,8 @@
         background-color: theme(colors.gray.800);
         color: theme(colors.white);
     }
+
+    :global(html, body) {
+        height: 100%;
+    }
 </style>

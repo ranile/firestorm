@@ -63,7 +63,7 @@ export function chunkMessagesArray(chunkSize: number, messages: Message[]): Mess
 
 export interface GroupedMessage {
     authorId: string;
-    firstMessage: string;
+    firstMessageTimestamp: string;
     messages: { id: string; content: string; created_at: string }[];
 }
 
@@ -75,7 +75,7 @@ export function groupMessagesByAuthor(chunks: Message[][]): GroupedMessage[] {
             content: message.content,
             created_at: message.created_at
         }));
-        return { authorId, messages, firstMessage: messages[0].created_at };
+        return { authorId, messages, firstMessageTimestamp: messages[0].created_at };
     });
 }
 
