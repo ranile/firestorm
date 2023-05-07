@@ -46,6 +46,7 @@ export function subscribeToRoomMessages(
         >
     ) => void
 ) {
+    console.log('room id', roomId);
     return supabase
         .channel(`${roomId}-messages`)
         .on(
@@ -53,7 +54,8 @@ export function subscribeToRoomMessages(
             {
                 event: 'INSERT',
                 schema: 'public',
-                table: 'messages'
+                table: 'messages',
+                filter: `room_id=eq.${roomId}`
             },
             callback
         )
