@@ -21,7 +21,7 @@ function genAuthor(id: string): Profile {
     return {
         id,
         avatar: null,
-        username: null,
+        username: null
     };
 }
 

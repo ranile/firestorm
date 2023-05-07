@@ -3,21 +3,21 @@ import { splitWith } from '$lib/utils';
 
 function formatDate(date: Date): string {
     if (isToday(date)) {
-        return 'Today'
+        return 'Today';
     } else if (isYesterday(date)) {
-        return 'Yesterday'
+        return 'Yesterday';
     } else {
-        return date.toDateString()
+        return date.toDateString();
     }
 }
 
 function formatTime(date: Date): string {
-    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' })
+    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' });
 }
 
 export function formatTimestamp(timestamp: string): string {
-    const date = new Date(timestamp)
-    return `${formatDate(date)} at ${formatTime(date)}`
+    const date = new Date(timestamp);
+    return `${formatDate(date)} at ${formatTime(date)}`;
 }
 
 if (import.meta.vitest) {
@@ -32,9 +32,9 @@ if (import.meta.vitest) {
             const date = new Date();
             date.setDate(date.getDate() - 1);
             expect(formatDate(date)).toEqual('Yesterday');
-        })
+        });
 
-        it('many days ago',() => {
+        it('many days ago', () => {
             let date = new Date(2023, 4, 20);
 
             // this condition exists so that the test won't fail if run on 4/20
@@ -44,7 +44,6 @@ if (import.meta.vitest) {
             } else {
                 expect(formatDate(date)).toEqual('Sat May 20 2023');
             }
-
         });
-    })
+    });
 }

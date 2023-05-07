@@ -20,10 +20,10 @@ export async function get(supabase: Supabase, id: string): Promise<Profile> {
 }
 
 export async function getInboundSession(supabase: Supabase, authorId: string, roomId: string) {
-    const cached = sessionKeys[`${roomId}:${authorId}`]
-    if (cached) return cached
+    const cached = sessionKeys[`${roomId}:${authorId}`];
+    if (cached) return cached;
 
-    console.info('cache miss for inbound session; fetching from supabase', authorId, roomId)
+    console.info('cache miss for inbound session; fetching from supabase', authorId, roomId);
     const key = await supabase
         .from('room_members')
         .select('*')
@@ -42,7 +42,7 @@ export async function getInboundSession(supabase: Supabase, authorId: string, ro
     }
 
     sessionKeys[`${roomId}:${authorId}`] = new InboundSession(sessionKey);
-    return sessionKeys[`${roomId}:${authorId}`]
+    return sessionKeys[`${roomId}:${authorId}`];
 }
 
 export async function decryptMessage(supabase: Supabase, message: AuthoredMessage) {
@@ -52,5 +52,5 @@ export async function decryptMessage(supabase: Supabase, message: AuthoredMessag
     return {
         ...message,
         content: plaintext
-    } satisfies AuthoredMessage
+    } satisfies AuthoredMessage;
 }
