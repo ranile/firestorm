@@ -46,15 +46,5 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
     }
 
     setSupabase(supabase);
-    if (browser && session) {
-        const sw = await navigator.serviceWorker.ready;
-        sw.active?.postMessage({
-            op: 'init',
-            supabaseUrl: PUBLIC_SUPABASE_URL,
-            supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
-            accessToken: session.access_token,
-            refreshToken: session.refresh_token
-        });
-    }
     return { supabase, session };
 };

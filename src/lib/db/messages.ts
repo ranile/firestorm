@@ -19,7 +19,7 @@ export async function getMessages(supabase: Supabase, roomId: string) {
     return data;
 }
 
-export async function subscribeToRoomMessages(
+export function subscribeToRoomMessages(
     supabase: Supabase,
     roomId: string,
     callback: (
