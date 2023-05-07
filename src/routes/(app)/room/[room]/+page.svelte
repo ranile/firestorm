@@ -8,6 +8,7 @@
     import { joinRoom } from '$lib/db/rooms';
     import { OutboundSession } from 'moe';
     import { browser } from '$app/environment';
+    import { decryptMessage } from './authors';
 
     export let data: PageData;
     let value = '';
@@ -18,8 +19,9 @@
     $: sub = browser && data.supabase ? subscribeToRoomMessages(data.supabase, room.id, (event) => {
         if (event.eventType === 'INSERT') {
             const newMessage = event.new as Message;
-            // todo decrypt new message's ciphertext
-            messages = [...messages, newMessage];
+            decryptMessage(data.supabase, newMessage).then(plaintextMessage => {
+                messages = [...messages, plaintextMessage];
+            });
         }
     }) : null;
 
@@ -36,6 +38,8 @@
         outbound = pickle ? OutboundSession.from_pickle(pickle, PICKLE_KEY) : undefined;
     }
 
+    let bottomContainer: HTMLDivElement;
+
     const sendMessage = (e: Event) => {
         e.preventDefault();
         if (outbound === undefined) {
@@ -47,7 +51,10 @@
         if (uid === undefined) {
             throw Error('User not logged in');
         }
-        createMessage(data.supabase, roomId, uid!, content).then(() => (value = ''));
+        createMessage(data.supabase, roomId, uid!, content).then(() => {
+            value = '';
+            bottomContainer.scrollIntoView(false)
+        });
     };
     const onJoinRoomClick = async () => {
         console.log('Joining room');
@@ -59,6 +66,7 @@
 <div class='grid h-full grid-cols-1'>
     <div class='row-start-auto overflow-y-auto text-white'>
         <MessageList {messages} />
+        <div bind:this={bottomContainer} class='w-full h-1'></div>
     </div>
     <div class='self-end mb-4 p-2 flex gap-2'>
         {#if invited}

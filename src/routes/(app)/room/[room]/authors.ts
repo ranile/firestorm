@@ -2,11 +2,12 @@ import type { Profile } from '$lib/db/users';
 import { getUserProfileById } from '$lib/db/users';
 import type { Supabase } from '$lib/supabase';
 import { InboundSession } from 'moe';
+import type { Message } from '$lib/db/messages';
 
 const authors: { [key: string]: Profile } = {};
 
 // map containing room id as key and map of author_id to InboundSession as value
-const sessionKeys: Record<string, Record<string, InboundSession>> = {};
+const sessionKeys: Record<string, InboundSession> = {};
 
 export async function get(supabase: Supabase, id: string): Promise<Profile> {
     const cached = authors[id];
@@ -19,12 +20,10 @@ export async function get(supabase: Supabase, id: string): Promise<Profile> {
 }
 
 export async function getInboundSession(supabase: Supabase, authorId: string, roomId: string) {
-    // if (sessionKeys[roomId] === undefined) {
-    //     sessionKeys[roomId] = {}
-    // }
-    //
-    // const cached = sessionKeys[roomId][authorId]
-    // if (cached) return cached
+    const cached = sessionKeys[`${roomId}:${authorId}`]
+    if (cached) return cached
+
+    console.info('cache miss for inbound session; fetching from supabase', authorId, roomId)
     const key = await supabase
         .from('room_members')
         .select('*')
@@ -42,19 +41,16 @@ export async function getInboundSession(supabase: Supabase, authorId: string, ro
         throw Error('attempted to get inbound session for a room without end-to-end encryption');
     }
 
-    let session = new InboundSession(sessionKey);
-    return {
-        authorId,
-        roomId,
-        session //: sessionKeys[roomId][authorId]
-    };
+    sessionKeys[`${roomId}:${authorId}`] = new InboundSession(sessionKey);
+    return sessionKeys[`${roomId}:${authorId}`]
 }
 
-/*
-
-    $: decrypt = async (content: string, authorId: string, roomId: string) => {
-        const sess = await getInboundSession(data.supabase, authorId, room.id);
-        return sess.session.decrypt(content);
-    };
-
-*/
+export async function decryptMessage(supabase: Supabase, message: Message) {
+    const { content, author_id: authorId, room_id: roomId } = message;
+    const sess = await getInboundSession(supabase, authorId, roomId);
+    const plaintext = sess.decrypt(content);
+    return {
+        ...message,
+        content: plaintext
+    } satisfies Message
+}
