@@ -48,8 +48,16 @@
 
     let bottomContainer: HTMLDivElement;
 
+    onMount(() => {
+        bottomContainer.scrollIntoView(false)
+    })
+
     const sendMessage = (e: Event) => {
         e.preventDefault();
+        if (value === '') {
+            // no empty messages
+            return;
+        }
         if (outbound === undefined) {
             throw Error('Outbound session not initialized');
         }
