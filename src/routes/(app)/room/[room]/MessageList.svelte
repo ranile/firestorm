@@ -1,9 +1,9 @@
 <script lang="ts">
-    import type { Message } from '$lib/db/messages';
+    import type { AuthoredMessage, Message } from '$lib/db/messages';
     import { groupMessages } from '$lib/utils/messageChunks';
     import MessagesChunk from './MessagesChunk.svelte';
 
-    export let messages: Message[] = [];
+    export let messages: AuthoredMessage[] = [];
     $: grouped = groupMessages(messages);
 </script>
 

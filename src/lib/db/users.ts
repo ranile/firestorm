@@ -1,7 +1,7 @@
 import type { Supabase } from '../supabase';
 import type { Session } from '@supabase/supabase-js';
 import { writable } from 'svelte/store';
-import { Unreachable } from '../utils';
+import type { Database } from '../../database';
 
 export function getUserProfile(supabase: Supabase, session: Session) {
     return getUserProfileById(supabase, session.user.id);
@@ -29,6 +29,6 @@ export async function findUser(supabase: Supabase, query: string) {
     return user.data;
 }
 
-export type Profile = Required<Awaited<ReturnType<typeof getUserProfileById>>>;
+export type Profile = Database['public']['Tables']['profiles']['Row'];
 
 export const profile = writable<(Profile & { email: string }) | null>(null);

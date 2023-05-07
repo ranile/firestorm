@@ -20,8 +20,9 @@ export async function splitWith<T>(
 }
 
 export class Unreachable extends Error {
-    constructor() {
-        super('Unreachable executed');
+    constructor(m = '') {
+        const append = m === '' ? '' : `: ${m}`;
+        super('Unreachable executed' + append);
     }
 }
 

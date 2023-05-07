@@ -1,19 +1,28 @@
 import { describe, it, expect } from 'vitest';
 import { chunkMessagesArray, groupMessagesByAuthor } from './messageChunks';
 import type { GroupedMessage } from './messageChunks';
-import type { Message } from '../db/messages';
+import type { AuthoredMessage } from '../db/messages';
+import type { Profile } from '$lib/db/users';
 
-function generateMessages(size: number): Message[] {
-    const messages: Message[] = [];
+function generateMessages(size: number): AuthoredMessage[] {
+    const messages: AuthoredMessage[] = [];
     for (let i = 0; i < size; i++) {
         const author_id = ((i % 2) + 1).toString();
         const content = `Message ${i + 1}`;
         const created_at = new Date(2022, 0, 1, 0, i, i * 2).toISOString();
         const id = (i + 1).toString();
         const room_id = '1';
-        messages.push({ author_id, content, created_at, id, room_id });
+        messages.push({ author: genAuthor(author_id), content, created_at, id, room_id });
     }
     return messages;
+}
+
+function genAuthor(id: string): Profile {
+    return {
+        id,
+        avatar: null,
+        username: null,
+    };
 }
 
 describe('chunkArray', () => {
@@ -26,7 +35,7 @@ describe('chunkArray', () => {
     it('messages are within one minute and by same author', () => {
         const messages = generateMessages(4).map((message, index) => ({
             ...message,
-            author_id: '1',
+            author: genAuthor('1'),
             created_at: new Date(2022, 0, 1, 0, 0, index * 2).toISOString()
         }));
         const result = chunkMessagesArray(2, messages);
@@ -36,7 +45,7 @@ describe('chunkArray', () => {
     it('messages are within one minute and by different authors', () => {
         const messages = generateMessages(4).map((message, index) => ({
             ...message,
-            author_id: index.toString(),
+            author: genAuthor(index.toString()),
             created_at: new Date(2022, 0, 1, 0, 0, index * 2).toISOString()
         }));
         const result = chunkMessagesArray(2, messages);
@@ -46,7 +55,7 @@ describe('chunkArray', () => {
     it('messages are within one minute and by alternating authors', () => {
         const messages = generateMessages(4).map((message, index) => ({
             ...message,
-            author_id: index % 2 ? 'one' : 'two',
+            author: genAuthor(index % 2 ? 'one' : 'two'),
             created_at: new Date(2022, 0, 1, 0, 0, index % 2).toISOString()
         }));
         const result = chunkMessagesArray(2, messages);
@@ -59,7 +68,7 @@ describe('chunkArray', () => {
     it('messages are by single author and more than a minute apart', () => {
         const messages = generateMessages(4).map((message, index) => ({
             ...message,
-            author_id: '1',
+            author: genAuthor('1'),
             created_at: new Date(2022, 0, 1, 0, index * 2).toISOString()
         }));
         const result = chunkMessagesArray(2, messages);
@@ -68,7 +77,7 @@ describe('chunkArray', () => {
     it('messages are by alternating author and more than a minute apart', () => {
         const messages = generateMessages(4).map((message, index) => ({
             ...message,
-            author_id: index % 2 ? 'one' : 'two',
+            author: genAuthor(index % 2 ? 'one' : 'two'),
             created_at: new Date(2022, 0, 1, 0, index * 2).toISOString()
         }));
         const result = chunkMessagesArray(2, messages);
@@ -77,17 +86,17 @@ describe('chunkArray', () => {
 });
 describe('groupMessagesByAuthor', () => {
     it('should group messages by author for a single chunk', () => {
-        const chunks: Message[][] = [
+        const chunks: AuthoredMessage[][] = [
             [
                 {
-                    author_id: '1',
+                    author: genAuthor('1'),
                     content: 'Hello',
                     created_at: '2022-04-18T12:00:00.000Z',
                     id: '1',
                     room_id: '1'
                 },
                 {
-                    author_id: '1',
+                    author: genAuthor('1'),
                     content: 'How are you?',
                     created_at: '2022-04-18T12:01:00.000Z',
                     id: '2',
@@ -98,7 +107,7 @@ describe('groupMessagesByAuthor', () => {
 
         const expected: GroupedMessage[] = [
             {
-                authorId: '1',
+                author: genAuthor('1'),
                 firstMessageTimestamp: '2022-04-18T12:00:00.000Z',
                 messages: [
                     { content: 'Hello', created_at: '2022-04-18T12:00:00.000Z', id: '1' },
@@ -113,13 +122,13 @@ describe('groupMessagesByAuthor', () => {
     it('should not group messages by same author but in different consecutive chunks', () => {
         const messages = generateMessages(2).map((message, i) => ({
             ...message,
-            author_id: '1',
+            author: genAuthor('1'),
             created_at: new Date(2022, 0, 1, i, 0).toISOString()
         }));
-        const chunks: Message[][] = chunkMessagesArray(1, messages);
+        const chunks: AuthoredMessage[][] = chunkMessagesArray(1, messages);
         const expected: GroupedMessage[] = [
             {
-                authorId: '1',
+                author: genAuthor('1'),
                 firstMessageTimestamp: messages[0].created_at,
                 messages: [
                     {
@@ -130,7 +139,7 @@ describe('groupMessagesByAuthor', () => {
                 ]
             },
             {
-                authorId: '1',
+                author: genAuthor('1'),
                 firstMessageTimestamp: messages[1].created_at,
                 messages: [
                     {
@@ -149,14 +158,14 @@ describe('groupMessagesByAuthor', () => {
     it('should group messages by author for multiple chunks', () => {
         const messages = generateMessages(8).map((message, index) => ({
             ...message,
-            author_id: index < 4 ? '1' : '2',
+            author: genAuthor(index < 4 ? '1' : '2'),
             created_at: '2022-04-18T12:00:00.000Z'
         }));
-        const chunks: Message[][] = chunkMessagesArray(2, messages);
+        const chunks: AuthoredMessage[][] = chunkMessagesArray(2, messages);
         const result = groupMessagesByAuthor(chunks);
         const expected = [
             {
-                authorId: '1',
+                author: genAuthor('1'),
                 firstMessageTimestamp: '2022-04-18T12:00:00.000Z',
                 messages: [
                     { content: 'Message 1', created_at: '2022-04-18T12:00:00.000Z', id: '1' },
@@ -166,7 +175,7 @@ describe('groupMessagesByAuthor', () => {
                 ]
             },
             {
-                authorId: '2',
+                author: genAuthor('2'),
                 firstMessageTimestamp: '2022-04-18T12:00:00.000Z',
                 messages: [
                     { content: 'Message 5', created_at: '2022-04-18T12:00:00.000Z', id: '5' },

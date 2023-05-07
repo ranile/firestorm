@@ -1,19 +1,9 @@
 <script lang="ts">
-    import { supabase } from '$lib/supabase';
-    import { get as getAuthor } from './authors';
     import type { GroupedMessage } from '$lib/utils/messageChunks';
-    import type { Profile } from '$lib/db/users';
-    import { onMount } from 'svelte';
     import { formatTimestamp } from '$lib/utils/timestamps';
 
     export let chunk: GroupedMessage;
-    const timestamp = new Date(chunk.messages[0].created_at);
-    let author: Profile;
-    onMount(() => {
-        getAuthor($supabase!, chunk.authorId).then((a) => {
-            author = a;
-        });
-    });
+    $: author = chunk.author;
 </script>
 
 <div class="relative">

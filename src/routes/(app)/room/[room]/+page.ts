@@ -1,6 +1,6 @@
 import type { PageLoad } from './$types';
-import { getMessages } from '../../../../lib/db/messages';
-import { rooms } from '../../../../lib/db/rooms';
+import { getMessages } from '$lib/db/messages';
+import { rooms } from '$lib/db/rooms';
 import { get as getStore } from 'svelte/store';
 import { decryptMessage } from './authors';
 

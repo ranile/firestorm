@@ -1,4 +1,5 @@
-import type { Message } from '../db/messages';
+import type { AuthoredMessage as Message } from '../db/messages';
+import type { Profile } from '$lib/db/users';
 
 export function chunkMessagesArray(chunkSize: number, messages: Message[]): Message[][] {
     const sortedMessages = messages
@@ -11,7 +12,7 @@ export function chunkMessagesArray(chunkSize: number, messages: Message[]): Mess
     const authorMessages: { [authorId: string]: Message[] } = {};
 
     for (const message of sortedMessages) {
-        const authorId = message.author_id;
+        const authorId = message.author.id;
 
         if (currentChunk.length === 0) {
             currentChunk.push(message);
@@ -20,7 +21,7 @@ export function chunkMessagesArray(chunkSize: number, messages: Message[]): Mess
         }
 
         const lastMessage = currentChunk[currentChunk.length - 1];
-        const lastAuthorId = lastMessage.author_id;
+        const lastAuthorId = lastMessage.author.id;
 
         if (authorId !== lastAuthorId) {
             chunks.push(currentChunk);
@@ -62,20 +63,20 @@ export function chunkMessagesArray(chunkSize: number, messages: Message[]): Mess
 }
 
 export interface GroupedMessage {
-    authorId: string;
+    author: Profile;
     firstMessageTimestamp: string;
     messages: { id: string; content: string; created_at: string }[];
 }
 
 export function groupMessagesByAuthor(chunks: Message[][]): GroupedMessage[] {
     return chunks.map((chunk) => {
-        const authorId = chunk[0].author_id;
+        const author = chunk[0].author;
         const messages = chunk.map((message) => ({
             id: message.id,
             content: message.content,
             created_at: message.created_at
         }));
-        return { authorId, messages, firstMessageTimestamp: messages[0].created_at };
+        return { author, messages, firstMessageTimestamp: messages[0].created_at };
     });
 }
 

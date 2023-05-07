@@ -2,7 +2,7 @@ import type { Profile } from '$lib/db/users';
 import { getUserProfileById } from '$lib/db/users';
 import type { Supabase } from '$lib/supabase';
 import { InboundSession } from 'moe';
-import type { Message } from '$lib/db/messages';
+import type { AuthoredMessage, Message } from '$lib/db/messages';
 
 const authors: { [key: string]: Profile } = {};
 
@@ -45,12 +45,12 @@ export async function getInboundSession(supabase: Supabase, authorId: string, ro
     return sessionKeys[`${roomId}:${authorId}`]
 }
 
-export async function decryptMessage(supabase: Supabase, message: Message) {
-    const { content, author_id: authorId, room_id: roomId } = message;
-    const sess = await getInboundSession(supabase, authorId, roomId);
+export async function decryptMessage(supabase: Supabase, message: AuthoredMessage) {
+    const { content, author, room_id: roomId } = message;
+    const sess = await getInboundSession(supabase, author.id, roomId);
     const plaintext = sess.decrypt(content);
     return {
         ...message,
         content: plaintext
-    } satisfies Message
+    } satisfies AuthoredMessage
 }

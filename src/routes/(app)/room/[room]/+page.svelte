@@ -1,25 +1,33 @@
 <script lang='ts'>
     import type { PageData } from './$types';
     import { Button, Textarea, ToolbarButton } from 'flowbite-svelte';
-    import { createMessage, subscribeToRoomMessages } from '$lib/db/messages';
+    import { type AuthoredMessage, createMessage, subscribeToRoomMessages } from '$lib/db/messages';
     import MessageList from './MessageList.svelte';
     import type { Message } from '$lib/db/messages';
     import { onDestroy, onMount } from 'svelte';
     import { joinRoom } from '$lib/db/rooms';
     import { OutboundSession } from 'moe';
     import { browser } from '$app/environment';
-    import { decryptMessage } from './authors';
+    import { decryptMessage, get as getAuthor } from './authors';
 
     export let data: PageData;
     let value = '';
-    let messages: Message[] = data.messages;
+    let messages: AuthoredMessage[] = data.messages;
     $: room = data.room;
     let invited = room?.membership.join_state === 'invited';
 
-    $: sub = browser && data.supabase ? subscribeToRoomMessages(data.supabase, room.id, (event) => {
+    $: sub = browser && data.supabase ? subscribeToRoomMessages(data.supabase, room.id, async (event) => {
         if (event.eventType === 'INSERT') {
             const newMessage = event.new as Message;
-            decryptMessage(data.supabase, newMessage).then(plaintextMessage => {
+            const author = await getAuthor(data.supabase, newMessage.author_id)
+            const newAuthoredMessage = {
+                created_at: newMessage.created_at,
+                id: newMessage.id,
+                content: newMessage.content,
+                room_id: newMessage.room_id,
+                author,
+            } satisfies AuthoredMessage;
+            decryptMessage(data.supabase, newAuthoredMessage).then(plaintextMessage => {
                 messages = [...messages, plaintextMessage];
             });
         }
