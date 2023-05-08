@@ -12,9 +12,9 @@
 
     export let data: PageData;
     let value = '';
-    let messages: AuthoredMessage[] = data.messages;
+    $: messages = data.messages;
     $: room = data.room;
-    let invited = room?.membership.join_state === 'invited';
+    $: invited = room?.membership.join_state === 'invited';
 
     $: sub =
         browser && data.supabase
