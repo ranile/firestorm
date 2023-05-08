@@ -82,6 +82,10 @@
     };
 </script>
 
+<svelte:head>
+    <title>{room.name} | Firestorm</title>
+</svelte:head>
+
 <div class="grid h-full grid-cols-1">
     <div class="row-start-auto overflow-y-auto text-white">
         <MessageList {messages} />

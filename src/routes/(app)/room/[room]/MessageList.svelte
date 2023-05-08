@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { AuthoredMessage, Message } from '$lib/db/messages';
+    import type { AuthoredMessage } from '$lib/db/messages';
     import { groupMessages } from '$lib/utils/messageChunks';
     import MessagesChunk from './MessagesChunk.svelte';
 

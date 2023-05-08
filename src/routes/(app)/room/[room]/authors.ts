@@ -2,7 +2,7 @@ import type { Profile } from '$lib/db/users';
 import { getUserProfileById } from '$lib/db/users';
 import type { Supabase } from '$lib/supabase';
 import { InboundSession } from 'moe';
-import type { AuthoredMessage, Message } from '$lib/db/messages';
+import type { AuthoredMessage } from '$lib/db/messages';
 
 const authors: { [key: string]: Profile } = {};
 

@@ -1,5 +1,4 @@
 import { isToday, isYesterday } from 'date-fns';
-import { splitWith } from '$lib/utils';
 
 function formatDate(date: Date): string {
     if (isToday(date)) {
