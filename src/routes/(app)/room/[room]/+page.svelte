@@ -4,11 +4,11 @@
     import { type AuthoredMessage, createMessage, subscribeToRoomMessages } from '$lib/db/messages';
     import MessageList from './MessageList.svelte';
     import type { Message } from '$lib/db/messages';
-    import { onDestroy, onMount } from 'svelte';
     import { joinRoom } from '$lib/db/rooms';
     import { OutboundSession } from 'moe';
     import { browser } from '$app/environment';
     import { decryptMessage, get as getAuthor } from './authors';
+    import { afterNavigate, beforeNavigate } from '$app/navigation';
 
     export let data: PageData;
     let value = '';
@@ -16,32 +16,39 @@
     $: room = data.room;
     $: invited = room?.membership.join_state === 'invited';
 
-    $: sub =
-        browser && data.supabase
-            ? subscribeToRoomMessages(data.supabase, room.id, async (event) => {
-                  if (event.eventType === 'INSERT') {
-                      const newMessage = event.new as Message;
-                      const author = await getAuthor(data.supabase, newMessage.author_id);
-                      const newAuthoredMessage = {
-                          created_at: newMessage.created_at,
-                          id: newMessage.id,
-                          content: newMessage.content,
-                          room_id: newMessage.room_id,
-                          author
-                      } satisfies AuthoredMessage;
-                      decryptMessage(data.supabase, newAuthoredMessage).then((plaintextMessage) => {
-                          messages = [...messages, plaintextMessage];
-                      });
-                  }
-              })
-            : null;
+    let sub = null
+    let bottomContainer: HTMLDivElement;
 
-    let outbound: OutboundSession | undefined;
-    onDestroy(() => {
+    afterNavigate(() => {
+        sub = subscribeToRoomMessages(data.supabase, room.id, async (event) => {
+            if (event.eventType === 'INSERT') {
+                const newMessage = event.new as Message;
+                const author = await getAuthor(data.supabase, newMessage.author_id);
+                const newAuthoredMessage = {
+                    created_at: newMessage.created_at,
+                    id: newMessage.id,
+                    content: newMessage.content,
+                    room_id: newMessage.room_id,
+                    author
+                } satisfies AuthoredMessage;
+                decryptMessage(data.supabase, newAuthoredMessage).then((plaintextMessage) => {
+                    messages = [...messages, plaintextMessage];
+                    console.log('yooo?', messages);
+                });
+            }
+        })
+
+        bottomContainer.scrollIntoView(false);
+
+    })
+
+    beforeNavigate(() => {
         if (sub !== null) {
             sub.unsubscribe();
         }
     });
+
+    let outbound: OutboundSession | undefined;
     $: if (browser) {
         const PICKLE_KEY = new Uint8Array(32).map(() => 1);
 
@@ -49,11 +56,6 @@
         outbound = pickle ? OutboundSession.from_pickle(pickle, PICKLE_KEY) : undefined;
     }
 
-    let bottomContainer: HTMLDivElement;
-
-    onMount(() => {
-        bottomContainer.scrollIntoView(false);
-    });
 
     const sendMessage = (e: Event) => {
         e.preventDefault();
@@ -89,7 +91,7 @@
 <div class="grid h-full grid-cols-1">
     <div class="row-start-auto overflow-y-auto text-white">
         <MessageList {messages} />
-        <div bind:this={bottomContainer} class="w-full h-1" />
+        <div bind:this={bottomContainer} class="w-full h-1"></div>
     </div>
     <div class="self-end mb-4 p-2 flex gap-2">
         {#if invited}
