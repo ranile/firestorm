@@ -8,6 +8,11 @@ export default defineConfig({
     server: {
         fs: {
             allow: ['crates/moe/pkg']
+        },
+        proxy: {
+            '/api/notify': {
+                target: 'http://localhost:3000/',
+            }
         }
     },
     test: {
