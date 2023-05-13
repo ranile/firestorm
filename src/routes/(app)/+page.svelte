@@ -4,6 +4,8 @@
     import { PUBLIC_VAPID_PUBLIC_KEY as VAPID_PUBLIC_KEY } from '$env/static/public'
     import { Button } from 'flowbite-svelte';
     import { onMount } from 'svelte';
+    import type { PageData } from './$types';
+    export let data: PageData;
     function urlB64ToUint8Array(base64String) {
         const padding = '='.repeat((4 - base64String.length % 4) % 4);
         const base64 = (base64String + padding)
@@ -18,6 +20,7 @@
     }
 
     const unsubHandler = async () => {
+        console.log('unsub');
         const registration = await navigator.serviceWorker.getRegistration();
         const sub = await registration.pushManager.getSubscription();
         if (sub) {
@@ -31,10 +34,11 @@
             applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY)
         });
         console.log('handler handling ', registration, subscription)
-        let response = await fetch('/api/notify', {
+        let response = await fetch('/api/push-notify', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${data.session.access_token}`
             },
             body: JSON.stringify(subscription)
         });
@@ -42,10 +46,12 @@
         console.log(response);
 
     }
-
-    onMount(() => {
-        subHandler()
-    })
+    //
+    // onMount(() => {
+    //     subHandler()
+    //
+    //     return unsubHandler
+    // })
 </script>
 
 <Button on:click={subHandler}>do me</Button>

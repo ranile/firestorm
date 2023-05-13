@@ -10,8 +10,9 @@ export default defineConfig({
             allow: ['crates/moe/pkg']
         },
         proxy: {
-            '/api/notify': {
-                target: 'http://localhost:3000/',
+            '/api/push-notify': {
+                target: 'http://localhost:54321/functions/v1/push-notify/',
+                rewrite: (path) => path.replace(/^\/api\/push-notify/, '')
             }
         }
     },

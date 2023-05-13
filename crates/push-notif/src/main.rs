@@ -1,24 +1,28 @@
-use axum::{
-    routing::{post},
-    http::StatusCode,
-    response::IntoResponse,
-    Json, Router,
-};
-use serde::{Deserialize, Serialize};
-use std::net::SocketAddr;
+
 use futures::TryStreamExt;
-use sqlx::postgres::PgListener;
+use sqlx::postgres::{PgListener, PgNotification};
 use sqlx::{Executor, PgPool};
 use std::sync::atomic::{AtomicI64, Ordering};
 use std::time::Duration;
 
 use web_push::*;
 use std::fs::File;
-use chrono::{DateTime, Utc};
+use serde::{Deserialize};
 use serde_json::json;
 
-async fn notify_route(Json(subscription_info): Json<SubscriptionInfo>) {
-    web_notify(subscription_info).await.expect("Failed to send notification");
+#[derive(Debug, Deserialize)]
+struct Message {
+    pub id: String,
+    pub content: String,
+    pub room_id: String,
+    pub author_id: String,
+    pub created_at: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct Payload {
+    message: Message,
+    subscribers: Vec<SubscriptionInfo>
 }
 
 async fn web_notify(subscription_info: SubscriptionInfo) -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>> {
@@ -33,6 +37,7 @@ async fn web_notify(subscription_info: SubscriptionInfo) -> Result<(), Box<dyn s
     tokio::spawn(async move {
         //Now add payload and encrypt.
         for i in 0..10 {
+            println!("trying: {:?}", subscription_info);
             let mut builder = WebPushMessageBuilder::new(&subscription_info)?;
             let content = json!({
                 "title": "I wanna fuck",
@@ -45,10 +50,11 @@ async fn web_notify(subscription_info: SubscriptionInfo) -> Result<(), Box<dyn s
                 auth_k: sig_builder.auth_k.clone(),
             });
 
-            let client = WebPushClient::new()?;
+            let client = WebPushClient::new().expect("failed to build client");
 
+            let msg = builder.build().expect("failed to build");
             //Finally, send the notification!
-            client.send(builder.build()?).await?;
+            client.send(msg).await.expect("failed to send");
             tokio::time::sleep(Duration::from_secs(3)).await;
         }
         Ok::<_, WebPushError>(())
@@ -56,25 +62,26 @@ async fn web_notify(subscription_info: SubscriptionInfo) -> Result<(), Box<dyn s
     Ok(())
 }
 
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // build our application with a route
-    let app = Router::new()
-        // `GET /` goes to `root`
-        .route("/api/notify", post(notify_route));
-        // `POST /users` goes to `create_user`
-
-    // run our app with hyper, listening globally on port 3000
-    axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
-        .serve(app.into_make_service())
-        .await.unwrap();
-
     let conn_str =
         std::env::var("DATABASE_URL").expect("Env var DATABASE_URL is required for this example.");
-    println!("Building PG pool. {conn_str}");
+
     let pool = PgPool::connect(&conn_str).await?;
 
+    // let (pg_notify_tx, mut pg_notify_rx) = broadcast::channel::<PgNotification>(2);
+
     let mut listener = PgListener::connect(&conn_str).await?;
+    listener.listen_all(["msg_chan"]).await?;
+
+    println!("Starting LISTEN loop.");
+    let mut stream = listener.into_stream();
+    while let Some(notification) = stream.try_next().await? {
+        tokio::spawn(async move {
+            deliver_notification(notification).await;
+        });
+    }
 
     // let notify_pool = pool.clone();
     let _t = tokio::spawn(async move {
@@ -85,19 +92,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    println!("Starting LISTEN loop.");
-
-    listener.listen_all(vec!["chan6", "chan1", "chan2"]).await?;
-
-    // Prove that we are buffering messages by waiting for 6 seconds
-    // listener.execute("SELECT pg_sleep(6)").await?;
-
-    let mut stream = listener.into_stream();
-    while let Some(notification) = stream.try_next().await? {
-        println!("[from stream]: {:?}", notification);
-    }
-
     Ok(())
+}
+
+async fn deliver_notification(notification: PgNotification) {
+    let payload = notification.payload();
+    let payload = serde_json::from_str::<Payload>(&payload).unwrap();
+    println!("Received notification: {:?}", payload);
+    for sub in payload.subscribers {
+        web_notify(sub).await.unwrap();
+    }
 }
 
 async fn notify(pool: &PgPool) {

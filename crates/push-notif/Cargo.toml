@@ -9,7 +9,7 @@ edition = "2021"
 tokio = { version = "1.28.1", features = ["full"] }
 sqlx = { version = "0.6.3", features = [ "runtime-tokio-rustls", "postgres", "uuid", "chrono" ] }
 chrono = { version = "0.4.24", features = ["clock", "std"]}
-web-push = "0.8"
+web-push = { version = "0.8", features = ["hyper-client"], default-features = false }
 futures = "0.3.28"
 axum = "0.6.17"
 serde = { version = "1.0.163", features = ["derive"] }
