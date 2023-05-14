@@ -13,6 +13,7 @@
     import CreateRoomModal from '$lib/components/SideNav/CreateRoomModal.svelte';
     import SidebarItem from '$lib/components/SideNav/SidebarItem.svelte';
     import type { RealtimeChannel } from '@supabase/supabase-js';
+    import { decryptMessage } from './room/[room]/authors.ts';
 
     export let data: LayoutData;
     const signout = () => {
@@ -41,6 +42,27 @@
     $: currentRoom = $rooms.find((room) => room.id === data.currentRoomId) ?? null;
     $: joined = $rooms.filter((room) => room.membership.join_state === 'joined');
     $: invited = $rooms.filter((room) => room.membership.join_state === 'invited');
+
+    onMount(() => {
+        const notificationChannel = new BroadcastChannel('notifications');
+        notificationChannel.addEventListener('message', (event) => {
+            const request = event.data;
+            if (request.op === 'decrypt') {
+                const content = request.content;
+                decryptMessage(data.supabase, {
+                    room_id: content.room.id,
+                    ...content
+                }).then(plaintext => {
+                    notificationChannel.postMessage({
+                        op: 'notify',
+                        content: plaintext,
+                    });
+                })
+
+            }
+        })
+
+    })
 </script>
 
 <SideNavGeneric>

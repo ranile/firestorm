@@ -20,10 +20,12 @@ interface Message {
     author: Profile
 }
 
-sw.addEventListener('push', (event) => {
-    const notification = event.data.json() as Notification<Message>;
-    if (notification.op === 'MessageCreate') {
-        const content = notification.content;
+const notificationChannel = new BroadcastChannel('notifications');
+notificationChannel.addEventListener('message', (event) => {
+    const request = event.data as Notification<Message>;
+    if (request.op === 'notify') {
+        // Process the request message
+        const content = request.content;
         sw.registration.showNotification(
             `${content.author.username} (${content.room.name})`,
             {
@@ -33,6 +35,13 @@ sw.addEventListener('push', (event) => {
                 icon: content.author.avatar ?? undefined
             }
         );
+    }
+})
+
+sw.addEventListener('push', (event) => {
+    const notification = event.data.json() as Notification<Message>;
+    if (notification.op === 'MessageCreate') {
+        notificationChannel.postMessage({ op: 'decrypt', content: notification.content });
     }
     console.log('EVENT NOTIFY', notification);
 });
