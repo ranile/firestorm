@@ -8,11 +8,24 @@ use web_push::{
 };
 
 #[derive(Debug, Serialize, Deserialize)]
+struct Room {
+    pub id: String,
+    pub name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Author {
+    pub id: String,
+    pub username: String,
+    pub avatar: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 struct Message {
     pub id: String,
+    pub room: Room,
+    pub author: Author,
     pub content: String,
-    pub room_id: String,
-    pub author_id: String,
     pub created_at: String,
 }
 
@@ -38,9 +51,10 @@ async fn web_notify<T: Serialize>(
     subscription_info: SubscriptionInfo,
     content: T,
 ) {
-    let sig_builder = VapidSignatureBuilder::from_pem(Cursor::new(vapid_private_key), &subscription_info)?
+    let sig_builder = VapidSignatureBuilder::from_pem(Cursor::new(vapid_private_key), &subscription_info)
+            .expect("unreachable (private key is verified to be good): VapidSignatureBuilder failed to build")
             .build()
-            .expect("unreachable (private key and signature info are verified to be good): VapidSignatureBuilder failed to build");
+            .expect("unreachable (signature info is verified to be good): VapidSignature failed to build");
 
     let content = serde_json::to_vec(&content).unwrap();
 
@@ -85,6 +99,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 async fn deliver_notification(vapid_private_key: &[u8], notification: PgNotification) {
     match notification.channel() {
         "msg_chan" => {
+            println!("received msg_chan notification: {:?}", notification.payload());
             deliver_msg_notification(vapid_private_key, notification.payload()).await;
         }
         _ => {

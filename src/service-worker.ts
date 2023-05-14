@@ -3,7 +3,8 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
-import type { Database } from './database';
+import type { Room } from './lib/db/rooms.ts';
+import type { Profile } from './lib/db/users.ts';
 
 const sw = self as unknown as ServiceWorkerGlobalScope;
 
@@ -12,15 +13,24 @@ interface Notification<T> {
     content: T
 }
 
-type Message = Database['public']['Tables']['messages']['Row']
+interface Message {
+    content: string,
+    created_at: string,
+    room: Room,
+    author: Profile
+}
 
 sw.addEventListener('push', (event) => {
-    const { op, content } = event.data.json() as Notification<Message>;
-    if (op === 'MessageCreate') {
+    const notification = event.data.json() as Notification<Message>;
+    if (notification.op === 'MessageCreate') {
+        const content = notification.content;
         sw.registration.showNotification(
-            `${content.author_id} (${content.room_id})`,
+            `${content.author.username} (${content.room.name})`,
             {
-                body: content.content
+                body: content.content,
+                timestamp: Date.parse(content.created_at),
+                badge: `${location.origin}/favicon.png`,
+                icon: content.author.avatar ?? undefined
             }
         );
     }
