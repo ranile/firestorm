@@ -8,6 +8,12 @@ export default defineConfig({
     server: {
         fs: {
             allow: ['crates/moe/pkg']
+        },
+        proxy: {
+            '/api/push-notify': {
+                target: 'http://localhost:54321/functions/v1/push-notify/',
+                rewrite: (path) => path.replace(/^\/api\/push-notify/, '')
+            }
         }
     },
     test: {

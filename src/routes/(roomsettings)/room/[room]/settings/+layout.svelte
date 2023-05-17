@@ -1,44 +1,21 @@
 <script lang="ts">
-    import SidebarItem from '../../../../../lib/components/SideNav/SidebarItem.svelte';
+    import SidebarItem from '$lib/components/SideNav/SidebarItem.svelte';
     import AccountGroup from 'svelte-material-icons/AccountGroup.svelte';
-    import Back from 'svelte-material-icons/ArrowLeft.svelte';
     import SideNav from '$lib/components/SideNavGeneric.svelte';
-    import { page } from '$app/stores';
     import type { LayoutData } from './$types';
 
     export let data: LayoutData;
 
-    $: activeUrl = $page.url.pathname;
-    let heading = '';
-    $: {
-        if (activeUrl.includes('overview')) {
-            heading = 'Overview';
-        } else if (activeUrl.includes('members')) {
-            heading = 'Members';
-        }
-    }
-
+    let heading;
     $: toNavigateBase = `/room/${data.room.id}/settings/`;
-    // let count = 0;
-    // <button on:click={() => count = count + 1}>{count}</button>
 </script>
 
-<SideNav>
-    <svelte:fragment slot="navbar">
-        <h2 class="text-xl font-bold px-4 py-2">{heading}</h2>
-    </svelte:fragment>
-
-    <svelte:fragment slot="sidebar-header">
-        <a class="text-2xl" href={`/room/${data.room.id}`}>
-            <Back />
-        </a>
-    </svelte:fragment>
-
+<SideNav {heading} goBackTo={`/room/${data.room.id}`}>
     <svelte:fragment slot="sidebar-content">
         <SidebarItem
             label="Overview"
-            active={$page.url.pathname.includes('overview')}
-            href={toNavigateBase + 'overview'}
+            href={toNavigateBase + 'settings'}
+            bind:heading
         >
             <svelte:fragment slot="icon">
                 <svg
@@ -57,8 +34,8 @@
 
         <SidebarItem
             label="Members"
-            active={$page.url.pathname.includes('members')}
             href={toNavigateBase + 'members'}
+            bind:heading
         >
             <AccountGroup slot="icon" size="1.5em" />
         </SidebarItem>
