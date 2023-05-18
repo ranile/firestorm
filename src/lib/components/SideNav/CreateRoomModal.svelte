@@ -5,10 +5,24 @@
     import { goto } from '$app/navigation';
 
     let name = '';
+    let errorMessage: string | null = null;
+    $: if (name.length > 64) {
+        errorMessage = "Name can't be longer than 64 characters";
+    } else {
+        errorMessage = ''
+    }
     let onCreateClick = async () => {
-        const { room } = await createRoom(name);
-        await goto(`/room/${room.id}`);
-        createRoomModalState.set(false);
+        if (name.length > 64) {
+            return
+        }
+        try {
+            const { room } = await createRoom(name);
+            await goto(`/room/${room.id}`);
+            createRoomModalState.set(false);
+            name = ''
+        } catch (e) {
+            errorMessage = e.toString()
+        }
     };
 </script>
 
@@ -24,9 +38,11 @@
                 max={64}
                 required
             />
-            <Helper class="text-sm mt-2">
-                <span class="text-gray-500 dark:text-gray-400">Max 64 characters</span>
-            </Helper>
+            {#if errorMessage !== null}
+                <Helper class='mt-2' color='red'>
+                    <span class="font-medium">{errorMessage}</span>
+                </Helper>
+            {/if}
         </Label>
         <Button type="submit" class="w-full1">Create</Button>
     </form>
