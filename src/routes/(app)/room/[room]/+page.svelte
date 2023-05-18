@@ -9,6 +9,7 @@
     import { browser } from '$app/environment';
     import { decryptMessage, get as getAuthor } from './authors';
     import { afterNavigate, beforeNavigate } from '$app/navigation';
+    import type { RealtimeChannel } from '@supabase/supabase-js';
 
     export let data: PageData;
     let value = '';
@@ -16,7 +17,7 @@
     $: room = data.room;
     $: invited = room?.membership.join_state === 'invited';
 
-    let sub = null
+    let sub: RealtimeChannel | null = null;
     let bottomContainer: HTMLDivElement;
 
     afterNavigate(() => {
@@ -36,11 +37,10 @@
                     console.log('yooo?', messages);
                 });
             }
-        })
+        });
 
         bottomContainer.scrollIntoView(false);
-
-    })
+    });
 
     beforeNavigate(() => {
         if (sub !== null) {
@@ -55,7 +55,6 @@
         const pickle = localStorage.getItem(`${room.id}:pickle`);
         outbound = pickle ? OutboundSession.from_pickle(pickle, PICKLE_KEY) : undefined;
     }
-
 
     const sendMessage = (e: Event) => {
         e.preventDefault();
@@ -91,7 +90,7 @@
 <div class="grid h-full grid-cols-1">
     <div class="row-start-auto overflow-y-auto text-white">
         <MessageList {messages} />
-        <div bind:this={bottomContainer} class="w-full h-1"></div>
+        <div bind:this={bottomContainer} class="w-full h-1" />
     </div>
     <div class="self-end mb-4 p-2 flex gap-2">
         {#if invited}

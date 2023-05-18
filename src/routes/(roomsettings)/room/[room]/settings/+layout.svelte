@@ -6,17 +6,13 @@
 
     export let data: LayoutData;
 
-    let heading;
+    let heading = '';
     $: toNavigateBase = `/room/${data.room.id}/settings/`;
 </script>
 
 <SideNav {heading} goBackTo={`/room/${data.room.id}`}>
     <svelte:fragment slot="sidebar-content">
-        <SidebarItem
-            label="Overview"
-            href={toNavigateBase + 'settings'}
-            bind:heading
-        >
+        <SidebarItem label="Overview" href={toNavigateBase + 'settings'} bind:heading>
             <svelte:fragment slot="icon">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -32,11 +28,7 @@
             </svelte:fragment>
         </SidebarItem>
 
-        <SidebarItem
-            label="Members"
-            href={toNavigateBase + 'members'}
-            bind:heading
-        >
+        <SidebarItem label="Members" href={toNavigateBase + 'members'} bind:heading>
             <AccountGroup slot="icon" size="1.5em" />
         </SidebarItem>
     </svelte:fragment>

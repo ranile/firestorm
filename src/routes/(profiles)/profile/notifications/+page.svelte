@@ -6,16 +6,16 @@
     export let data: PageData;
 
     const enableNotifications = () => {
-        Notification.requestPermission().then(result => {
+        Notification.requestPermission().then((result) => {
             if (result === 'granted') {
-                subscribeToNotifications(data.supabase, data.session).then(() => {
-                    navigator.serviceWorker.ready.then(registration => {
+                subscribeToNotifications(data.supabase, data.session!).then(() => {
+                    navigator.serviceWorker.ready.then((registration) => {
                         registration.showNotification('Notification with ServiceWorker');
                     });
                 });
             }
         });
-    }
+    };
 </script>
 
 <Button on:click={enableNotifications}>Enable Notifications</Button>

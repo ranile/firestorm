@@ -9,15 +9,15 @@ import type { Profile } from './lib/db/users.ts';
 const sw = self as unknown as ServiceWorkerGlobalScope;
 
 interface Notification<T> {
-    op: string,
-    content: T
+    op: string;
+    content: T;
 }
 
 interface Message {
-    content: string,
-    created_at: string,
-    room: Room,
-    author: Profile
+    content: string;
+    created_at: string;
+    room: Room;
+    author: Profile;
 }
 
 const notificationChannel = new BroadcastChannel('notifications');
@@ -26,17 +26,14 @@ notificationChannel.addEventListener('message', (event) => {
     if (request.op === 'notify') {
         // Process the request message
         const content = request.content;
-        sw.registration.showNotification(
-            `${content.author.username} (${content.room.name})`,
-            {
-                body: content.content,
-                timestamp: Date.parse(content.created_at),
-                badge: `${location.origin}/favicon.png`,
-                icon: content.author.avatar ?? undefined
-            }
-        );
+        sw.registration.showNotification(`${content.author.username} (${content.room.name})`, {
+            body: content.content,
+            timestamp: Date.parse(content.created_at),
+            badge: `${location.origin}/favicon.png`,
+            icon: content.author.avatar ?? undefined
+        });
     }
-})
+});
 
 sw.addEventListener('push', (event) => {
     const notification = event.data.json() as Notification<Message>;

@@ -37,9 +37,8 @@
     };
     let isLarge = true;
     export let id = 'sidebar-drawer';
-    export let heading: string;
-    export let goBackTo: string | undefined;
-
+    export let heading = '';
+    export let goBackTo: string | undefined = undefined;
 </script>
 
 <MediaQuery query="(min-width: 1024px)" bind:matches={isLarge} />

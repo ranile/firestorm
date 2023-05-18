@@ -3,16 +3,15 @@
 
     export let href: string;
     export let label: string;
-    export let active: boolean;
-    $: active = $page.url.pathname.toLowerCase().includes(href.toLowerCase())
+    export let active = false;
+    $: active = $page.url.pathname.toLowerCase().includes(href.toLowerCase());
     export let heading = '';
 
     $: {
         if (active) {
-            heading = label
+            heading = label;
         }
     }
-
 </script>
 
 <a

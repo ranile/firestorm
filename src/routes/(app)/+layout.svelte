@@ -13,14 +13,14 @@
     import CreateRoomModal from '$lib/components/SideNav/CreateRoomModal.svelte';
     import SidebarItem from '$lib/components/SideNav/SidebarItem.svelte';
     import type { RealtimeChannel } from '@supabase/supabase-js';
-    import { decryptMessage } from './room/[room]/authors.ts';
+    import { decryptMessage } from './room/[room]/authors';
 
     export let data: LayoutData;
     const signout = () => {
         data.supabase.auth.signOut();
     };
 
-    const handleRoomMemberChange = (payload: any) => {
+    const handleRoomMemberChange = () => {
         console.log('invalidating');
         invalidate('rooms:load');
     };
@@ -52,17 +52,15 @@
                 decryptMessage(data.supabase, {
                     room_id: content.room.id,
                     ...content
-                }).then(plaintext => {
+                }).then((plaintext) => {
                     notificationChannel.postMessage({
                         op: 'notify',
-                        content: plaintext,
+                        content: plaintext
                     });
-                })
-
+                });
             }
-        })
-
-    })
+        });
+    });
 </script>
 
 <SideNavGeneric>
