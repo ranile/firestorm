@@ -7,6 +7,7 @@ import { getUserProfile, profile } from '$lib/db/users';
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { redirect } from '@sveltejs/kit';
+import { subscribeToNotifications } from '$lib/notifications';
 
 const { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } = env;
 
@@ -46,5 +47,8 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
     }
 
     setSupabase(supabase);
+    if (browser && session && Notification.permission === 'granted') {
+        await subscribeToNotifications(supabase, session);
+    }
     return { supabase, session };
 };
