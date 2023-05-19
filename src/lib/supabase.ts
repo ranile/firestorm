@@ -1,12 +1,8 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '../database';
 import { get, writable } from 'svelte/store';
+import type { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit';
 
 export const supabase = writable<Supabase | null>(null);
-
-export function setSupabase(supa: Supabase) {
-    supabase.set(supa);
-}
 
 export async function getSession(supa = get(supabase)) {
     if (supa === null) {
@@ -18,4 +14,4 @@ export async function getSession(supa = get(supabase)) {
     if (session === null) throw new Error('No session found');
     return session;
 }
-export type Supabase = SupabaseClient<Database, 'public', Database['public']>;
+export type Supabase = ReturnType<typeof createSupabaseLoadClient<Database>>;

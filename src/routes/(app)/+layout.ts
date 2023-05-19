@@ -12,7 +12,7 @@ export const load = (async ({ params, parent, depends }) => {
         throw redirect(307, '/auth');
     }
     let roomsWithMember = get(rooms);
-    if (roomsWithMember === null) {
+    if (roomsWithMember.length === 0) {
         console.log('fetching rooms');
         roomsWithMember = await getRoomsWithMember(supabase, session.user.id);
         rooms.set(roomsWithMember);

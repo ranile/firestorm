@@ -53,9 +53,9 @@
         <Auth
             supabaseClient={data.supabase}
             appearance={{ theme }}
+            additionalData={{redirectTo:"/auth/onboarding"}}
             theme="dark"
             magicLink={true}
-            redirectTo="/auth/onboarding"
         />
     </div>
 </div>

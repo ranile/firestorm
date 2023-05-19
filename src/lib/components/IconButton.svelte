@@ -1,7 +1,8 @@
 <script lang="ts">
-    import type { SvelteComponent } from 'svelte';
-
-    export let icon: SvelteComponent | undefined = undefined;
+    // this is because we don't know the type of the component
+    // and can't be generic over it
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    export let icon: any | undefined = undefined;
 </script>
 
 <button

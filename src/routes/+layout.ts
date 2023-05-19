@@ -2,7 +2,7 @@ import { env } from '$env/dynamic/public';
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit';
 import type { LayoutLoad } from './$types';
 import type { Database } from '../database';
-import { setSupabase } from '$lib/supabase';
+import { supabase as supabaseStore } from '$lib/supabase';
 import { getUserProfile, profile } from '$lib/db/users';
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
@@ -53,7 +53,7 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
         }
     }
 
-    setSupabase(supabase);
+    supabaseStore.set(supabase);
     if (browser && session && Notification.permission === 'granted') {
         await subscribeToNotifications(supabase, session);
     }

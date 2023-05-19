@@ -21,7 +21,7 @@
             createRoomModalState.set(false);
             name = ''
         } catch (e) {
-            errorMessage = e.toString()
+            errorMessage = (e as Error).message
         }
     };
 </script>

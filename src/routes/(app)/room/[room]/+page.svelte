@@ -16,7 +16,7 @@
     let loading = true;
 
     $: room = data.room;
-    let messages = [];
+    let messages: AuthoredMessage[] = [];
     $: invited = room?.membership.join_state === 'invited';
 
     let sub: RealtimeChannel | null = null;
