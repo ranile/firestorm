@@ -9,19 +9,19 @@
     $: if (name.length > 64) {
         errorMessage = "Name can't be longer than 64 characters";
     } else {
-        errorMessage = ''
+        errorMessage = '';
     }
     let onCreateClick = async () => {
         if (name.length > 64) {
-            return
+            return;
         }
         try {
             const { room } = await createRoom(name);
             await goto(`/room/${room.id}`);
             createRoomModalState.set(false);
-            name = ''
+            name = '';
         } catch (e) {
-            errorMessage = (e as Error).message
+            errorMessage = (e as Error).message;
         }
     };
 </script>
@@ -39,7 +39,7 @@
                 required
             />
             {#if errorMessage !== null}
-                <Helper class='mt-2' color='red'>
+                <Helper class="mt-2" color="red">
                     <span class="font-medium">{errorMessage}</span>
                 </Helper>
             {/if}

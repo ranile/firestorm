@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
     import type { PageData } from './$types';
     import { Button, Textarea, ToolbarButton } from 'flowbite-svelte';
     import { type AuthoredMessage, createMessage, subscribeToRoomMessages } from '$lib/db/messages';
@@ -24,20 +24,24 @@
     const scrollToBottom = (smooth?: boolean) => {
         if (bottomContainer === null) {
             console.log('no bottom container???');
-            return
+            return;
         }
-        bottomContainer.scrollIntoView( smooth ?{
-            behavior: 'smooth',
-        } : false);
-    }
+        bottomContainer.scrollIntoView(
+            smooth
+                ? {
+                      behavior: 'smooth'
+                  }
+                : false
+        );
+    };
 
     $: {
-        loading = true
-        data.room.messages.then(m => {
-            messages = m
-            loading = false
-            requestAnimationFrame(() => scrollToBottom(true))
-        })
+        loading = true;
+        data.room.messages.then((m) => {
+            messages = m;
+            loading = false;
+            requestAnimationFrame(() => scrollToBottom(true));
+        });
     }
 
     afterNavigate(() => {
@@ -78,18 +82,18 @@
     <title>{room.name} | Firestorm</title>
 </svelte:head>
 
-<div class='grid h-full grid-cols-1'>
-    <div class='row-start-auto overflow-y-auto text-white'>
+<div class="grid h-full grid-cols-1">
+    <div class="row-start-auto overflow-y-auto text-white">
         {#if loading}
             Loading...
-        {:else }
+        {:else}
             <MessageList {messages} />
         {/if}
-        <div bind:this={bottomContainer} class='w-full h-1'></div>
+        <div bind:this={bottomContainer} class="w-full h-1" />
     </div>
-    <div class='self-end mb-4 p-2'>
+    <div class="self-end mb-4 p-2">
         {#if invited}
-            <div class='text-gray-400 flex justify-between items-center w-full px-4'>
+            <div class="text-gray-400 flex justify-between items-center w-full px-4">
                 You have been invited to this room. Please join to send messages.
                 <Button on:click={onJoinRoomClick}>Join</Button>
             </div>

@@ -30,4 +30,4 @@ export const load = (async ({ params, parent, depends }) => {
     };
 }) satisfies LayoutLoad;
 
-export const ssr = false
+export const ssr = false;

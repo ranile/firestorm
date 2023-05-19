@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
     import { Textarea } from 'flowbite-svelte';
     import { OutboundSession } from 'moe';
     import { browser } from '$app/environment';
@@ -47,28 +47,24 @@
     const addFile = () => {
         inputEl.click();
     };
-
 </script>
-<input bind:files type='file' class='hidden' bind:this={inputEl} />
 
-<div class='flex mx-2 flex-col gap-2'>
+<input bind:files type="file" class="hidden" bind:this={inputEl} />
+
+<div class="flex mx-2 flex-col gap-2">
     {#if files !== undefined && files?.length !== 0}
-        <div class='flex flex-col gap-2 bg-pink-600 z-20 mx-14 px-2'>
+        <div class="flex flex-col gap-2 bg-pink-600 z-20 mx-14 px-2">
             {#each Array.from(files) as file}
-                <div class='flex gap-2'>
+                <div class="flex gap-2">
                     <span>{file.name}</span>
                     <span>{file.size}</span>
                 </div>
             {/each}
         </div>
     {/if}
-    <div class='flex gap-3'>
+    <div class="flex gap-3">
         <IconButton icon={AttachmentIcon} on:click={addFile} />
-        <Textarea bind:value class='' rows='1' placeholder='Your message...' />
-        <IconButton
-            on:click={sendMessage}
-            icon={SendIcon}
-        >
-        </IconButton>
+        <Textarea bind:value class="" rows="1" placeholder="Your message..." />
+        <IconButton on:click={sendMessage} icon={SendIcon} />
     </div>
 </div>

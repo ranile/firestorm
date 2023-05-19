@@ -36,7 +36,7 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
     } = await supabase.auth.getSession();
 
     if (get(loaded)) {
-        return { supabase, session }
+        return { supabase, session };
     }
 
     console.log('loading initial state');
@@ -57,6 +57,6 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
     if (browser && session && Notification.permission === 'granted') {
         await subscribeToNotifications(supabase, session);
     }
-    loaded.set(true)
+    loaded.set(true);
     return { supabase, session };
 };
