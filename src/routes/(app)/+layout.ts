@@ -1,15 +1,22 @@
 import type { LayoutLoad } from './$types';
 import { getRoomsWithMember, rooms } from '$lib/db/rooms';
 import { error, redirect } from '@sveltejs/kit';
+import { get } from 'svelte/store';
 
 export const load = (async ({ params, parent, depends }) => {
     depends('rooms:load');
+    console.time('rooms load start (parent)');
     const { supabase, session } = await parent();
+    console.timeEnd('rooms load start (parent)');
     if (session === null) {
         throw redirect(307, '/auth');
     }
-    const roomsWithMember = await getRoomsWithMember(supabase, session.user.id);
-    rooms.set(roomsWithMember);
+    let roomsWithMember = get(rooms);
+    if (roomsWithMember === null) {
+        console.log('fetching rooms');
+        roomsWithMember = await getRoomsWithMember(supabase, session.user.id);
+        rooms.set(roomsWithMember);
+    }
     if (params.room === undefined) {
         return;
     }
@@ -22,3 +29,5 @@ export const load = (async ({ params, parent, depends }) => {
         currentRoomId: params.room
     };
 }) satisfies LayoutLoad;
+
+export const ssr = false

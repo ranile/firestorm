@@ -1,3 +1,5 @@
+import { writable } from 'svelte/store';
+
 export type UnionFromValues<T> = T[keyof T];
 
 export async function splitWith<T>(
@@ -25,6 +27,8 @@ export class Unreachable extends Error {
         super('Unreachable executed' + append);
     }
 }
+
+export const loaded = writable(false);
 
 // taken from flowbite-svelte
 export const clickOutside = (node: HTMLElement, callback: () => void) => {

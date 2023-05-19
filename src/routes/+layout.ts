@@ -8,6 +8,8 @@ import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { redirect } from '@sveltejs/kit';
 import { subscribeToNotifications } from '$lib/notifications';
+import { loaded } from '$lib/utils';
+import { get } from 'svelte/store';
 
 const { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } = env;
 
@@ -33,6 +35,11 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
         data: { session }
     } = await supabase.auth.getSession();
 
+    if (get(loaded)) {
+        return { supabase, session }
+    }
+
+    console.log('loading initial state');
     if (session !== null) {
         const fetched = await getUserProfile(supabase, session);
         const where = fetched.username === null ? '/auth/onboarding' : '/';
@@ -50,5 +57,6 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
     if (browser && session && Notification.permission === 'granted') {
         await subscribeToNotifications(supabase, session);
     }
+    loaded.set(true)
     return { supabase, session };
 };

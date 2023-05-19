@@ -26,7 +26,6 @@
 
     const sendMessage = (e: Event) => {
         e.preventDefault();
-        console.log(files);
         if (value === '') {
             // no empty messages
             return;

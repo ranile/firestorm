@@ -13,13 +13,32 @@
     import MessageInput from './MessageInput.svelte';
 
     export let data: PageData;
-    let value = '';
-    $: messages = data.messages;
+    let loading = true;
+
     $: room = data.room;
+    let messages = [];
     $: invited = room?.membership.join_state === 'invited';
 
     let sub: RealtimeChannel | null = null;
-    let bottomContainer: HTMLDivElement;
+    let bottomContainer: HTMLDivElement | null = null;
+    const scrollToBottom = (smooth?: boolean) => {
+        if (bottomContainer === null) {
+            console.log('no bottom container???');
+            return
+        }
+        bottomContainer.scrollIntoView( smooth ?{
+            behavior: 'smooth',
+        } : false);
+    }
+
+    $: {
+        loading = true
+        data.room.messages.then(m => {
+            messages = m
+            loading = false
+            requestAnimationFrame(() => scrollToBottom(true))
+        })
+    }
 
     afterNavigate(() => {
         sub = subscribeToRoomMessages(data.supabase, room.id, async (event) => {
@@ -35,12 +54,11 @@
                 } satisfies AuthoredMessage;
                 decryptMessage(data.supabase, newAuthoredMessage).then((plaintextMessage) => {
                     messages = [...messages, plaintextMessage];
-                    console.log('yooo?', messages);
+                    console.log('New message received');
+                    requestAnimationFrame(() => scrollToBottom(false));
                 });
             }
         });
-
-        bottomContainer.scrollIntoView(false);
     });
 
     beforeNavigate(() => {
@@ -62,7 +80,11 @@
 
 <div class='grid h-full grid-cols-1'>
     <div class='row-start-auto overflow-y-auto text-white'>
-        <MessageList {messages} />
+        {#if loading}
+            Loading...
+        {:else }
+            <MessageList {messages} />
+        {/if}
         <div bind:this={bottomContainer} class='w-full h-1'></div>
     </div>
     <div class='self-end mb-4 p-2'>

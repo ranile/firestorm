@@ -22,6 +22,7 @@
 
     const handleRoomMemberChange = () => {
         console.log('invalidating');
+        rooms.set(null)
         invalidate('rooms:load');
     };
 

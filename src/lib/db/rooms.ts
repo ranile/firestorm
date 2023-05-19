@@ -169,4 +169,4 @@ interface Membership {
     join_state: 'joined' | 'invited';
 }
 
-export const rooms = writable<(Room & { membership: Membership })[]>([]);
+export const rooms = writable<(Room & { membership: Membership })[] | null>(null);
