@@ -6,8 +6,8 @@ const { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } = env;
 
 export const handle: Handle = async ({ event, resolve }) => {
     event.locals.supabase = createSupabaseServerClient({
-        supabaseUrl: PUBLIC_SUPABASE_URL,
-        supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+        supabaseUrl: PUBLIC_SUPABASE_URL!,
+        supabaseKey: PUBLIC_SUPABASE_ANON_KEY!,
         event
     });
 

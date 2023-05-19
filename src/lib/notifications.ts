@@ -40,7 +40,7 @@ export async function subscribeToNotifications(supabase: Supabase, session: Sess
     }
     const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY)
+        applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY!)
     });
     const subId = localStorage.getItem(WEB_PUSH_SUBSCRIPTION_ID_KEY);
 

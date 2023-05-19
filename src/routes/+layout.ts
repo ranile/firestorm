@@ -25,8 +25,8 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
     depends('supabase:auth');
 
     const supabase = createSupabaseLoadClient<Database>({
-        supabaseUrl: PUBLIC_SUPABASE_URL,
-        supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+        supabaseUrl: PUBLIC_SUPABASE_URL!,
+        supabaseKey: PUBLIC_SUPABASE_ANON_KEY!,
         event: { fetch },
         serverSession: data.session
     });
