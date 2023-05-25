@@ -24,14 +24,15 @@
         outbound = pickle ? OutboundSession.from_pickle(pickle, PICKLE_KEY) : undefined;
     }
 
-    $: worker = browser ? initAttachmentsWorker((m) => {
+    let worker = initAttachmentsWorker((m) => {
         const { room_id: roomId, uid, ciphertext, files: encryptedFiles } = m;
-        createMessage(data.supabase, roomId, uid!, ciphertext)
-        value = '';
-        files = undefined
-        bottomContainer.scrollIntoView(false);
+        createMessage(data.supabase, roomId, uid!, ciphertext).then(() => {
+            value = '';
+            files = undefined
+            bottomContainer.scrollIntoView(false);
+        })
         console.log('got files', encryptedFiles.length);
-    }) : null;
+    });
 
     const sendMessage = (e: Event) => {
         e.preventDefault();
