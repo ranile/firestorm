@@ -1,3 +1,4 @@
+mod attachments;
 use vodozemac::megolm::{GroupSession, GroupSessionPickle, InboundGroupSession, MegolmMessage, SessionConfig, SessionKey};
 use wasm_bindgen::prelude::*;
 
