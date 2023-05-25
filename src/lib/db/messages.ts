@@ -10,7 +10,7 @@ export async function getMessages(supabase: Supabase, roomId: string) {
         .from('messages')
         .select('created_at, content, room_id, id, users_with_profiles(id, username, avatar)')
         .eq('room_id', roomId)
-        .order('created_at', { ascending: true })
+        .order('created_at', { ascending: false })
         .limit(69);
 
     if (error !== null) {
@@ -19,7 +19,7 @@ export async function getMessages(supabase: Supabase, roomId: string) {
     }
 
     return (
-        data?.map((message) => {
+        data?.reverse()?.map((message) => {
             const author = message.users_with_profiles;
             if (author === null || Array.isArray(author)) {
                 throw new Unreachable('author of message is null');
