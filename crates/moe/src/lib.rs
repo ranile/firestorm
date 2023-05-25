@@ -1,7 +1,7 @@
 mod attachments;
 mod json_web_key;
 mod serde;
-mod worker;
+pub mod worker;
 
 use vodozemac::megolm::{GroupSession, GroupSessionPickle, InboundGroupSession, MegolmMessage, SessionConfig, SessionKey};
 use wasm_bindgen::prelude::*;
