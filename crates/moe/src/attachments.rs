@@ -26,14 +26,12 @@ use aes::{
 };
 use base64::DecodeError;
 use rand::{thread_rng, RngCore};
-use ruma::{
-    events::room::{EncryptedFile, JsonWebKey, JsonWebKeyInit},
-    serde::Base64,
-};
+use crate::serde::Base64;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 use zeroize::Zeroize;
+use crate::json_web_key::JsonWebKey;
 
 const IV_SIZE: usize = 16;
 const KEY_SIZE: usize = 32;
@@ -237,14 +235,14 @@ impl<'a, R: Read + ?Sized + 'a> AttachmentEncryptor<'a, R> {
         // initialized for the counter.
         rng.fill_bytes(&mut iv[0..8]);
 
-        let web_key = JsonWebKey::from(JsonWebKeyInit {
+        let web_key = JsonWebKey {
             kty: "oct".to_owned(),
             key_ops: vec!["encrypt".to_owned(), "decrypt".to_owned()],
             alg: "A256CTR".to_owned(),
             #[allow(clippy::unnecessary_to_owned)]
             k: Base64::new(key.to_vec()),
             ext: true,
-        });
+        };
         #[allow(clippy::unnecessary_to_owned)]
         let encoded_iv = Base64::new(iv.to_vec());
 
@@ -295,12 +293,6 @@ pub struct MediaEncryptionInfo {
     pub hashes: BTreeMap<String, Base64>,
 }
 
-impl From<EncryptedFile> for MediaEncryptionInfo {
-    fn from(file: EncryptedFile) -> Self {
-        Self { version: file.v, key: file.key, iv: file.iv, hashes: file.hashes }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use std::io::{Cursor, Read};
@@ -308,6 +300,8 @@ mod tests {
     use serde_json::json;
 
     use super::{AttachmentDecryptor, AttachmentEncryptor, MediaEncryptionInfo};
+    wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
+    use wasm_bindgen_test::wasm_bindgen_test as test;
 
     const EXAMPLE_DATA: &[u8] = &[
         179, 154, 118, 127, 186, 127, 110, 33, 203, 33, 33, 134, 67, 100, 173, 46, 235, 27, 215,
