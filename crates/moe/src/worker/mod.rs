@@ -1,15 +1,13 @@
-#![allow(warnings)]
-
 use std::io::Read;
 use gloo::console::log;
-use gloo::worker::{Codec, HandlerId, Worker, WorkerBridge, WorkerScope};
-use gloo::worker::Spawnable;
+use gloo::worker::{HandlerId, Worker, WorkerBridge, WorkerScope};
 use gloo::utils::format::JsValueSerdeExt;
 use js_sys::{JsString, Uint8Array};
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use wasm_bindgen::{JsCast, JsValue, UnwrapThrowExt};
+use serde::{Deserialize, Serialize};
+use wasm_bindgen::{JsValue, UnwrapThrowExt};
 use wasm_bindgen::prelude::wasm_bindgen;
 use crate::attachments::MediaEncryptionInfo;
+use gloo::worker::Spawnable;
 
 #[wasm_bindgen]
 #[derive(Debug, Serialize, Deserialize)]
@@ -26,7 +24,6 @@ impl EncryptedFile {
     pub fn bytes(&self) -> Uint8Array {
         Uint8Array::from(&self.bytes[..])
     }
-
     #[wasm_bindgen(getter)]
     pub fn key(&self) -> JsValue {
         JsValue::from_serde(&self.key).unwrap_throw()
@@ -39,123 +36,149 @@ impl EncryptedFile {
     pub fn type_(&self) -> JsString {
         JsString::from(self.type_.as_str())
     }
-
-}
-
-#[derive(Debug)]
-pub enum Steps {
-    Respond { output: EncryptedFile, id: HandlerId },
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub enum WorkerInput {
-    EncryptFile { bytes: Vec<u8>, name: String, type_: String },
+pub struct FileToEncrypt {
+    bytes: Vec<u8>,
+    name: String,
+    type_: String,
 }
 
-#[derive(Serialize, Deserialize)]
-pub enum WorkerOutput {
-    EncryptedFile(EncryptedFile),
+#[derive(Debug, Serialize, Deserialize)]
+pub struct WorkerInput {
+    ciphertext: String,
+    files: Vec<FileToEncrypt>,
+    room_id: String,
+    uid: String,
 }
 
-struct EncryptedAttachmentsCodec;
-impl Codec for EncryptedAttachmentsCodec {
-    fn encode<I>(input: I) -> JsValue where I: Serialize {
-        let s= serde_json::to_string(&input).expect_throw("failed to encode message");
-        log!("encode: input", &s);
-        JsValue::from(s)
+#[wasm_bindgen]
+#[derive(Debug, Serialize, Deserialize)]
+pub struct WorkerOutput {
+    uid: String,
+    files: Vec<EncryptedFile>,
+    room_id: String,
+    ciphertext: String,
+}
+
+#[wasm_bindgen]
+impl WorkerOutput {
+    #[wasm_bindgen(getter)]
+    pub fn uid(&self) -> JsString {
+        JsString::from(self.uid.as_str())
     }
 
-    fn decode<O>(input: JsValue) -> O where O: for<'de> Deserialize<'de> {
-        log!("decode: input", &input);
-        let s = input.as_string().expect_throw("input was not string");
-        serde_json::from_str(&s).expect_throw("failed to decode message")
+    #[wasm_bindgen(getter)]
+    pub fn files(&self) -> js_sys::Array {
+        js_sys::Array::from_iter(self.files.iter().map(|it| {
+            JsValue::from_serde(it).unwrap_throw()
+        }))
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn room_id(&self) -> JsString {
+        JsString::from(self.room_id.as_str())
+    }
+    #[wasm_bindgen(getter)]
+    pub fn ciphertext(&self) -> JsString {
+        JsString::from(self.ciphertext.as_str())
     }
 }
 
-pub struct EncryptedAttachmentsWorker {}
+pub struct EncryptedMessagesWorker {}
 
-impl Worker for EncryptedAttachmentsWorker {
-    type Message = Steps;
+pub enum WorkerMessage {}
+
+impl Worker for EncryptedMessagesWorker {
+    type Message = WorkerMessage;
 
     type Input = WorkerInput;
 
     type Output = WorkerOutput;
 
     fn create(_scope: &WorkerScope<Self>) -> Self {
-        log!("create");
         Self {}
     }
 
-    fn update(&mut self, scope: &WorkerScope<Self>, msg: Self::Message) {
-        match msg {
-            Steps::Respond { id, output } => {
-                scope.respond(id, WorkerOutput::EncryptedFile(output));
-            }
-        }
+    fn update(&mut self, _scope: &WorkerScope<Self>, msg: Self::Message) {
+        match msg {}
     }
 
     fn received(&mut self, scope: &WorkerScope<Self>, input: Self::Input, who: HandlerId) {
-        log!("received", format!("{:?}", input));
-        match input {
-            WorkerInput::EncryptFile { type_, mut bytes, name } => {
-                let mut bytes = &bytes[..];
-                let mut encryptor = crate::attachments::AttachmentEncryptor::new(&mut bytes);
-                let mut encrypted = Vec::new();
-                encryptor.read_to_end(&mut encrypted).unwrap();
-                let key = encryptor.finish();
-                let output = EncryptedFile {
-                    bytes: encrypted,
-                    key,
-                    name,
-                    type_,
-                };
-                scope.send_message(Steps::Respond { output, id: who });
-            }
-        }
+        let WorkerInput {
+            ciphertext,
+            files,
+            room_id,
+            uid,
+        } = input;
+
+        let files = files.into_iter().map(|FileToEncrypt { bytes, name, type_ }| {
+            let mut bytes = &bytes[..];
+            let mut encryptor = crate::attachments::AttachmentEncryptor::new(&mut bytes);
+            let mut encrypted = Vec::new();
+            encryptor.read_to_end(&mut encrypted).unwrap();
+            let key = encryptor.finish();
+            EncryptedFile { bytes: encrypted, key, name, type_ }
+        });
+        scope.respond(who, WorkerOutput {
+            ciphertext,
+            files: files.collect(),
+            room_id,
+            uid,
+        })
     }
 }
 
 #[wasm_bindgen]
 pub struct JsWorker {
-    worker: WorkerBridge<EncryptedAttachmentsWorker>,
+    worker: WorkerBridge<EncryptedMessagesWorker>,
 }
 
 #[wasm_bindgen]
 impl JsWorker {
-    #[wasm_bindgen]
-    pub async fn send_file(&self, file: web_sys::File) {
-        let file = gloo::file::File::from(file);
-        let bytes = gloo::file::futures::read_as_bytes(&file).await;
-        let bytes = match bytes {
-            Ok(bytes) => bytes,
-            Err(e) => todo!("throw error: {e}")
+    #[wasm_bindgen(js_name = "newMessage")]
+    pub async fn new_message(
+        &self,
+        outbound_session: &mut crate::OutboundSession,
+        room_id: String,
+        uid: String,
+        content: &str,
+        files: Vec<web_sys::File>,
+    ) {
+        let mut new_files = Vec::with_capacity(files.len());
+        for file in files {
+            let name = file.name();
+            let type_ = file.type_();
+            let bytes = {
+                let file = gloo::file::File::from(file);
+                gloo::file::futures::read_as_bytes(&file).await.unwrap_throw()
+            };
+            new_files.push(FileToEncrypt { bytes, name, type_ });
+        }
+
+        let ciphertext = outbound_session.encrypt(&content);
+
+        let input = WorkerInput {
+            ciphertext,
+            files: new_files,
+            room_id,
+            uid,
         };
-
-        let input = WorkerInput::EncryptFile {
-            bytes: bytes,
-            name: file.name(),
-            type_: file.raw_mime_type(),
-        };
-
-
         self.worker.send(input);
-        log!("sent");
     }
 }
 
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = "initAttachmentsWorker")]
 pub fn worker_init(cb: js_sys::Function) -> JsWorker {
     console_error_panic_hook::set_once();
 
-    let bridge = EncryptedAttachmentsWorker::spawner()
+    let bridge = EncryptedMessagesWorker::spawner()
         .callback(move |m| {
-            let WorkerOutput::EncryptedFile(m) = m;
             let m = JsValue::from(m);
-            log!("Worker Callback: m", &m);
             let ret = cb.call1(&JsValue::NULL, &m);
-            match ret {
-                Ok(v) => log!("Worker Callback: Ok", v),
-                Err(e) => log!("Worker Callback: Err", e),
+            if let Err(e) = ret {
+                log!("Error calling callback", e);
             }
         })
         .spawn("/crates/moe/dist/worker/worker.js");
