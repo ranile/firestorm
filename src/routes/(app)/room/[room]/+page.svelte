@@ -54,6 +54,7 @@
                     id: newMessage.id,
                     content: newMessage.content,
                     room_id: newMessage.room_id,
+                    attachments: [], // TODO
                     author
                 } satisfies AuthoredMessage;
                 decryptMessage(data.supabase, newAuthoredMessage).then((plaintextMessage) => {

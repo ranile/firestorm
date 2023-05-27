@@ -5,12 +5,14 @@ import type { UnionFromValues } from '../utils';
 import { Unreachable } from '../utils';
 import type { Profile } from '$lib/db/users';
 import type { EncryptedFile, OutboundSession } from 'moe';
-import { ulid } from "ulidx";
+import { ulid } from 'ulidx';
 
 export async function getMessages(supabase: Supabase, roomId: string) {
     const { data, error } = await supabase
         .from('messages')
-        .select('created_at, content, room_id, id, users_with_profiles(id, username, avatar), attachments_and_objects(*)')
+        .select(
+            'created_at, content, room_id, id, users_with_profiles(id, username, avatar), attachments_and_objects(*)'
+        )
         .eq('room_id', roomId)
         .order('created_at', { ascending: false })
         .limit(69);
@@ -79,52 +81,54 @@ export async function createMessage(
     attachments: EncryptedFile[]
 ) {
     interface Attachment {
-        path: string
-        name: string
-        type: string
-        key_ciphertext: string
-        hashes: Record<string, string>
+        path: string;
+        name: string;
+        type: string;
+        key_ciphertext: string;
+        hashes: Record<string, string>;
     }
 
-
-    const files: Attachment[] = []
+    const files: Attachment[] = [];
     for (const file of attachments) {
         const id = ulid();
-        const { data, error } = await supabase.storage.from('attachments').upload(`attachments/${id}`, file.bytes, {
-            contentType: file.type,
-        })
+        const { data, error } = await supabase.storage
+            .from('attachments')
+            .upload(`attachments/${id}`, file.bytes, {
+                contentType: file.type
+            });
 
         if (error !== null) {
             console.error(error);
-            continue
+            continue;
         }
 
-        const keyCiphertext = outboundSession.encrypt(JSON.stringify(file.key))
+        const keyCiphertext = outboundSession.encrypt(JSON.stringify(file.key));
         files.push({
             path: data.path,
             name: file.name,
+            // @ts-expect-error type_ is a valid property, wasm bindgen doesn't like to expose `type`
             type: file.type_,
             key_ciphertext: keyCiphertext,
-            hashes: file.key.hashes,
-        } satisfies Attachment)
+            hashes: file.key.hashes
+        } satisfies Attachment);
     }
 
     console.log(files);
 
-    const { error } = await supabase
-        .rpc('insert_message', {
-            p_uid: userId,
-            p_files: files as unknown as PgJson,
-            p_room_id: roomId,
-            p_ciphertext: ciphertext,
-        })
-
+    const { error } = await supabase.rpc('insert_message', {
+        p_uid: userId,
+        p_files: files as unknown as PgJson,
+        p_room_id: roomId,
+        p_ciphertext: ciphertext
+    });
 
     if (error !== null) {
         throw error;
     }
 }
 
-export type Attachment = Database['public']['Views']['attachments_and_objects']['Row']
-export type Message = Database['public']['Tables']['messages']['Row'] & { attachments: Attachment[] }
+export type Attachment = Required<Database['public']['Views']['attachments_and_objects']['Row']>;
+export type Message = Database['public']['Tables']['messages']['Row'] & {
+    attachments: Attachment[];
+};
 export type AuthoredMessage = Omit<Message, 'author_id'> & { author: Profile };

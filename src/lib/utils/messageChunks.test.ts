@@ -12,7 +12,14 @@ function generateMessages(size: number): AuthoredMessage[] {
         const created_at = new Date(2022, 0, 1, 0, i, i * 2).toISOString();
         const id = (i + 1).toString();
         const room_id = '1';
-        messages.push({ author: genAuthor(author_id), content, created_at, id, room_id });
+        messages.push({
+            author: genAuthor(author_id),
+            content,
+            created_at,
+            id,
+            room_id,
+            attachments: []
+        });
     }
     return messages;
 }
@@ -93,14 +100,16 @@ describe('groupMessagesByAuthor', () => {
                     content: 'Hello',
                     created_at: '2022-04-18T12:00:00.000Z',
                     id: '1',
-                    room_id: '1'
+                    room_id: '1',
+                    attachments: []
                 },
                 {
                     author: genAuthor('1'),
                     content: 'How are you?',
                     created_at: '2022-04-18T12:01:00.000Z',
                     id: '2',
-                    room_id: '1'
+                    room_id: '1',
+                    attachments: []
                 }
             ]
         ];

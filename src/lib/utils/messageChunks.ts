@@ -1,4 +1,4 @@
-import type { AuthoredMessage as Message } from '../db/messages';
+import type { Attachment, AuthoredMessage as Message } from '../db/messages';
 import type { Profile } from '$lib/db/users';
 
 export function chunkMessagesArray(chunkSize: number, messages: Message[]): Message[][] {
@@ -65,7 +65,7 @@ export function chunkMessagesArray(chunkSize: number, messages: Message[]): Mess
 export interface GroupedMessage {
     author: Profile;
     firstMessageTimestamp: string;
-    messages: { id: string; content: string; created_at: string }[];
+    messages: { id: string; content: string; created_at: string; attachments?: Attachment[] }[];
 }
 
 export function groupMessagesByAuthor(chunks: Message[][]): GroupedMessage[] {
@@ -75,7 +75,7 @@ export function groupMessagesByAuthor(chunks: Message[][]): GroupedMessage[] {
             id: message.id,
             content: message.content,
             created_at: message.created_at,
-            attachments: message.attachments,
+            attachments: message.attachments
         }));
         return { author, messages, firstMessageTimestamp: messages[0].created_at };
     });

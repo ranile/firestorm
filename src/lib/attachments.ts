@@ -1,6 +1,6 @@
 import { initAttachmentsWorker as moeInitAttachmentsWorker, type WorkerOutput } from 'moe';
 
-type AttachmentsWorker = ReturnType<typeof moeInitAttachmentsWorker>
+type AttachmentsWorker = ReturnType<typeof moeInitAttachmentsWorker>;
 
 let encryptionWorker: AttachmentsWorker | null = null;
 

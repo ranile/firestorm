@@ -7,7 +7,7 @@
     import AttachmentIcon from 'svelte-material-icons/Attachment.svelte';
     import SendIcon from 'svelte-material-icons/Send.svelte';
     import IconButton from '$lib/components/IconButton.svelte';
-    import {initAttachmentsWorker } from '$lib/attachments';
+    import { initAttachmentsWorker } from '$lib/attachments';
     $: data = $page.data;
 
     export let bottomContainer: HTMLDivElement;
@@ -26,11 +26,13 @@
 
     $: worker = initAttachmentsWorker((m) => {
         const { room_id: roomId, uid, ciphertext, files: encryptedFiles } = m;
-        createMessage(data.supabase, outbound!, roomId, uid!, ciphertext, encryptedFiles).then(() => {
-            value = '';
-            files = undefined
-            bottomContainer.scrollIntoView(false);
-        })
+        createMessage(data.supabase, outbound!, roomId, uid!, ciphertext, encryptedFiles).then(
+            () => {
+                value = '';
+                files = undefined;
+                bottomContainer.scrollIntoView(false);
+            }
+        );
     });
 
     const sendMessage = (e: Event) => {
@@ -49,8 +51,13 @@
         const roomId = data.room.id;
         console.log(files);
         worker.newMessage(
-            outbound, roomId, uid, value, files ?? []
-        )
+            outbound,
+            roomId,
+            uid,
+            value,
+            // @ts-expect-error Vec<File> is not assignable to FileList
+            files ?? []
+        );
     };
     const addFile = () => {
         inputEl.click();
