@@ -50,11 +50,10 @@ export async function decryptMessage(supabase: Supabase, message: AuthoredMessag
     const sess = await getInboundSession(supabase, author.id, roomId);
     const plaintext = sess.decrypt(content);
     const attachments = message.attachments.map((it) => {
-        const { key_ciphertext, ...rest } = it;
-        const key = JSON.parse(sess.decrypt(key_ciphertext!));
+        const key = JSON.parse(sess.decrypt(it.key_ciphertext!));
         console.log('dec', key);
         return {
-            ...rest,
+            ...it,
             key
         };
     });

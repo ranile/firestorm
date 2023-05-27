@@ -103,7 +103,6 @@ export async function createMessage(
             continue;
         }
 
-        console.log('enc', file.key);
         const keyCiphertext = outboundSession.encrypt(JSON.stringify(file.key));
         files.push({
             path: data.path,
@@ -114,8 +113,6 @@ export async function createMessage(
             hashes: file.key.hashes
         } satisfies Attachment);
     }
-
-    console.log(files);
 
     const { error } = await supabase.rpc('insert_message', {
         p_uid: userId,
@@ -134,5 +131,5 @@ export type Message = Database['public']['Tables']['messages']['Row'] & {
     attachments: Attachment[];
 };
 export type AuthoredMessage = Omit<Message, 'author_id' | 'attachments'> & { author: Profile } & {
-    attachments: (Attachment & { key: Attachment['key_ciphertext'] })[]
+    attachments: (Attachment & { key?: Attachment['key_ciphertext'] })[];
 };
