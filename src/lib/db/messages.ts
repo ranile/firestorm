@@ -48,6 +48,20 @@ export async function getMessages(supabase: Supabase, roomId: string) {
     );
 }
 
+export async function getAttachmentsForMessage(supabase: Supabase, messageId: string) {
+    const { data, error } = await supabase
+        .from('attachments_and_objects')
+        .select('*')
+        .eq('message_id', messageId);
+
+    if (error) {
+        console.error(error);
+        throw error;
+    }
+
+    return data ?? [];
+}
+
 export function subscribeToRoomMessages(
     supabase: Supabase,
     roomId: string,

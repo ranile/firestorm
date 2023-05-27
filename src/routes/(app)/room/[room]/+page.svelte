@@ -1,7 +1,12 @@
 <script lang="ts">
     import type { PageData } from './$types';
     import { Button, Textarea, ToolbarButton } from 'flowbite-svelte';
-    import { type AuthoredMessage, createMessage, subscribeToRoomMessages } from '$lib/db/messages';
+    import {
+        type AuthoredMessage,
+        createMessage,
+        getAttachmentsForMessage,
+        subscribeToRoomMessages
+    } from '$lib/db/messages';
     import MessageList from './MessageList.svelte';
     import type { Message } from '$lib/db/messages';
     import { joinRoom } from '$lib/db/rooms';
@@ -49,12 +54,13 @@
             if (event.eventType === 'INSERT') {
                 const newMessage = event.new as Message;
                 const author = await getAuthor(data.supabase, newMessage.author_id);
+                const attachments = await getAttachmentsForMessage(data.supabase, newMessage.id);
                 const newAuthoredMessage = {
                     created_at: newMessage.created_at,
                     id: newMessage.id,
                     content: newMessage.content,
                     room_id: newMessage.room_id,
-                    attachments: [], // TODO
+                    attachments,
                     author
                 } satisfies AuthoredMessage;
                 decryptMessage(data.supabase, newAuthoredMessage).then((plaintextMessage) => {
