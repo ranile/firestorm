@@ -74,7 +74,8 @@ export function groupMessagesByAuthor(chunks: Message[][]): GroupedMessage[] {
         const messages = chunk.map((message) => ({
             id: message.id,
             content: message.content,
-            created_at: message.created_at
+            created_at: message.created_at,
+            attachments: message.attachments,
         }));
         return { author, messages, firstMessageTimestamp: messages[0].created_at };
     });

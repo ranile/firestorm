@@ -10,7 +10,7 @@ use crate::serde::{Base64, UrlSafe};
 /// `JsonWebKey::from` / `.into()`.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(not(feature = "unstable-exhaustive-types"), non_exhaustive)]
-pub struct JsonWebKey {
+pub struct  JsonWebKey {
     /// Key type.
     ///
     /// Must be `oct`.

@@ -54,6 +54,7 @@
         "flowbite": "^1.6.5",
         "flowbite-svelte": "^0.34.9",
         "svelte-material-icons": "^3.0.4",
-        "svelte-media-queries": "^1.5.4"
+        "svelte-media-queries": "^1.5.4",
+        "ulidx": "^1.0.0"
     }
 }

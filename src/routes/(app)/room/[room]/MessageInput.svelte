@@ -24,14 +24,13 @@
         outbound = pickle ? OutboundSession.from_pickle(pickle, PICKLE_KEY) : undefined;
     }
 
-    let worker = initAttachmentsWorker((m) => {
+    $: worker = initAttachmentsWorker((m) => {
         const { room_id: roomId, uid, ciphertext, files: encryptedFiles } = m;
-        createMessage(data.supabase, roomId, uid!, ciphertext).then(() => {
+        createMessage(data.supabase, outbound!, roomId, uid!, ciphertext, encryptedFiles).then(() => {
             value = '';
             files = undefined
             bottomContainer.scrollIntoView(false);
         })
-        console.log('got files', encryptedFiles.length);
     });
 
     const sendMessage = (e: Event) => {
@@ -48,6 +47,7 @@
             throw Error('User not logged in');
         }
         const roomId = data.room.id;
+        console.log(files);
         worker.newMessage(
             outbound, roomId, uid, value, files ?? []
         )

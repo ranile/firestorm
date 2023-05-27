@@ -18,6 +18,12 @@
             {#each chunk.messages as message}
                 <div class="">
                     <p>{message.content}</p>
+                    <hr>
+                    {#if message.attachments}
+                        {#each message.attachments as attachment}
+                            {JSON.stringify(attachment, undefined, 2)}
+                        {/each}
+                    {/if}
                 </div>
             {/each}
         </div>
