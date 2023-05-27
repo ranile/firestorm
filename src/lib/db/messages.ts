@@ -91,10 +91,11 @@ export async function createMessage(
     const files: Attachment[] = [];
     for (const file of attachments) {
         const id = ulid();
+        const bytes = new Uint8Array(file.bytes);
         const { data, error } = await supabase.storage
             .from('attachments')
-            .upload(`attachments/${id}`, file.bytes, {
-                contentType: file.type
+            .upload(`attachments/${id}`, bytes, {
+                contentType: 'application/octet-stream'
             });
 
         if (error !== null) {
@@ -102,6 +103,7 @@ export async function createMessage(
             continue;
         }
 
+        console.log('enc', file.key);
         const keyCiphertext = outboundSession.encrypt(JSON.stringify(file.key));
         files.push({
             path: data.path,
@@ -131,4 +133,6 @@ export type Attachment = Required<Database['public']['Views']['attachments_and_o
 export type Message = Database['public']['Tables']['messages']['Row'] & {
     attachments: Attachment[];
 };
-export type AuthoredMessage = Omit<Message, 'author_id'> & { author: Profile };
+export type AuthoredMessage = Omit<Message, 'author_id' | 'attachments'> & { author: Profile } & {
+    attachments: (Attachment & { key: Attachment['key_ciphertext'] })[]
+};

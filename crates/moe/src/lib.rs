@@ -1,6 +1,6 @@
-mod attachments;
-mod json_web_key;
-mod serde;
+pub mod attachments;
+pub mod json_web_key;
+pub mod serde;
 pub mod worker;
 
 use vodozemac::megolm::{GroupSession, GroupSessionPickle, InboundGroupSession, MegolmMessage, SessionConfig, SessionKey};
@@ -78,10 +78,13 @@ pub fn encrypt_file(file: web_sys::File) {
 
 #[cfg(test)]
 mod tests {
+    use std::io::Read;
+    use rand::RngCore;
     use crate::{InboundSession, OutboundSession};
 
     wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
     use wasm_bindgen_test::wasm_bindgen_test as test;
+    use crate::attachments::{AttachmentDecryptor, AttachmentEncryptor};
 
     #[test]
     fn message_encryption_roundtrip() {
@@ -98,6 +101,27 @@ mod tests {
         let mut inbound = InboundSession::new(&session_key).unwrap();
         let plaintext = inbound.decrypt(&ciphertext).unwrap();
         assert_eq!(plaintext, msg);
+    }
 
+    #[test]
+    fn attachments_roundtrip() {
+        let input = {
+            let mut input = [0; 1024];
+            rand::thread_rng().fill_bytes(&mut input);
+            input
+        };
+        let mut bytes = input.to_vec();
+        let mut bytes = &bytes[..];
+        let mut encryptor = AttachmentEncryptor::new(&mut bytes);
+        let mut encrypted = Vec::new();
+        encryptor.read_to_end(&mut encrypted).unwrap();
+        let info = encryptor.finish();
+
+        let mut encrypted = &encrypted[..];
+        let mut decryptor = AttachmentDecryptor::new(&mut encrypted, info).unwrap();
+        let mut decrypted_data = Vec::new();
+        decryptor.read_to_end(&mut decrypted_data).unwrap();
+
+        assert_eq!(input, *decrypted_data);
     }
 }

@@ -51,9 +51,11 @@ export async function decryptMessage(supabase: Supabase, message: AuthoredMessag
     const plaintext = sess.decrypt(content);
     const attachments = message.attachments.map((it) => {
         const { key_ciphertext, ...rest } = it;
+        const key = JSON.parse(sess.decrypt(key_ciphertext!));
+        console.log('dec', key);
         return {
             ...rest,
-            key_ciphertext: JSON.parse(sess.decrypt(key_ciphertext!))
+            key
         };
     });
     return {

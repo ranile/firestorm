@@ -1,4 +1,4 @@
-import { initAttachmentsWorker as moeInitAttachmentsWorker, type WorkerOutput } from 'moe';
+import { initAttachmentsWorker as moeInitAttachmentsWorker, newDecryptAttachmentsWorker, type WorkerOutput } from 'moe';
 
 type AttachmentsWorker = ReturnType<typeof moeInitAttachmentsWorker>;
 
@@ -10,3 +10,14 @@ export function initAttachmentsWorker(cb: (v: WorkerOutput) => void) {
     }
     return encryptionWorker;
 }
+
+
+let decryptAttachmentsWorker: AttachmentsWorker | null = null;
+
+export function initDecryptAttachmentsWorker(cb: (v: Uint8Array) => void) {
+    if (decryptAttachmentsWorker === null) {
+        decryptAttachmentsWorker = newDecryptAttachmentsWorker(cb);
+    }
+    return decryptAttachmentsWorker;
+}
+

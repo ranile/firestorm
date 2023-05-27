@@ -8,7 +8,7 @@ export default defineConfig({
     plugins: [wasm(), topLevelAwait(), sveltekit()],
     server: {
         fs: {
-            allow: ['crates/moe/pkg', 'crates/moe/dist/worker']
+            allow: ['crates/moe/pkg', 'crates/moe/dist/worker', 'crates/moe/dist/decrypt_attachment_worker']
         }
     },
     test: {

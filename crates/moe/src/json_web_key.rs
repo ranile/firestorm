@@ -9,7 +9,6 @@ use crate::serde::{Base64, UrlSafe};
 /// To create an instance of this type, first create a `JsonWebKeyInit` and convert it via
 /// `JsonWebKey::from` / `.into()`.
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[cfg_attr(not(feature = "unstable-exhaustive-types"), non_exhaustive)]
 pub struct  JsonWebKey {
     /// Key type.
     ///

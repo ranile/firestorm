@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { GroupedMessage } from '$lib/utils/messageChunks';
+    import AttachmentPreview from '$lib/components/attachments/AttachmentPreview.svelte';
     import { formatTimestamp } from '$lib/utils/timestamps';
 
     export let chunk: GroupedMessage;
@@ -19,9 +20,8 @@
                 <div class="">
                     <p>{message.content}</p>
                     {#if message.attachments}
-                        <hr />
                         {#each message.attachments as attachment}
-                            {JSON.stringify(attachment, undefined, 2)}
+                            <AttachmentPreview {attachment} />
                         {/each}
                     {/if}
                 </div>
