@@ -1,6 +1,6 @@
-#! /usr/bin/fish
+#! /usr/bin/bash
 
-set -u CARGO_TARGET_DIR
+unset CARGO_TARGET_DIR
 
 cargo build --bin worker --target wasm32-unknown-unknown
 wasm-bindgen --target no-modules --out-dir ./dist/worker target/wasm32-unknown-unknown/debug/worker.wasm
