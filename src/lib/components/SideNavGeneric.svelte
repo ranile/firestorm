@@ -2,16 +2,9 @@
     import { onMount } from 'svelte';
     import MediaQuery from 'svelte-media-queries';
     import { NavHamburger, CloseButton } from 'flowbite-svelte';
-    import { sineIn } from 'svelte/easing';
-    import { slide } from 'svelte/transition';
     import { clickOutside } from '$lib/utils';
     import Back from 'svelte-material-icons/ArrowLeft.svelte';
 
-    let transitionParams = {
-        x: -320,
-        duration: 200,
-        easing: sineIn
-    };
     let breakPoint = 1024;
     let width = 0;
     let activateClickOutside = true;

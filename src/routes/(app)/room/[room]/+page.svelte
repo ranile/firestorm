@@ -1,17 +1,14 @@
 <script lang="ts">
     import type { PageData } from './$types';
-    import { Button, Textarea, ToolbarButton } from 'flowbite-svelte';
+    import { Button } from 'flowbite-svelte';
     import {
         type AuthoredMessage,
-        createMessage,
         getAttachmentsForMessage,
         subscribeToRoomMessages
     } from '$lib/db/messages';
     import MessageList from './MessageList.svelte';
     import type { Message } from '$lib/db/messages';
     import { joinRoom } from '$lib/db/rooms';
-    import { OutboundSession } from 'moe';
-    import { browser } from '$app/environment';
     import { decryptMessage, get as getAuthor } from './authors';
     import { afterNavigate, beforeNavigate } from '$app/navigation';
     import type { RealtimeChannel } from '@supabase/supabase-js';
