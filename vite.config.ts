@@ -4,16 +4,15 @@ import wasm from 'vite-plugin-wasm';
 import topLevelAwait from 'vite-plugin-top-level-await';
 
 export default defineConfig({
+    assetsInclude: ['crates/moe/dist/*'],
     plugins: [wasm(), topLevelAwait(), sveltekit()],
     server: {
         fs: {
-            allow: ['crates/moe/pkg']
-        },
-        proxy: {
-            '/api/push-notify': {
-                target: 'http://localhost:54321/functions/v1/push-notify/',
-                rewrite: (path) => path.replace(/^\/api\/push-notify/, '')
-            }
+            allow: [
+                'crates/moe/pkg',
+                'crates/moe/dist/worker',
+                'crates/moe/dist/decrypt_attachment_worker'
+            ]
         }
     },
     test: {

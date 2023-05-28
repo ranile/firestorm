@@ -11,6 +11,7 @@
       <excludeFolder url="file://$MODULE_DIR$/supabase/.branches" />
       <excludeFolder url="file://$MODULE_DIR$/supabase/.temp" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/crates/moe/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

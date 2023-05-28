@@ -1,3 +1,8 @@
+pub mod attachments;
+pub mod json_web_key;
+pub mod serde;
+pub mod worker;
+
 use vodozemac::megolm::{GroupSession, GroupSessionPickle, InboundGroupSession, MegolmMessage, SessionConfig, SessionKey};
 use wasm_bindgen::prelude::*;
 
@@ -62,59 +67,27 @@ impl InboundSession {
     }
 }
 
-/*
-pub struct SessionKey {
-    room_id: String,
-    user_id: String,
-    inner: vodozemac::megolm::SessionKey,
+pub fn encrypt_file(file: web_sys::File) {
+    // TODO: implement
+    // Steps:
+    // 1. read file into Vec<u8>
+    // 2. encrypt using attachments:AttachmentEncryptor
+    // 3. finalize attachment
+    // 4. return the metadata and the ciphertext
 }
-
-pub fn init_room(members: Vec<RoomMember>) {
-    let mut outbound = vodozemac::megolm::GroupSession::new(vodozemac::megolm::SessionConfig::version_1());
-    let session_key = outbound.session_key();
-
-    let b64 = session_key.to_base64();
-    let mut inbound = InboundGroupSession::new(&vodozemac::megolm::SessionKey::from_base64(&b64).unwrap(), vodozemac::megolm::SessionConfig::version_1());
-
-    // broadcast this key to the other users
-    let _ = members.into_iter().map(|member| EncryptedSessionKeyForUser {
-        session_key: encrypt_session_key(&b64, member.identity_key, member.one_time_key),
-        user_id: member.user_id
-    });
-
-}
-struct UserAccount {
-    inner: Account,
-}
-
-static MY_ACCOUNT: OnceCell<Account> = OnceCell::new();
-
-pub fn encrypt_session_key(message: &str, identity_key: Curve25519PublicKey, one_time_key: Curve25519PublicKey) -> OlmMessage {
-    let my_account = MY_ACCOUNT.get().unwrap();
-    let mut sess = my_account.create_outbound_session(SessionConfig::version_2(), identity_key, one_time_key);
-    sess.encrypt(message)
-}
-
-pub fn init() {}
-
-pub struct RoomMember {
-    user_id: String,
-    one_time_key: Curve25519PublicKey,
-    identity_key: Curve25519PublicKey,
-}
-
-struct EncryptedSessionKeyForUser {
-    user_id: String,
-    session_key: OlmMessage,
-}
-*/
 
 #[cfg(test)]
 mod tests {
+    use std::io::Read;
+    use rand::RngCore;
     use crate::{InboundSession, OutboundSession};
 
+    wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
+    use wasm_bindgen_test::wasm_bindgen_test as test;
+    use crate::attachments::{AttachmentDecryptor, AttachmentEncryptor};
+
     #[test]
-    fn it_works() {
+    fn message_encryption_roundtrip() {
         let msg = "i fucked your mum";
 
         let mut outbound = OutboundSession::new();
@@ -128,6 +101,27 @@ mod tests {
         let mut inbound = InboundSession::new(&session_key).unwrap();
         let plaintext = inbound.decrypt(&ciphertext).unwrap();
         assert_eq!(plaintext, msg);
+    }
 
+    #[test]
+    fn attachments_roundtrip() {
+        let input = {
+            let mut input = [0; 1024];
+            rand::thread_rng().fill_bytes(&mut input);
+            input
+        };
+        let mut bytes = input.to_vec();
+        let mut bytes = &bytes[..];
+        let mut encryptor = AttachmentEncryptor::new(&mut bytes);
+        let mut encrypted = Vec::new();
+        encryptor.read_to_end(&mut encrypted).unwrap();
+        let info = encryptor.finish();
+
+        let mut encrypted = &encrypted[..];
+        let mut decryptor = AttachmentDecryptor::new(&mut encrypted, info).unwrap();
+        let mut decrypted_data = Vec::new();
+        decryptor.read_to_end(&mut decrypted_data).unwrap();
+
+        assert_eq!(input, *decrypted_data);
     }
 }

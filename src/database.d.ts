@@ -28,6 +28,32 @@ export interface Database {
     };
     public: {
         Tables: {
+            attachments: {
+                Row: {
+                    hashes: Json;
+                    id: string;
+                    key_ciphertext: string;
+                    message_id: string | null;
+                    name: string;
+                    type: string;
+                };
+                Insert: {
+                    hashes: Json;
+                    id: string;
+                    key_ciphertext: string;
+                    message_id?: string | null;
+                    name: string;
+                    type: string;
+                };
+                Update: {
+                    hashes?: Json;
+                    id?: string;
+                    key_ciphertext?: string;
+                    message_id?: string | null;
+                    name?: string;
+                    type?: string;
+                };
+            };
             messages: {
                 Row: {
                     author_id: string;
@@ -164,6 +190,18 @@ export interface Database {
             };
         };
         Views: {
+            attachments_and_objects: {
+                Row: {
+                    attachment_id: string | null;
+                    hashes: Json | null;
+                    key_ciphertext: string | null;
+                    message_id: string | null;
+                    name: string | null;
+                    object_id: string | null;
+                    path: string | null;
+                    type: string | null;
+                };
+            };
             room_members_with_users: {
                 Row: {
                     avatar: string | null;
@@ -185,6 +223,15 @@ export interface Database {
             };
         };
         Functions: {
+            insert_message: {
+                Args: {
+                    p_uid: string;
+                    p_files: Json;
+                    p_room_id: string;
+                    p_ciphertext: string;
+                };
+                Returns: undefined;
+            };
             is_member_of: {
                 Args: {
                     _user_id: string;

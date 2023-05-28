@@ -7,7 +7,7 @@
     import AttachmentIcon from 'svelte-material-icons/Attachment.svelte';
     import SendIcon from 'svelte-material-icons/Send.svelte';
     import IconButton from '$lib/components/IconButton.svelte';
-
+    import { initAttachmentsWorker } from '$lib/attachments';
     $: data = $page.data;
 
     export let bottomContainer: HTMLDivElement;
@@ -24,6 +24,17 @@
         outbound = pickle ? OutboundSession.from_pickle(pickle, PICKLE_KEY) : undefined;
     }
 
+    $: worker = initAttachmentsWorker((m) => {
+        const { room_id: roomId, uid, ciphertext, files: encryptedFiles } = m;
+        createMessage(data.supabase, outbound!, roomId, uid!, ciphertext, encryptedFiles).then(
+            () => {
+                value = '';
+                files = undefined;
+                bottomContainer.scrollIntoView(false);
+            }
+        );
+    });
+
     const sendMessage = (e: Event) => {
         e.preventDefault();
         if (value === '') {
@@ -33,16 +44,20 @@
         if (outbound === undefined) {
             throw Error('Outbound session not initialized');
         }
-        const roomId = data.room.id;
-        const content = outbound.encrypt(value);
         const uid = data.session?.user.id;
         if (uid === undefined) {
             throw Error('User not logged in');
         }
-        createMessage(data.supabase, roomId, uid!, content).then(() => {
-            value = '';
-            bottomContainer.scrollIntoView(false);
-        });
+        const roomId = data.room.id;
+        console.log(files);
+        worker.newMessage(
+            outbound,
+            roomId,
+            uid,
+            value,
+            // @ts-expect-error Vec<File> is not assignable to FileList
+            files ?? []
+        );
     };
     const addFile = () => {
         inputEl.click();

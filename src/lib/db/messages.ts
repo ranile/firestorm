@@ -1,16 +1,20 @@
 import type { Supabase } from '../supabase';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
-import type { Database } from '../../database';
+import type { Database, Json as PgJson } from '../../database';
 import type { UnionFromValues } from '../utils';
 import { Unreachable } from '../utils';
 import type { Profile } from '$lib/db/users';
+import type { EncryptedFile, OutboundSession } from 'moe';
+import { ulid } from 'ulidx';
 
 export async function getMessages(supabase: Supabase, roomId: string) {
     const { data, error } = await supabase
         .from('messages')
-        .select('created_at, content, room_id, id, users_with_profiles(id, username, avatar)')
+        .select(
+            'created_at, content, room_id, id, users_with_profiles(id, username, avatar), attachments_and_objects(*)'
+        )
         .eq('room_id', roomId)
-        .order('created_at', { ascending: true })
+        .order('created_at', { ascending: false })
         .limit(69);
 
     if (error !== null) {
@@ -19,16 +23,21 @@ export async function getMessages(supabase: Supabase, roomId: string) {
     }
 
     return (
-        data?.map((message) => {
+        data?.reverse()?.map((message) => {
             const author = message.users_with_profiles;
             if (author === null || Array.isArray(author)) {
                 throw new Unreachable('author of message is null');
+            }
+            let attachments = message.attachments_and_objects ?? [];
+            if (!Array.isArray(attachments)) {
+                attachments = [attachments];
             }
             return {
                 room_id: message.room_id,
                 content: message.content,
                 created_at: message.created_at,
                 id: message.id,
+                attachments,
                 author: {
                     id: author.id!,
                     username: author.username!,
@@ -37,6 +46,20 @@ export async function getMessages(supabase: Supabase, roomId: string) {
             } satisfies AuthoredMessage;
         }) ?? []
     );
+}
+
+export async function getAttachmentsForMessage(supabase: Supabase, messageId: string) {
+    const { data, error } = await supabase
+        .from('attachments_and_objects')
+        .select('*')
+        .eq('message_id', messageId);
+
+    if (error) {
+        console.error(error);
+        throw error;
+    }
+
+    return data ?? [];
 }
 
 export function subscribeToRoomMessages(
@@ -48,7 +71,6 @@ export function subscribeToRoomMessages(
         >
     ) => void
 ) {
-    console.log('room id', roomId);
     return supabase
         .channel(`${roomId}-messages`)
         .on(
@@ -63,20 +85,65 @@ export function subscribeToRoomMessages(
         )
         .subscribe();
 }
+
 export async function createMessage(
     supabase: Supabase,
+    outboundSession: OutboundSession,
     roomId: string,
     userId: string,
-    content: string
+    ciphertext: string,
+    attachments: EncryptedFile[]
 ) {
-    const { error } = await supabase
-        .from('messages')
-        .insert({ room_id: roomId, author_id: userId, content });
+    interface Attachment {
+        path: string;
+        name: string;
+        type: string;
+        key_ciphertext: string;
+        hashes: Record<string, string>;
+    }
+
+    const files: Attachment[] = [];
+    for (const file of attachments) {
+        const id = ulid();
+        const bytes = new Uint8Array(file.bytes);
+        const { data, error } = await supabase.storage
+            .from('attachments')
+            .upload(`attachments/${id}`, bytes, {
+                contentType: 'application/octet-stream'
+            });
+
+        if (error !== null) {
+            console.error(error);
+            continue;
+        }
+
+        const keyCiphertext = outboundSession.encrypt(JSON.stringify(file.key));
+        files.push({
+            path: data.path,
+            name: file.name,
+            // @ts-expect-error type_ is a valid property, wasm bindgen doesn't like to expose `type`
+            type: file.type_,
+            key_ciphertext: keyCiphertext,
+            hashes: file.key.hashes
+        } satisfies Attachment);
+    }
+
+    const { error } = await supabase.rpc('insert_message', {
+        p_uid: userId,
+        p_files: files as unknown as PgJson,
+        p_room_id: roomId,
+        p_ciphertext: ciphertext
+    });
 
     if (error !== null) {
         throw error;
     }
 }
 
-export type Message = Database['public']['Tables']['messages']['Row'];
-export type AuthoredMessage = Omit<Message, 'author_id'> & { author: Profile };
+export type Attachment = Required<Database['public']['Views']['attachments_and_objects']['Row']>;
+export type Message = Database['public']['Tables']['messages']['Row'] & {
+    attachments: Attachment[];
+};
+export type AuthoredMessage = Omit<Message, 'author_id' | 'attachments'> & { author: Profile } & {
+    attachments: (Attachment & { key?: Attachment['key_ciphertext'] })[];
+};
