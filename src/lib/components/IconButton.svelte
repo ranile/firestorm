@@ -3,6 +3,7 @@
     // and can't be generic over it
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     export let icon: any | undefined = undefined;
+    export let label: string;
 </script>
 
 <button
@@ -14,4 +15,5 @@
             <svelte:component this={icon} size="1.5em" />
         {/if}
     </slot>
+    <span class="sr-only">{label}</span>
 </button>

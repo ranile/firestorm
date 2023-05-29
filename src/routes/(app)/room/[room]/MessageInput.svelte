@@ -78,8 +78,8 @@
         </div>
     {/if}
     <div class="flex gap-3">
-        <IconButton icon={AttachmentIcon} on:click={addFile} />
+        <IconButton icon={AttachmentIcon} on:click={addFile} label="Add files" />
         <Textarea bind:value class="" rows="1" placeholder="Your message..." />
-        <IconButton on:click={sendMessage} icon={SendIcon} />
+        <IconButton on:click={sendMessage} icon={SendIcon} label="Send message" />
     </div>
 </div>

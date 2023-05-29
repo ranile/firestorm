@@ -35,15 +35,15 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
         data: { session }
     } = await supabase.auth.getSession();
 
-    if (get(loaded)) {
-        return { supabase, session };
-    }
-
     console.log('loading initial state');
     if (session !== null) {
-        const fetched = await getUserProfile(supabase, session);
-        const where = fetched.username === null ? '/auth/onboarding' : '/';
-        profile.set({ ...fetched, email: data.session?.user.email ?? '' });
+        let cachedProfile = get(profile);
+        if (cachedProfile === null) {
+            const fetched = await getUserProfile(supabase, session);
+            cachedProfile = { ...fetched, email: data.session?.user.email ?? '' };
+            profile.set(cachedProfile);
+        }
+        const where = cachedProfile.username === null ? '/auth/onboarding' : '/';
         if (url.pathname.startsWith('/auth') && url.pathname !== where) {
             await navigate(where);
         }
@@ -51,6 +51,10 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
         if (url.pathname !== '/auth') {
             await navigate('/auth');
         }
+    }
+
+    if (get(loaded)) {
+        return { supabase, session };
     }
 
     supabaseStore.set(supabase);

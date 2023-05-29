@@ -5,15 +5,12 @@ import { get } from 'svelte/store';
 
 export const load = (async ({ params, parent, depends }) => {
     depends('rooms:load');
-    console.time('rooms load start (parent)');
     const { supabase, session } = await parent();
-    console.timeEnd('rooms load start (parent)');
     if (session === null) {
         throw redirect(307, '/auth');
     }
     let roomsWithMember = get(rooms);
     if (roomsWithMember.length === 0) {
-        console.log('fetching rooms');
         roomsWithMember = await getRoomsWithMember(supabase, session.user.id);
         rooms.set(roomsWithMember);
     }

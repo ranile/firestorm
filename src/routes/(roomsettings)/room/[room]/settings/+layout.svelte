@@ -10,7 +10,7 @@
     $: toNavigateBase = `/room/${data.room.id}/settings/`;
 </script>
 
-<SideNav {heading} goBackTo={`/room/${data.room.id}`}>
+<SideNav {heading} goBackTo={{ href: `/room/${data.room.id}`, label: 'Back to messages' }}>
     <svelte:fragment slot="sidebar-content">
         <SidebarItem label="Overview" href={toNavigateBase + 'settings'} bind:heading>
             <svelte:fragment slot="icon">

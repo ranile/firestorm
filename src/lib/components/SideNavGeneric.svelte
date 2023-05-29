@@ -31,7 +31,7 @@
     let isLarge = true;
     export let id = 'sidebar-drawer';
     export let heading = '';
-    export let goBackTo: string | undefined = undefined;
+    export let goBackTo: { href: string; label: string } | undefined = undefined;
 </script>
 
 <MediaQuery query="(min-width: 1024px)" bind:matches={isLarge} />
@@ -56,8 +56,9 @@
             <div class="overflow-y-auto py-4 px-3 rounded dark:bg-gray-900 flex flex-col gap-2">
                 <div class="flex justify-between">
                     {#if goBackTo !== undefined}
-                        <a class="text-2xl" href={goBackTo}>
+                        <a class="text-2xl" href={goBackTo.href}>
                             <Back />
+                            <span class="sr-only">{goBackTo.label}</span>
                         </a>
                     {/if}
                     <slot name="sidebar-header" />

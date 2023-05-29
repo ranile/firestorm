@@ -1,8 +1,8 @@
 <script lang="ts">
     import { Button, Modal, Label, Input, Helper } from 'flowbite-svelte';
     import { createRoomModalState } from './store';
-    import { createRoom } from '$lib/db/rooms';
-    import { goto } from '$app/navigation';
+    import { createRoom, rooms } from '$lib/db/rooms';
+    import { goto, invalidate } from '$app/navigation';
 
     let name = '';
     let errorMessage: string | null = null;
@@ -17,6 +17,8 @@
         }
         try {
             const { room } = await createRoom(name);
+            rooms.set([]);
+            await invalidate('rooms:load');
             await goto(`/room/${room.id}`);
             createRoomModalState.set(false);
             name = '';

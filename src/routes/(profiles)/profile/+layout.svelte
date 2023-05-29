@@ -8,7 +8,7 @@
     const toNavigateBase = `/profile/`;
 </script>
 
-<SideNav {heading} goBackTo={`/`}>
+<SideNav {heading} goBackTo={{ href: '/', label: 'Home' }}>
     <svelte:fragment slot="sidebar-content">
         <SidebarItem label="Settings" href={toNavigateBase + 'settings'} bind:heading>
             <svelte:fragment slot="icon">

@@ -80,6 +80,7 @@
         <ProfileDropdown {signout} />
         <Button pill={true} on:click={() => createRoomModalState.set(true)}>
             <Plus />
+            <span class="sr-only">Create room</span>
         </Button>
     </svelte:fragment>
 
