@@ -1,9 +1,9 @@
 <script lang="ts">
-    import type { AuthoredMessage } from '$lib/db/messages';
+    import type { Attachment } from '$lib/db/messages';
     import { supabase } from '$lib/supabase';
     import { newDecryptAttachmentsWorker } from 'moe';
 
-    export let attachment: AuthoredMessage['attachments'][number];
+    export let attachment: Attachment;
 
     let workerOutput: Uint8Array | null = null;
     let src = '';

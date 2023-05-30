@@ -140,10 +140,11 @@ export async function createMessage(
     }
 }
 
-export type Attachment = Required<Database['public']['Views']['attachments_and_objects']['Row']>;
+type AttachmentInner = Required<Database['public']['Views']['attachments_and_objects']['Row']>;
+export type Attachment = AttachmentInner & { key?: AttachmentInner['key_ciphertext'] };
 export type Message = Database['public']['Tables']['messages']['Row'] & {
     attachments: Attachment[];
 };
 export type AuthoredMessage = Omit<Message, 'author_id' | 'attachments'> & { author: Profile } & {
-    attachments: (Attachment & { key?: Attachment['key_ciphertext'] })[];
+    attachments?: Attachment[];
 };

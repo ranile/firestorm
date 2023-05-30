@@ -49,7 +49,7 @@ export async function decryptMessage(supabase: Supabase, message: AuthoredMessag
     const { content, author, room_id: roomId } = message;
     const sess = await getInboundSession(supabase, author.id, roomId);
     const plaintext = sess.decrypt(content);
-    const attachments = message.attachments.map((it) => {
+    const attachments = message.attachments?.map((it) => {
         const key = JSON.parse(sess.decrypt(it.key_ciphertext!));
         console.log('dec', key);
         return {
