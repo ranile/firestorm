@@ -24,6 +24,12 @@ jobs:
           key: 'rust-cache'
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+      - name: Install wasm-bindgen
+        working-directory: crates/moe
+        run: |
+          VERSION=$(cargo pkgid --frozen wasm-bindgen | cut -d "@" -f 2)
+          cargo +stable install --version $VERSION wasm-bindgen-cli
+
       - run: npm run wasm
 
       - run: npm run check
@@ -42,8 +48,15 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           key: 'rust-cache'
+
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+      - name: Install wasm-bindgen
+        working-directory: crates/moe
+        run: |
+          VERSION=$(cargo pkgid --frozen wasm-bindgen | cut -d "@" -f 2)
+          cargo +stable install --version $VERSION wasm-bindgen-cli
+
       - name: Build WASM
         run: npm run wasm:build
 
