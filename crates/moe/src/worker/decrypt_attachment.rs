@@ -102,7 +102,7 @@ pub fn new(cb: js_sys::Function) -> JsDecryptAttachmentsWorker {
                 log!("Error calling callback", e);
             }
         })
-        .spawn("/crates/moe/dist/decrypt_attachment_worker/decrypt_attachment_worker.js");
+        .spawn("/dist/decrypt_attachment_worker/decrypt_attachment_worker.js");
 
     JsDecryptAttachmentsWorker {
         worker: bridge,

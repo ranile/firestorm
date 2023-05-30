@@ -154,7 +154,7 @@ pub fn worker_init(cb: js_sys::Function) -> JsWorker {
                 log!("Error calling callback", e);
             }
         })
-        .spawn("/crates/moe/dist/worker/worker.js");
+        .spawn("/dist/worker/worker.js");
 
     JsWorker {
         worker: bridge,
