@@ -1,14 +1,13 @@
-use std::io::Read;
-use gloo::console::log;
-use gloo::worker::{HandlerId, Worker, WorkerBridge, WorkerScope};
-use gloo::utils::format::JsValueSerdeExt;
-use js_sys::{JsString, Uint8Array};
-use serde::{Deserialize, Serialize};
-use wasm_bindgen::{JsValue, UnwrapThrowExt};
-use wasm_bindgen::prelude::wasm_bindgen;
 use crate::worker::EncryptedFile;
+use gloo::console::log;
+use gloo::utils::format::JsValueSerdeExt;
 use gloo::worker::Spawnable;
-
+use gloo::worker::{HandlerId, Worker, WorkerBridge, WorkerScope};
+use js_sys::JsString;
+use serde::{Deserialize, Serialize};
+use std::io::Read;
+use wasm_bindgen::prelude::wasm_bindgen;
+use wasm_bindgen::{JsValue, UnwrapThrowExt};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FileToEncrypt {
@@ -43,9 +42,11 @@ impl WorkerOutput {
 
     #[wasm_bindgen(getter)]
     pub fn files(&self) -> js_sys::Array {
-        js_sys::Array::from_iter(self.files.iter().map(|it| {
-            JsValue::from_serde(it).unwrap_throw()
-        }))
+        js_sys::Array::from_iter(
+            self.files
+                .iter()
+                .map(|it| JsValue::from_serde(it).unwrap_throw()),
+        )
     }
 
     #[wasm_bindgen(getter)]
@@ -85,21 +86,35 @@ impl Worker for EncryptedMessagesWorker {
             uid,
         } = input;
 
-        let files = files.into_iter().map(|FileToEncrypt { bytes, name, type_ }| {
-            let mut bytes = &bytes[..];
-            let mut encryptor = crate::attachments::AttachmentEncryptor::new(&mut bytes);
-            let mut encrypted = Vec::new();
-            encryptor.read_to_end(&mut encrypted).unwrap();
-            let key = encryptor.finish();
-            log!("LOG FROM WORKER -- enc", format!("{:#?}", key), format!("{:?}", encrypted));
-            EncryptedFile { bytes: encrypted, key, name, type_ }
-        });
-        scope.respond(who, WorkerOutput {
-            ciphertext,
-            files: files.collect(),
-            room_id,
-            uid,
-        })
+        let files = files
+            .into_iter()
+            .map(|FileToEncrypt { bytes, name, type_ }| {
+                let mut bytes = &bytes[..];
+                let mut encryptor = crate::attachments::AttachmentEncryptor::new(&mut bytes);
+                let mut encrypted = Vec::new();
+                encryptor.read_to_end(&mut encrypted).unwrap();
+                let key = encryptor.finish();
+                log!(
+                    "LOG FROM WORKER -- enc",
+                    format!("{:#?}", key),
+                    format!("{:?}", encrypted)
+                );
+                EncryptedFile {
+                    bytes: encrypted,
+                    key,
+                    name,
+                    type_,
+                }
+            });
+        scope.respond(
+            who,
+            WorkerOutput {
+                ciphertext,
+                files: files.collect(),
+                room_id,
+                uid,
+            },
+        )
     }
 }
 
@@ -125,12 +140,14 @@ impl JsWorker {
             let type_ = file.type_();
             let bytes = {
                 let file = gloo::file::File::from(file);
-                gloo::file::futures::read_as_bytes(&file).await.unwrap_throw()
+                gloo::file::futures::read_as_bytes(&file)
+                    .await
+                    .unwrap_throw()
             };
             new_files.push(FileToEncrypt { bytes, name, type_ });
         }
 
-        let ciphertext = outbound_session.encrypt(&content);
+        let ciphertext = outbound_session.encrypt(content);
 
         let input = WorkerInput {
             ciphertext,
@@ -156,7 +173,5 @@ pub fn worker_init(cb: js_sys::Function) -> JsWorker {
         })
         .spawn("/dist/worker/worker.js");
 
-    JsWorker {
-        worker: bridge,
-    }
+    JsWorker { worker: bridge }
 }

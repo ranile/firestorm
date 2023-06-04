@@ -20,18 +20,18 @@ use std::{
     io::{Error as IoError, ErrorKind, Read},
 };
 
+use crate::json_web_key::JsonWebKey;
+use crate::serde::Base64;
 use aes::{
     cipher::{generic_array::GenericArray, KeyIvInit, StreamCipher},
     Aes256,
 };
 use base64::DecodeError;
 use rand::{thread_rng, RngCore};
-use crate::serde::Base64;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 use zeroize::Zeroize;
-use crate::json_web_key::JsonWebKey;
 
 const IV_SIZE: usize = 16;
 const KEY_SIZE: usize = 32;
@@ -67,7 +67,10 @@ impl<'a, R: Read> Read for AttachmentDecryptor<'a, R> {
             if hash.as_slice() == self.expected_hash.as_slice() {
                 Ok(0)
             } else {
-                Err(IoError::new(ErrorKind::Other, "Hash mismatch while decrypting"))
+                Err(IoError::new(
+                    ErrorKind::Other,
+                    "Hash mismatch while decrypting",
+                ))
             }
         } else {
             self.sha.update(&buf[0..read_bytes]);
@@ -135,8 +138,12 @@ impl<'a, R: Read + 'a> AttachmentDecryptor<'a, R> {
             return Err(DecryptorError::UnknownVersion);
         }
 
-        let hash =
-            info.hashes.get("sha256").ok_or(DecryptorError::MissingHash)?.as_bytes().to_owned();
+        let hash = info
+            .hashes
+            .get("sha256")
+            .ok_or(DecryptorError::MissingHash)?
+            .as_bytes()
+            .to_owned();
         let mut key = info.key.k.into_inner();
         let iv = info.iv.into_inner();
 
@@ -152,7 +159,12 @@ impl<'a, R: Read + 'a> AttachmentDecryptor<'a, R> {
         let aes = Aes256Ctr::new(key_array, &iv);
         key.zeroize();
 
-        Ok(AttachmentDecryptor { inner: input, expected_hash: hash, sha, aes })
+        Ok(AttachmentDecryptor {
+            inner: input,
+            expected_hash: hash,
+            sha,
+            aes,
+        })
     }
 }
 

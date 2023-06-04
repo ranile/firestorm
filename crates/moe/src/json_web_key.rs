@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::serde::{Base64, UrlSafe};
+use serde::{Deserialize, Serialize};
 
 // This was copied from:
 // https://github.com/ruma/ruma/blob/d78c3e11f1a37112316e48272d10f00abc0bfd7a/crates/ruma-common/src/events/room.rs#L209-L240
@@ -9,7 +9,7 @@ use crate::serde::{Base64, UrlSafe};
 /// To create an instance of this type, first create a `JsonWebKeyInit` and convert it via
 /// `JsonWebKey::from` / `.into()`.
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct  JsonWebKey {
+pub struct JsonWebKey {
     /// Key type.
     ///
     /// Must be `oct`.

@@ -67,7 +67,10 @@ impl<C: Base64Config, B> Base64<C, B> {
 impl<C: Base64Config, B: AsRef<[u8]>> Base64<C, B> {
     /// Create a `Base64` instance from raw bytes, to be base64-encoded in serialialization.
     pub fn new(bytes: B) -> Self {
-        Self { bytes, _phantom_conf: PhantomData }
+        Self {
+            bytes,
+            _phantom_conf: PhantomData,
+        }
     }
 
     /// Get a reference to the raw bytes held by this `Base64` instance.
@@ -96,7 +99,10 @@ impl<C: Base64Config> Base64<C> {
 
     /// Parse some base64-encoded data to create a `Base64` instance.
     pub fn parse(encoded: impl AsRef<[u8]>) -> Result<Self, Base64DecodeError> {
-        Self::ENGINE.decode(encoded).map(Self::new).map_err(Base64DecodeError)
+        Self::ENGINE
+            .decode(encoded)
+            .map(Self::new)
+            .map_err(Base64DecodeError)
     }
 }
 

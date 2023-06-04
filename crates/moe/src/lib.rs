@@ -1,9 +1,13 @@
+#![allow(clippy::new_without_default)]
+
 pub mod attachments;
 pub mod json_web_key;
 pub mod serde;
 pub mod worker;
 
-use vodozemac::megolm::{GroupSession, GroupSessionPickle, InboundGroupSession, MegolmMessage, SessionConfig, SessionKey};
+use vodozemac::megolm::{
+    GroupSession, GroupSessionPickle, InboundGroupSession, MegolmMessage, SessionConfig, SessionKey,
+};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -30,14 +34,16 @@ impl OutboundSession {
         m.to_base64()
     }
 
-
     pub fn pickle(&self, pickle_key: &[u8]) -> String {
-        self.session.pickle().encrypt(pickle_key.try_into().expect("should be 32 bytes"))
+        self.session
+            .pickle()
+            .encrypt(pickle_key.try_into().expect("should be 32 bytes"))
     }
 
     pub fn from_pickle(ciphertext: &str, pickle_key: &[u8]) -> Result<OutboundSession, JsValue> {
         let pickle_key = pickle_key.try_into().expect("should be 32 bytes");
-        let pickle = GroupSessionPickle::from_encrypted(ciphertext, pickle_key).map_err(|e| JsError::from(e))?;
+        let pickle =
+            GroupSessionPickle::from_encrypted(ciphertext, pickle_key).map_err(JsError::from)?;
         let session = GroupSession::from_pickle(pickle);
         Ok(Self { session })
     }
@@ -67,24 +73,15 @@ impl InboundSession {
     }
 }
 
-pub fn encrypt_file(file: web_sys::File) {
-    // TODO: implement
-    // Steps:
-    // 1. read file into Vec<u8>
-    // 2. encrypt using attachments:AttachmentEncryptor
-    // 3. finalize attachment
-    // 4. return the metadata and the ciphertext
-}
-
 #[cfg(test)]
 mod tests {
-    use std::io::Read;
-    use rand::RngCore;
     use crate::{InboundSession, OutboundSession};
+    use rand::RngCore;
+    use std::io::Read;
 
     wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
-    use wasm_bindgen_test::wasm_bindgen_test as test;
     use crate::attachments::{AttachmentDecryptor, AttachmentEncryptor};
+    use wasm_bindgen_test::wasm_bindgen_test as test;
 
     #[test]
     fn message_encryption_roundtrip() {
@@ -110,7 +107,7 @@ mod tests {
             rand::thread_rng().fill_bytes(&mut input);
             input
         };
-        let mut bytes = input.to_vec();
+        let bytes = input.to_vec();
         let mut bytes = &bytes[..];
         let mut encryptor = AttachmentEncryptor::new(&mut bytes);
         let mut encrypted = Vec::new();

@@ -51,10 +51,15 @@ async fn web_notify<T: Serialize>(
     subscription_info: SubscriptionInfo,
     content: T,
 ) {
-    let sig_builder = VapidSignatureBuilder::from_pem(Cursor::new(vapid_private_key), &subscription_info)
-            .expect("unreachable (private key is verified to be good): VapidSignatureBuilder failed to build")
-            .build()
-            .expect("unreachable (signature info is verified to be good): VapidSignature failed to build");
+    let sig_builder = VapidSignatureBuilder::from_pem(
+        Cursor::new(vapid_private_key),
+        &subscription_info,
+    )
+    .expect(
+        "unreachable (private key is verified to be good): VapidSignatureBuilder failed to build",
+    )
+    .build()
+    .expect("unreachable (signature info is verified to be good): VapidSignature failed to build");
 
     let content = serde_json::to_vec(&content).unwrap();
 
@@ -99,7 +104,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 async fn deliver_notification(vapid_private_key: &[u8], notification: PgNotification) {
     match notification.channel() {
         "msg_chan" => {
-            println!("received msg_chan notification: {:?}", notification.payload());
+            println!(
+                "received msg_chan notification: {:?}",
+                notification.payload()
+            );
             deliver_msg_notification(vapid_private_key, notification.payload()).await;
         }
         _ => {

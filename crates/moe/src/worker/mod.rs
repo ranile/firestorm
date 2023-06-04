@@ -1,13 +1,12 @@
-mod encrypt_messages;
 mod decrypt_attachment;
+mod encrypt_messages;
+use crate::attachments::MediaEncryptionInfo;
+pub use decrypt_attachment::*;
+pub use encrypt_messages::*;
 use gloo::utils::format::JsValueSerdeExt;
-use wasm_bindgen::prelude::*;
 use js_sys::{JsString, Uint8Array};
 use serde::{Deserialize, Serialize};
-use crate::attachments::MediaEncryptionInfo;
-pub use encrypt_messages::*;
-pub use decrypt_attachment::*;
-
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 #[derive(Debug, Serialize, Deserialize)]
