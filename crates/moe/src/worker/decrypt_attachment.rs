@@ -77,6 +77,28 @@ pub struct JsDecryptAttachmentsWorker {
 
 #[wasm_bindgen]
 impl JsDecryptAttachmentsWorker {
+
+    fn make_worker_callback(cb: js_sys::Function) -> impl Fn(WorkerOutput) + 'static {
+        move |m| {
+            let bytes = m.bytes;
+            let m = js_sys::Uint8Array::from(bytes.as_slice());
+            let ret = cb.call1(&JsValue::NULL, &m);
+            if let Err(e) = ret {
+                log!("Error calling callback", e);
+            }
+        }
+    }
+
+    #[wasm_bindgen(constructor)]
+    pub fn new(cb: js_sys::Function) -> Self {
+        console_error_panic_hook::set_once();
+        let bridge = DecryptAttachmentsWorker::spawner()
+            .callback(Self::make_worker_callback(cb))
+            .spawn("/dist/decrypt_attachment_worker/decrypt_attachment_worker.js");
+
+        JsDecryptAttachmentsWorker { worker: bridge }
+    }
+
     #[wasm_bindgen(js_name = "decryptAttachment")]
     pub async fn decrypt_attachment(&self, blob: web_sys::Blob, info: JsValue) {
         log!("Decrypting attachment");
@@ -88,22 +110,11 @@ impl JsDecryptAttachmentsWorker {
         let input = WorkerInput { bytes, info };
         self.worker.send(input);
     }
-}
 
-#[wasm_bindgen(js_name = "newDecryptAttachmentsWorker")]
-pub fn new(cb: js_sys::Function) -> JsDecryptAttachmentsWorker {
-    console_error_panic_hook::set_once();
-
-    let bridge = DecryptAttachmentsWorker::spawner()
-        .callback(move |m| {
-            let bytes = m.bytes;
-            let m = js_sys::Uint8Array::from(bytes.as_slice());
-            let ret = cb.call1(&JsValue::NULL, &m);
-            if let Err(e) = ret {
-                log!("Error calling callback", e);
-            }
-        })
-        .spawn("/dist/decrypt_attachment_worker/decrypt_attachment_worker.js");
-
-    JsDecryptAttachmentsWorker { worker: bridge }
+    pub fn fork(&self, cb: js_sys::Function) -> Self {
+        let fork = self.worker.fork(Some(Self::make_worker_callback(cb)));
+        Self {
+            worker: fork,
+        }
+    }
 }

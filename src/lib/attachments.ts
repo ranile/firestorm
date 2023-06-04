@@ -1,11 +1,11 @@
 import {
     initAttachmentsWorker as moeInitAttachmentsWorker,
-    newDecryptAttachmentsWorker,
+    JsDecryptAttachmentsWorker,
     type WorkerOutput
 } from 'moe';
 
 type AttachmentsWorker = ReturnType<typeof moeInitAttachmentsWorker>;
-
+;
 let encryptionWorker: AttachmentsWorker | null = null;
 
 export function initAttachmentsWorker(cb: (v: WorkerOutput) => void) {
@@ -15,13 +15,11 @@ export function initAttachmentsWorker(cb: (v: WorkerOutput) => void) {
     return encryptionWorker;
 }
 
-type JsDecryptAttachmentsWorker = ReturnType<typeof newDecryptAttachmentsWorker>;
-
-let decryptAttachmentsWorker: JsDecryptAttachmentsWorker | null = null;
+const decryptAttachmentsWorker: JsDecryptAttachmentsWorker = new JsDecryptAttachmentsWorker(
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    () => {}
+);
 
 export function initDecryptAttachmentsWorker(cb: (v: Uint8Array) => void) {
-    if (decryptAttachmentsWorker === null) {
-        decryptAttachmentsWorker = newDecryptAttachmentsWorker(cb);
-    }
-    return decryptAttachmentsWorker;
+    return decryptAttachmentsWorker.fork(cb);
 }
