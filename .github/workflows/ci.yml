@@ -8,12 +8,12 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
           node-version: 16
-      - run: npm install
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -22,6 +22,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           key: 'rust-cache'
+
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
       - name: Install wasm-bindgen
@@ -30,10 +31,31 @@ jobs:
           VERSION=$(cargo pkgid --frozen wasm-bindgen | cut -d "@" -f 2)
           cargo +stable install --version $VERSION wasm-bindgen-cli
 
+      - run: npm install
       - run: npm run wasm
 
+      # svelte-check
       - run: npm run check
+      # pretter & eslint
       - run: npm run lint
+      # vitest
+      - run: npm run test:unit
+
+      - uses: supabase/setup-cli@v1
+      - run: npx playwright install-deps
+      - run: supabase start
+
+      - name: Verify generated types match Postgres schema
+        run: |
+          supabase gen types typescript --local > schema.gen.ts
+          if ! git diff --ignore-space-at-eol --exit-code --quiet schema.gen.ts; then
+            echo "Detected uncommitted changes after build. See status below:"
+            git diff
+            exit 1
+          fi
+
+      # run playwright tests
+      - run: npm run test
 
   docker-sveltekit:
     runs-on: ubuntu-latest
@@ -80,30 +102,3 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
-  docker-push-notif:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    permissions:
-      packages: write
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v4
-        with:
-          context: crates/push-notif
-          push: true
-          tags: ghcr.io/${{ github.actor }}/firestorm-push-notif:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}

@@ -16,6 +16,9 @@ test('should send message', async ({ page }) => {
     await createRoom(page, ulid());
 
     await sendTextMessage(page, `${ulid()} ${Date.now()}`);
+    const input = await page.getByPlaceholder('Your message...')
+    const content = await input.textContent()
+    expect(content).toEqual('')
 });
 
 test.only('should send attachments with a message', async ({ page }) => {
