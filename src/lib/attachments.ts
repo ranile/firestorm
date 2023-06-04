@@ -5,7 +5,7 @@ import {
 } from 'moe';
 
 type AttachmentsWorker = ReturnType<typeof moeInitAttachmentsWorker>;
-;
+
 let encryptionWorker: AttachmentsWorker | null = null;
 
 export function initAttachmentsWorker(cb: (v: WorkerOutput) => void) {

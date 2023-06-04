@@ -37,7 +37,7 @@
 
     const sendMessage = (e: Event) => {
         e.preventDefault();
-        if (value === '') {
+        if (value === '' && files?.length === 0) {
             // no empty messages
             return;
         }
