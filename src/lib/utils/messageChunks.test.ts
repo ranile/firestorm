@@ -119,8 +119,18 @@ describe('groupMessagesByAuthor', () => {
                 author: genAuthor('1'),
                 firstMessageTimestamp: '2022-04-18T12:00:00.000Z',
                 messages: [
-                    { content: 'Hello', created_at: '2022-04-18T12:00:00.000Z', id: '1' },
-                    { content: 'How are you?', created_at: '2022-04-18T12:01:00.000Z', id: '2' }
+                    {
+                        content: 'Hello',
+                        created_at: '2022-04-18T12:00:00.000Z',
+                        id: '1',
+                        attachments: []
+                    },
+                    {
+                        content: 'How are you?',
+                        created_at: '2022-04-18T12:01:00.000Z',
+                        id: '2',
+                        attachments: []
+                    }
                 ]
             }
         ];
@@ -143,7 +153,8 @@ describe('groupMessagesByAuthor', () => {
                     {
                         content: messages[0].content,
                         created_at: messages[0].created_at,
-                        id: messages[0].id
+                        id: messages[0].id,
+                        attachments: messages[0].attachments
                     }
                 ]
             },
@@ -154,7 +165,8 @@ describe('groupMessagesByAuthor', () => {
                     {
                         content: messages[1].content,
                         created_at: messages[1].created_at,
-                        id: messages[1].id
+                        id: messages[1].id,
+                        attachments: messages[1].attachments
                     }
                 ]
             }
@@ -177,20 +189,60 @@ describe('groupMessagesByAuthor', () => {
                 author: genAuthor('1'),
                 firstMessageTimestamp: '2022-04-18T12:00:00.000Z',
                 messages: [
-                    { content: 'Message 1', created_at: '2022-04-18T12:00:00.000Z', id: '1' },
-                    { content: 'Message 2', created_at: '2022-04-18T12:00:00.000Z', id: '2' },
-                    { content: 'Message 3', created_at: '2022-04-18T12:00:00.000Z', id: '3' },
-                    { content: 'Message 4', created_at: '2022-04-18T12:00:00.000Z', id: '4' }
+                    {
+                        content: 'Message 1',
+                        created_at: '2022-04-18T12:00:00.000Z',
+                        id: '1',
+                        attachments: []
+                    },
+                    {
+                        content: 'Message 2',
+                        created_at: '2022-04-18T12:00:00.000Z',
+                        id: '2',
+                        attachments: []
+                    },
+                    {
+                        content: 'Message 3',
+                        created_at: '2022-04-18T12:00:00.000Z',
+                        id: '3',
+                        attachments: []
+                    },
+                    {
+                        content: 'Message 4',
+                        created_at: '2022-04-18T12:00:00.000Z',
+                        id: '4',
+                        attachments: []
+                    }
                 ]
             },
             {
                 author: genAuthor('2'),
                 firstMessageTimestamp: '2022-04-18T12:00:00.000Z',
                 messages: [
-                    { content: 'Message 5', created_at: '2022-04-18T12:00:00.000Z', id: '5' },
-                    { content: 'Message 6', created_at: '2022-04-18T12:00:00.000Z', id: '6' },
-                    { content: 'Message 7', created_at: '2022-04-18T12:00:00.000Z', id: '7' },
-                    { content: 'Message 8', created_at: '2022-04-18T12:00:00.000Z', id: '8' }
+                    {
+                        content: 'Message 5',
+                        created_at: '2022-04-18T12:00:00.000Z',
+                        id: '5',
+                        attachments: []
+                    },
+                    {
+                        content: 'Message 6',
+                        created_at: '2022-04-18T12:00:00.000Z',
+                        id: '6',
+                        attachments: []
+                    },
+                    {
+                        content: 'Message 7',
+                        created_at: '2022-04-18T12:00:00.000Z',
+                        id: '7',
+                        attachments: []
+                    },
+                    {
+                        content: 'Message 8',
+                        created_at: '2022-04-18T12:00:00.000Z',
+                        id: '8',
+                        attachments: []
+                    }
                 ]
             }
         ] satisfies GroupedMessage[];

@@ -1,7 +1,7 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 import { SupabaseClient, Session } from '@supabase/supabase-js';
-import { Database } from './database';
+import { Database } from './database/';
 
 declare global {
     namespace App {

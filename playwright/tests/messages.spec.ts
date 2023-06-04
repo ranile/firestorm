@@ -2,11 +2,11 @@ import { expect, test } from '@playwright/test';
 import { createRoom, login, sendTextMessage } from '../utils';
 import { ulid } from 'ulidx';
 import { join } from 'path';
-import crypto from 'crypto';
+import { createHash } from 'crypto';
 import { promises as fs } from 'fs';
 
-async function calculateFileHash(fileData: ArrayBuffer): Promise<string> {
-    const hash = crypto.createHash('sha256');
+async function calculateFileHash(fileData: Buffer): Promise<string> {
+    const hash = createHash('sha256');
     hash.update(fileData);
     return hash.digest('hex');
 }
@@ -16,13 +16,13 @@ test('should send message', async ({ page }) => {
     await createRoom(page, ulid());
 
     await sendTextMessage(page, `${ulid()} ${Date.now()}`);
-    const input = await page.getByPlaceholder('Your message...')
-    const content = await input.textContent()
-    expect(content).toEqual('')
+    const input = await page.getByPlaceholder('Your message...');
+    const content = await input.textContent();
+    expect(content).toEqual('');
 });
 
 test.only('should send attachments with a message', async ({ page }) => {
-    const file = join(import.meta.url, '../../static/image002.jpg').replace('file:', '');
+    const file = join(process.cwd(), 'playwright/static/image002.jpg').replace('file:', '');
     const fileData = await fs.readFile(file);
     const expectedHash = await calculateFileHash(fileData);
 

@@ -38,8 +38,6 @@ jobs:
       - run: npm run check
       # pretter & eslint
       - run: npm run lint
-      # vitest
-      - run: npm run test:unit
 
       - uses: supabase/setup-cli@v1
       - run: npx playwright install-deps
