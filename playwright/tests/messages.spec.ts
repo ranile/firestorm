@@ -68,7 +68,7 @@ test('should send attachments with a message', async ({ page }) => {
 
     const fileName = file.split('/').at(-1)!;
     const selectedFile = page.getByText(fileName);
-    await expect(selectedFile).not.toBeAttached()
+    await expect(selectedFile).not.toBeAttached();
 });
 
 test('should send attachments in a message with no content', async ({ page }) => {
@@ -85,5 +85,5 @@ test('should send attachments in a message with no content', async ({ page }) =>
     const actualHash = await calculateFileHash(buf);
     expect(actualHash).toEqual(expectedHash);
     const selectedFile = page.getByText(fileName);
-    await expect(selectedFile).not.toBeAttached()
+    await expect(selectedFile).not.toBeAttached();
 });
