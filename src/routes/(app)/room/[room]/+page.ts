@@ -21,3 +21,4 @@ export const load = (async ({ parent }) => {
         }
     };
 }) satisfies PageLoad;
+export const ssr = false;
