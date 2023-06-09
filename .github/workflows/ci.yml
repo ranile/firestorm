@@ -40,7 +40,6 @@ jobs:
       - run: npm run lint
 
       - uses: supabase/setup-cli@v1
-      - run: npx playwright install-deps
       - run: supabase start
 
       - name: Verify generated types match Postgres schema
@@ -51,6 +50,9 @@ jobs:
             git diff
             exit 1
           fi
+
+      - run: npx playwright install-deps
+      - run: npx playwright install
 
       # run playwright tests
       - run: npm run test
