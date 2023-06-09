@@ -2,6 +2,7 @@
     import SidebarItem from '$lib/components/SideNav/SidebarItem.svelte';
     import AccountSettings from 'svelte-material-icons/AccountSettings.svelte';
     import Notifications from 'svelte-material-icons/Bell.svelte';
+    import Security from 'svelte-material-icons/Security.svelte';
     import SideNav from '$lib/components/SideNavGeneric.svelte';
 
     let heading = '';
@@ -18,6 +19,10 @@
 
         <SidebarItem label="Notifications" href={toNavigateBase + 'notifications'} bind:heading>
             <Notifications slot="icon" size="1.5em" />
+        </SidebarItem>
+
+        <SidebarItem label="Security" href={toNavigateBase + 'security'} bind:heading>
+            <Security slot="icon" size="1.5em" />
         </SidebarItem>
     </svelte:fragment>
     <slot />

@@ -87,3 +87,95 @@ test('should send attachments in a message with no content', async ({ page }) =>
     const selectedFile = page.getByText(fileName);
     await expect(selectedFile).not.toBeAttached();
 });
+
+test.describe('keys', () => {
+    async function removePickleFromLocalStorage(page: Page) {
+        return await page.evaluate(() => {
+            const roomId = window.location.href.split('/').at(-1)!;
+            localStorage.removeItem(`${roomId}:pickle`);
+            return roomId;
+        });
+    }
+
+    async function makeFailedAttemptToSendAMessage(page: Page) {
+        await page.getByPlaceholder('Your message...').fill('message');
+        let dialogDismissed = false;
+        page.on('dialog', async (dialog) => {
+            expect(dialog.type()).toEqual('alert');
+            expect(dialog.message()).toEqual(
+                'No keys for this room found. Please import the keys from another device to send messages here'
+            );
+            await dialog.dismiss();
+            dialogDismissed = true;
+        });
+        await page.getByRole('button', { name: 'Send message' }).click();
+        await page.waitForTimeout(1000);
+        expect(dialogDismissed).toEqual(true);
+    }
+
+    function streamToString(stream) {
+        const chunks = [];
+        return new Promise<string>((resolve, reject) => {
+            stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+            stream.on('error', (err) => reject(err));
+            stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+        });
+    }
+
+    test('should fail to send message if no keys are present', async ({ page }) => {
+        await login(page);
+        await createRoom(page, ulid());
+        await page.waitForTimeout(800);
+        const id = await removePickleFromLocalStorage(page);
+
+        await page.reload();
+        await page.goto(`/room/${id}`, { waitUntil: 'networkidle' });
+        await makeFailedAttemptToSendAMessage(page);
+    });
+
+    test.only('should export and import keys successfully', async ({ page, browser }) => {
+        await login(page);
+        await createRoom(page, ulid());
+        await page.waitForTimeout(300);
+
+        const roomId = await page.evaluate(() => {
+            return window.location.href.split('/').at(-1)!;
+        });
+        await page.goto('/profile/security');
+
+        const downloadPromise = page.waitForEvent('download');
+        await page.waitForTimeout(300);
+        await page.getByText('Export room E2E keys').click();
+        const download = await downloadPromise;
+
+        const file = await download.createReadStream();
+        const keys = await streamToString(file);
+        const parsedKeys = JSON.parse(keys);
+
+        expect(parsedKeys[`${roomId}:pickle`]).toBeDefined();
+
+        await page.close();
+
+        const context = await browser.newContext({});
+        const newPage = await context.newPage();
+
+        await login(newPage);
+        await newPage.waitForURL('/');
+
+        await newPage.goto(`/room/${roomId}`);
+        await makeFailedAttemptToSendAMessage(newPage);
+
+        await newPage.goto('/profile/security');
+        await newPage.waitForTimeout(300);
+        const fileChooserPromise = newPage.waitForEvent('filechooser');
+        await newPage.getByText('Import room E2E keys').click();
+        const fileChooser = await fileChooserPromise;
+        await fileChooser.setFiles({
+            name: 'keys.json',
+            mimeType: 'application/json',
+            buffer: Buffer.from(keys)
+        });
+        await newPage.goto(`/room/${roomId}`);
+        await sendTextMessage(newPage, 'message');
+    });
+});

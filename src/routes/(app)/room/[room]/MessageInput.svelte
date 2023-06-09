@@ -42,7 +42,10 @@
             return;
         }
         if (outbound === undefined) {
-            throw Error('Outbound session not initialized');
+            alert(
+                'No keys for this room found. Please import the keys from another device to send messages here'
+            );
+            return;
         }
         const uid = data.session?.user.id;
         if (uid === undefined) {
