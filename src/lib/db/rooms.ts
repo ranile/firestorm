@@ -33,9 +33,10 @@ export async function getRoomsWithMember(supabase: Supabase, memberId: string) {
 
 export function initRoomEncryption() {
     const outboundSession = new OutboundSession();
-    const arr = new Uint8Array(32).map(() => 1);
+    const arr = new Uint8Array(32);
+    crypto.getRandomValues(arr)
     const pickle = outboundSession.pickle(arr);
-    return { pickle, sessionKey: outboundSession.session_key() };
+    return { pickle: { ciphertext: pickle, key: arr }, sessionKey: outboundSession.session_key() };
 }
 
 export async function getRoomById(supabase: Supabase, id: string) {
@@ -78,7 +79,10 @@ export async function createRoom(name: string) {
     if (sess === undefined) {
         throw Error('executed on server environment');
     }
-    localStorage.setItem(`${room.data.id}:pickle`, sess.pickle);
+    localStorage.setItem(`${room.data.id}:pickle`, JSON.stringify({
+        ciphertext: sess.pickle.ciphertext,
+        key: Array.from(sess.pickle.key)
+    }));
     const member = await get(supabase)!
         .from('room_members')
         .insert({

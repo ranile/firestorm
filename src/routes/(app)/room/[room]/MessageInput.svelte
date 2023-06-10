@@ -18,10 +18,11 @@
 
     let outbound: OutboundSession | undefined;
     $: if (browser) {
-        const PICKLE_KEY = new Uint8Array(32).map(() => 1);
-
-        const pickle = localStorage.getItem(`${data.room.id}:pickle`);
-        outbound = pickle ? OutboundSession.from_pickle(pickle, PICKLE_KEY) : undefined;
+        const storedPickle = JSON.parse(localStorage.getItem(`${data.room.id}:pickle`))
+        if (storedPickle) {
+            const key = new Uint8Array(storedPickle.key)
+            outbound = OutboundSession.from_pickle(storedPickle.ciphertext, key);
+        }
     }
 
     $: worker = initAttachmentsWorker((m) => {
