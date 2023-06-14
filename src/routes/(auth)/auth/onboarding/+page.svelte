@@ -21,6 +21,7 @@
         }
         const userId = data.session!.user.id;
         let avatarUrl: string | null = null;
+        console.log('creating', avatarUrl, userId, username);
         if (files !== undefined && files.length !== 0) {
             const avatarFile = files.item(0)!;
             const extension = avatarFile.name.split('.').pop() ?? '';
@@ -34,10 +35,15 @@
             const path = data.supabase.storage.from('avatars').getPublicUrl(upload.data!.path);
             avatarUrl = path.data.publicUrl;
         }
-        await data.supabase
-            .from('profiles')
-            .update({ username, avatar: avatarUrl })
-            .eq('id', userId);
+        try {
+            await data.supabase
+                .from('profiles')
+                .update({ username, avatar: avatarUrl })
+                .eq('id', userId);
+        } catch (error) {
+            alert(error.message);
+        }
+        console.log('created user', username);
         await goto('/');
     };
 </script>

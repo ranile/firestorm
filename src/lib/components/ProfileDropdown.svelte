@@ -6,7 +6,7 @@
 </script>
 
 {#if $profile !== null}
-    <Avatar class="acs cursor-pointer hover:shadow" src={$profile.avatar ?? ''} />
+    <Avatar class="acs cursor-pointer hover:shadow" src={$profile.avatar ?? ''} alt='User options' />
     <Dropdown triggeredBy=".acs">
         <div slot="header" class="px-4 py-2">
             <span class="block text-sm font-bold text-gray-900 dark:text-white">

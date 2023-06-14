@@ -35,17 +35,29 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
         data: { session }
     } = await supabase.auth.getSession();
 
-    console.log('loading initial state');
+    console.log('loading initial state', session);
+    const reCacheProfile = async () => {
+        const fetched = await getUserProfile(supabase, session!);
+        console.log('fetched profile', fetched);
+        const cachedProfile = { ...fetched, email: data.session?.user.email ?? '' };
+        profile.set(cachedProfile);
+        return cachedProfile;
+    }
     if (session !== null) {
+        console.log('session is not null', session);
         let cachedProfile = get(profile);
-        if (cachedProfile === null) {
-            const fetched = await getUserProfile(supabase, session);
-            cachedProfile = { ...fetched, email: data.session?.user.email ?? '' };
-            profile.set(cachedProfile);
+        if (cachedProfile === null || cachedProfile.username === null) {
+            cachedProfile = await reCacheProfile()
         }
-        const where = cachedProfile.username === null ? '/auth/onboarding' : '/';
-        if (url.pathname.startsWith('/auth') && url.pathname !== where) {
-            await navigate(where);
+        console.log('cached profile', cachedProfile);
+        const onboardingUrl = '/auth/onboarding';
+
+        if (url.pathname === '/' && cachedProfile.username === null) {
+            // fucking supabase
+            await navigate(onboardingUrl)
+        } else {
+            console.log('url', url.pathname);
+            console.log('cachedProfile', cachedProfile);
         }
     } else {
         if (url.pathname !== '/auth') {
