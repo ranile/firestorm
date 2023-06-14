@@ -4,8 +4,8 @@ import { ulid } from 'ulidx';
 
 test('should navigate to home after sign in', async ({ page }) => {
     await login(page);
-    const createRoomButton = await page.getByRole('button', { name: 'Create room' });
-    await expect(createRoomButton).toBeVisible();
+
+    await expect(page.getByRole('button', { name: 'Create room' })).toBeVisible();
 });
 
 test('should onboard new users', async ({ page, request }) => {
@@ -42,3 +42,13 @@ test('should onboard new users', async ({ page, request }) => {
     await page.getByRole('img').first().click();
     await expect(page.getByText(username)).toBeVisible();
 });
+
+test('should stay logged in', (async ({ page, context }) => {
+    await login(page);
+    await expect(page.getByRole('button', { name: 'Create room' })).toBeVisible();
+
+    await page.close()
+    page = await context.newPage()
+    await page.goto('/')
+    await expect(page.getByRole('button', { name: 'Create room' })).toBeVisible();
+}))

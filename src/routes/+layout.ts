@@ -55,6 +55,8 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
         if (url.pathname === '/' && cachedProfile.username === null) {
             // fucking supabase
             await navigate(onboardingUrl)
+        } else if (url.pathname === '/auth') {
+            await navigate('/')
         } else {
             console.log('url', url.pathname);
             console.log('cachedProfile', cachedProfile);
