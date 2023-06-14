@@ -64,6 +64,14 @@ export async function getRoomMembers(supabase: Supabase, roomId: string) {
     return members.data;
 }
 
+function storePickleInLocalStorage(roomId: string, sess: ReturnType<typeof initRoomEncryption>) {
+    localStorage.setItem(`${roomId}:pickle`, JSON.stringify({
+        ciphertext: sess.pickle.ciphertext,
+        key: Array.from(sess.pickle.key)
+    }));
+
+}
+
 export async function createRoom(name: string) {
     const session = await getSession();
     const room = await get(supabase)!
@@ -79,10 +87,7 @@ export async function createRoom(name: string) {
     if (sess === undefined) {
         throw Error('executed on server environment');
     }
-    localStorage.setItem(`${room.data.id}:pickle`, JSON.stringify({
-        ciphertext: sess.pickle.ciphertext,
-        key: Array.from(sess.pickle.key)
-    }));
+    storePickleInLocalStorage(room.data.id, sess)
     const member = await get(supabase)!
         .from('room_members')
         .insert({
@@ -162,7 +167,7 @@ export async function joinRoom(supabase: Supabase, roomId: string) {
         .match({ room_id: roomId, member_id: session.user.id })
         .select()
         .single();
-    localStorage.setItem(`${roomId}:pickle`, sess.pickle);
+    storePickleInLocalStorage(roomId, sess)
 
     return member.data;
 }
