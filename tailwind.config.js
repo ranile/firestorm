@@ -10,7 +10,7 @@ export default {
                 'auth-card': '32rem'
             },
             brightness: {
-                80: '.80',
+                80: '.80'
             }
         }
     },

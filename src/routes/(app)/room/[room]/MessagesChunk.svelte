@@ -4,9 +4,9 @@
     import { formatTimestamp } from '$lib/utils/timestamps';
     import { deleteMessage as doDeleteMessage } from '$lib/db/messages';
     import { supabase } from '$lib/supabase';
-    import Trash from 'svelte-material-icons/Delete.svelte'
-    import Edit from 'svelte-material-icons/Pencil.svelte'
-    import Reply from 'svelte-material-icons/Reply.svelte'
+    import Trash from 'svelte-material-icons/Delete.svelte';
+    import Edit from 'svelte-material-icons/Pencil.svelte';
+    import Reply from 'svelte-material-icons/Reply.svelte';
     import MessageReply from './MessageReply.svelte';
     import { replyingToMessage } from './utils';
 
@@ -15,8 +15,8 @@
 
     const deleteMessage = (id: string) => {
         console.log('delete message', id);
-        doDeleteMessage($supabase!, id)
-    }
+        doDeleteMessage($supabase!, id);
+    };
 
     $: console.log(chunk);
 </script>
@@ -34,16 +34,27 @@
                 {#if message.replyTo}
                     <MessageReply replyMessageId={message.replyTo} />
                 {/if}
-                <div class="relative hover:bg-gray-600 group transition-colors" data-message-id={message.id}>
-                    <div class='absolute right-1 -top-2 px-2 bg-gray-800 rounded invisible group-hover:visible'>
-                        <button class='hover:bg-gray-600 rounded p-1' on:click={() => deleteMessage(message.id)}>
-                            <Trash size='1.5em' />
+                <div
+                    class="relative hover:bg-gray-600 group transition-colors"
+                    data-message-id={message.id}
+                >
+                    <div
+                        class="absolute right-1 -top-2 px-2 bg-gray-800 rounded invisible group-hover:visible"
+                    >
+                        <button
+                            class="hover:bg-gray-600 rounded p-1"
+                            on:click={() => deleteMessage(message.id)}
+                        >
+                            <Trash size="1.5em" />
                         </button>
-                        <button class='hover:bg-gray-600 rounded p-1'>
-                            <Edit size='1.5em' />
+                        <button class="hover:bg-gray-600 rounded p-1">
+                            <Edit size="1.5em" />
                         </button>
-                        <button class='hover:bg-gray-600 rounded p-1' on:click={() => replyingToMessage.set(message)}>
-                            <Reply size='1.5em' />
+                        <button
+                            class="hover:bg-gray-600 rounded p-1"
+                            on:click={() => replyingToMessage.set(message)}
+                        >
+                            <Reply size="1.5em" />
                         </button>
                     </div>
                     <div>

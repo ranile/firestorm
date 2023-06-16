@@ -7,7 +7,12 @@ import type { Profile } from '$lib/db/users';
 import type { EncryptedFile, OutboundSession } from 'moe';
 import { ulid } from 'ulidx';
 
-export async function getMessages(supabase: Supabase, roomId: string | undefined, limit = 69, messageId?: string) {
+export async function getMessages(
+    supabase: Supabase,
+    roomId: string | undefined,
+    limit = 69,
+    messageId?: string
+) {
     let query = supabase
         .from('messages')
         .select(
@@ -23,9 +28,7 @@ export async function getMessages(supabase: Supabase, roomId: string | undefined
         query = query.eq('id', messageId);
     }
 
-    const { data, error } = await query
-        .order('created_at', { ascending: false })
-        .limit(limit);
+    const { data, error } = await query.order('created_at', { ascending: false }).limit(limit);
 
     if (error !== null) {
         console.error(error);
@@ -145,7 +148,7 @@ export async function createMessage(
         p_files: files as unknown as PgJson,
         p_room_id: roomId,
         p_ciphertext: ciphertext,
-        p_reply_to: replyTo
+        p_reply_to: replyTo ?? undefined
     });
 
     if (error !== null) {
@@ -166,7 +169,7 @@ export type Message = Database['public']['Tables']['messages']['Row'] & {
     attachments: Attachment[];
 };
 export type AuthoredMessage = Omit<Message, 'author_id' | 'attachments' | 'deleted'> & {
-    author: Profile,
-    attachments?: Attachment[],
-    deleted?: boolean,
+    author: Profile;
+    attachments?: Attachment[];
+    deleted?: boolean;
 };

@@ -17,6 +17,7 @@ function generateMessages(size: number): AuthoredMessage[] {
             content,
             created_at,
             id,
+            reply_to: null,
             room_id,
             attachments: []
         });
@@ -100,6 +101,7 @@ describe('groupMessagesByAuthor', () => {
                     content: 'Hello',
                     created_at: '2022-04-18T12:00:00.000Z',
                     id: '1',
+                    reply_to: null,
                     room_id: '1',
                     attachments: []
                 },
@@ -109,6 +111,7 @@ describe('groupMessagesByAuthor', () => {
                     created_at: '2022-04-18T12:01:00.000Z',
                     id: '2',
                     room_id: '1',
+                    reply_to: null,
                     attachments: []
                 }
             ]

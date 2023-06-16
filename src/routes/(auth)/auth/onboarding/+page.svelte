@@ -41,7 +41,9 @@
                 .update({ username, avatar: avatarUrl })
                 .eq('id', userId);
         } catch (error) {
-            alert(error.message);
+            if (error instanceof Error) {
+                alert(error.message);
+            }
         }
         console.log('created user', username);
         await goto('/');

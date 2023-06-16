@@ -42,21 +42,21 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
         const cachedProfile = { ...fetched, email: data.session?.user.email ?? '' };
         profile.set(cachedProfile);
         return cachedProfile;
-    }
+    };
     if (session !== null) {
         console.log('session is not null', session);
         let cachedProfile = get(profile);
         if (cachedProfile === null || cachedProfile.username === null) {
-            cachedProfile = await reCacheProfile()
+            cachedProfile = await reCacheProfile();
         }
         console.log('cached profile', cachedProfile);
         const onboardingUrl = '/auth/onboarding';
 
         if (url.pathname === '/' && cachedProfile.username === null) {
             // fucking supabase
-            await navigate(onboardingUrl)
+            await navigate(onboardingUrl);
         } else if (url.pathname === '/auth') {
-            await navigate('/')
+            await navigate('/');
         } else {
             console.log('url', url.pathname);
             console.log('cachedProfile', cachedProfile);

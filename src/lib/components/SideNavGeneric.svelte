@@ -81,7 +81,7 @@
             <h2 class="text-xl font-bold px-4 py-2">{heading}</h2>
         </slot>
     </nav>
-    <slot name='body' />
+    <slot name="body" />
 </main>
 
 <style lang="postcss">

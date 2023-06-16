@@ -62,7 +62,13 @@ export function chunkMessagesArray(chunkSize: number, messages: Message[]): Mess
     return chunks;
 }
 
-export interface ChunkMessage { id: string; content: string; created_at: string; attachments?: Attachment[], replyTo?: string }
+export interface ChunkMessage {
+    id: string;
+    content: string;
+    created_at: string;
+    attachments?: Attachment[];
+    replyTo?: string;
+}
 
 export interface GroupedMessage {
     author: Profile;

@@ -109,7 +109,7 @@
         {/if}
     </svelte:fragment>
 
-    <svelte:fragment slot='body'>
+    <svelte:fragment slot="body">
         <slot />
     </svelte:fragment>
 </SideNavGeneric>

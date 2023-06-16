@@ -36,7 +36,7 @@ create or replace view "public"."attachments_and_objects" as  SELECT a.id AS att
      JOIN storage.objects o ON ((a.id = o.id)));
 
 
-CREATE OR REPLACE FUNCTION public.insert_message(p_uid uuid, p_files jsonb, p_room_id uuid, p_ciphertext text, p_reply_to uuid)
+CREATE OR REPLACE FUNCTION public.insert_message(p_uid uuid, p_files jsonb, p_room_id uuid, p_ciphertext text, p_reply_to uuid default null)
  RETURNS void
  LANGUAGE plpgsql
 AS $function$
