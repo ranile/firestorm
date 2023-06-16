@@ -4,6 +4,7 @@
     import { initDecryptAttachmentsWorker } from '$lib/attachments';
     import { onDestroy } from 'svelte';
     import ImagePlaceholder from 'svelte-material-icons/Image.svelte';
+    import DownloadIcon from 'svelte-material-icons/Download.svelte';
 
     export let attachment: Attachment;
     $: isImage = attachment.type?.startsWith('image') ?? false;
@@ -12,6 +13,12 @@
 
     $: worker = initDecryptAttachmentsWorker((workerOutput: Uint8Array) => {
         src = URL.createObjectURL(new Blob([workerOutput.buffer], { type: attachment.type! }));
+        if (!isImage) {
+            const a = document.createElement('a');
+            a.href = src;
+            a.download = attachment.name!;
+            a.click();
+        }
     });
 
     onDestroy(() => {
@@ -48,5 +55,12 @@
         <img {src} alt=" " class="max-w-xs" />
     {/if}
 {:else}
-    fucking bitch
+    <div class='flex bg-gray-900 w-fit py-1 px-2 rounded-3xl items-center'>
+        <h5 class='font-bold text-md'>{attachment.name}</h5>
+        <button
+            class='m-2 rounded-full p-1 border border-gray-100'
+            on:click={() => download(attachment)}>
+            <DownloadIcon size='1.1em' />
+        </button>
+    </div>
 {/if}
