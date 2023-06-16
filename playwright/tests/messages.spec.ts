@@ -108,6 +108,20 @@ test('should send non-image attachments in a message', async ({ page }) => {
     await expect(selectedFile).toBeVisible();
 });
 
+test.only('should delete message', async ({ page }) => {
+    await login(page);
+    await createRoom(page, ulid());
+
+    const message = `${ulid()} ${Date.now()}`
+    await sendTextMessage(page, message);
+    await page.getByText(message).hover();
+
+    await page.getByRole('button', { name: 'Delete Message' }).click();
+    await expect(page.getByText(message)).not.toBeVisible()
+
+});
+
+
 test.describe('keys', () => {
     async function removePickleFromLocalStorage(page: Page) {
         return await page.evaluate(() => {
