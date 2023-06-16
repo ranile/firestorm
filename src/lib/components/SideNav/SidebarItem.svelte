@@ -23,5 +23,5 @@
     `}
 >
     <slot name="icon" />
-    <span class="ml-3">{label}</span>
+    <span class="ml-3 wrap-anywhere">{label}</span>
 </a>

@@ -72,20 +72,21 @@
     </div>
 {/if}
 
-<main class="lg:ml-64 mx-auto">
+<main class="lg:ml-64 mx-auto h-full">
     <nav
-        class="bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-100 dark:border-gray-700 h-12 flex items-center"
+        class="bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-100 dark:border-gray-700 min-h-12 flex items-center"
     >
         <NavHamburger on:click={toggleDrawer} btnClass="max-lg:ml-3 lg:hidden" />
         <slot name="navbar">
             <h2 class="text-xl font-bold px-4 py-2">{heading}</h2>
         </slot>
     </nav>
-    <slot />
+    <slot name='body' />
 </main>
 
 <style lang="postcss">
     main {
-        height: calc(100% - theme(height.12));
+        display: grid;
+        grid-template-rows: auto 1fr;
     }
 </style>

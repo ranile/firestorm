@@ -86,29 +86,21 @@
     <title>{room.name} | Firestorm</title>
 </svelte:head>
 
-<div class="grid h-full grid-cols-1">
-    <div class="row-start-auto overflow-y-auto text-white">
-        {#if loading}
-            Loading...
-        {:else}
-            <MessageList {messages} />
-        {/if}
-        <div bind:this={bottomContainer} class="w-full h-1" />
-    </div>
-    <div class="self-end mb-4 p-2">
-        {#if invited}
-            <div class="text-gray-400 flex justify-between items-center w-full px-4">
-                You have been invited to this room. Please join to send messages.
-                <Button on:click={onJoinRoomClick}>Join</Button>
-            </div>
-        {:else}
-            <MessageInput {bottomContainer} />
-        {/if}
-    </div>
+<div class="row-start-auto overflow-y-auto text-white">
+    {#if loading}
+        Loading...
+    {:else}
+        <MessageList {messages} />
+    {/if}
+    <div bind:this={bottomContainer} class="w-full h-1" />
 </div>
-
-<style>
-    div.grid {
-        grid-template-rows: 1fr 5rem;
-    }
-</style>
+<div class="self-end mb-4 p-2">
+    {#if invited}
+        <div class="text-gray-400 flex justify-between items-center w-full px-4">
+            You have been invited to this room. Please join to send messages.
+            <Button on:click={onJoinRoomClick}>Join</Button>
+        </div>
+    {:else}
+        <MessageInput {bottomContainer} />
+    {/if}
+</div>

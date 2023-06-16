@@ -68,7 +68,7 @@
     <svelte:fragment slot="navbar">
         {#if currentRoom !== null}
             <button
-                class="text-2xl font-bold px-4 py-2"
+                class="text-2xl font-bold px-4 py-2 wrap-anywhere"
                 on:click={() => goto(`/room/${currentRoom?.id ?? ''}/settings/overview`)}
             >
                 {currentRoom.name}
@@ -108,7 +108,10 @@
             {/each}
         {/if}
     </svelte:fragment>
-    <slot />
+
+    <svelte:fragment slot='body'>
+        <slot />
+    </svelte:fragment>
 </SideNavGeneric>
 
 <CreateRoomModal />
