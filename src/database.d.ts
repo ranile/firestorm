@@ -67,6 +67,7 @@ export interface Database {
           created_at: string
           deleted: boolean
           id: string
+          reply_to: string | null
           room_id: string
         }
         Insert: {
@@ -75,6 +76,7 @@ export interface Database {
           created_at?: string
           deleted?: boolean
           id?: string
+          reply_to?: string | null
           room_id: string
         }
         Update: {
@@ -83,6 +85,7 @@ export interface Database {
           created_at?: string
           deleted?: boolean
           id?: string
+          reply_to?: string | null
           room_id?: string
         }
       }
@@ -232,15 +235,26 @@ export interface Database {
       }
     }
     Functions: {
-      insert_message: {
-        Args: {
-          p_uid: string
-          p_files: Json
-          p_room_id: string
-          p_ciphertext: string
-        }
-        Returns: undefined
-      }
+      insert_message:
+        | {
+            Args: {
+              p_uid: string
+              p_files: Json
+              p_room_id: string
+              p_ciphertext: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_uid: string
+              p_files: Json
+              p_room_id: string
+              p_ciphertext: string
+              p_reply_to: string
+            }
+            Returns: undefined
+          }
       is_member_of: {
         Args: {
           _user_id: string

@@ -7,16 +7,25 @@ import type { Profile } from '$lib/db/users';
 import type { EncryptedFile, OutboundSession } from 'moe';
 import { ulid } from 'ulidx';
 
-export async function getMessages(supabase: Supabase, roomId: string) {
-    const { data, error } = await supabase
+export async function getMessages(supabase: Supabase, roomId: string | undefined, limit = 69, messageId?: string) {
+    let query = supabase
         .from('messages')
         .select(
-            'created_at, content, room_id, id, users_with_profiles(id, username, avatar), attachments_and_objects(*)'
+            'created_at, content, room_id, reply_to, id, users_with_profiles(id, username, avatar), attachments_and_objects(*)'
         )
-        .eq('room_id', roomId)
-        .eq('deleted', false)
+        .eq('deleted', false);
+
+    if (roomId) {
+        query = query.eq('room_id', roomId);
+    }
+
+    if (messageId) {
+        query = query.eq('id', messageId);
+    }
+
+    const { data, error } = await query
         .order('created_at', { ascending: false })
-        .limit(69);
+        .limit(limit);
 
     if (error !== null) {
         console.error(error);
@@ -38,6 +47,7 @@ export async function getMessages(supabase: Supabase, roomId: string) {
                 content: message.content,
                 created_at: message.created_at,
                 id: message.id,
+                reply_to: message.reply_to,
                 attachments,
                 author: {
                     id: author.id!,
@@ -93,6 +103,7 @@ export async function createMessage(
     roomId: string,
     userId: string,
     ciphertext: string,
+    replyTo: string | null,
     attachments: EncryptedFile[]
 ) {
     interface Attachment {
@@ -133,7 +144,8 @@ export async function createMessage(
         p_uid: userId,
         p_files: files as unknown as PgJson,
         p_room_id: roomId,
-        p_ciphertext: ciphertext
+        p_ciphertext: ciphertext,
+        p_reply_to: replyTo
     });
 
     if (error !== null) {

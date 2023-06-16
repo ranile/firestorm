@@ -36,7 +36,7 @@ create or replace view "public"."attachments_and_objects" as  SELECT a.id AS att
      JOIN storage.objects o ON ((a.id = o.id)));
 
 
-CREATE OR REPLACE FUNCTION public.insert_message(p_uid uuid, p_files jsonb, p_room_id uuid, p_ciphertext text)
+CREATE OR REPLACE FUNCTION public.insert_message(p_uid uuid, p_files jsonb, p_room_id uuid, p_ciphertext text, p_reply_to uuid)
  RETURNS void
  LANGUAGE plpgsql
 AS $function$
@@ -46,8 +46,8 @@ DECLARE
     file_record       RECORD;
 BEGIN
     -- Insert data into messages table
-    INSERT INTO messages (content, room_id, author_id)
-    VALUES (p_ciphertext, p_room_id, p_uid)
+    INSERT INTO messages (content, room_id, author_id, reply_to)
+    VALUES (p_ciphertext, p_room_id, p_uid, p_reply_to)
     RETURNING id INTO message_id;
 
     -- Iterate over files and insert data into attachments table

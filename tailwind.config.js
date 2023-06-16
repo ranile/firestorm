@@ -8,6 +8,9 @@ export default {
         extend: {
             minWidth: {
                 'auth-card': '32rem'
+            },
+            brightness: {
+                80: '.80',
             }
         }
     },

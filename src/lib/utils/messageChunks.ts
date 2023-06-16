@@ -62,10 +62,12 @@ export function chunkMessagesArray(chunkSize: number, messages: Message[]): Mess
     return chunks;
 }
 
+export interface ChunkMessage { id: string; content: string; created_at: string; attachments?: Attachment[], replyTo?: string }
+
 export interface GroupedMessage {
     author: Profile;
     firstMessageTimestamp: string;
-    messages: { id: string; content: string; created_at: string; attachments?: Attachment[] }[];
+    messages: ChunkMessage[];
 }
 
 export function groupMessagesByAuthor(chunks: Message[][]): GroupedMessage[] {
@@ -75,6 +77,7 @@ export function groupMessagesByAuthor(chunks: Message[][]): GroupedMessage[] {
             id: message.id,
             content: message.content,
             created_at: message.created_at,
+            replyTo: message.reply_to ?? undefined,
             attachments: message.attachments
         }));
         return { author, messages, firstMessageTimestamp: messages[0].created_at };

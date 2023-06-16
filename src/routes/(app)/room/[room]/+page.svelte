@@ -57,6 +57,7 @@
                     id: newMessage.id,
                     content: newMessage.content,
                     room_id: newMessage.room_id,
+                    reply_to: newMessage.reply_to,
                     attachments,
                     author
                 } satisfies AuthoredMessage;
