@@ -2,9 +2,18 @@
     import type { GroupedMessage } from '$lib/utils/messageChunks';
     import AttachmentPreview from '$lib/components/attachments/AttachmentPreview.svelte';
     import { formatTimestamp } from '$lib/utils/timestamps';
+    import { deleteMessage as doDeleteMessage } from '$lib/db/messages';
+    import { supabase } from '$lib/supabase';
+    import Trash from 'svelte-material-icons/Delete.svelte'
+    import Edit from 'svelte-material-icons/Pencil.svelte'
 
     export let chunk: GroupedMessage;
     $: author = chunk.author;
+
+    const deleteMessage = (id: string) => {
+        console.log('delete message', id);
+        doDeleteMessage($supabase!, id)
+    }
 </script>
 
 <div class="relative">
@@ -17,8 +26,18 @@
         </h3>
         <div class="messages">
             {#each chunk.messages as message}
-                <div class="">
-                    <p>{message.content}</p>
+                <div class="relative hover:bg-gray-600 group">
+                    <div class='absolute right-1 -top-2 px-2 bg-gray-800 rounded invisible group-hover:visible'>
+                        <button class='hover:bg-gray-600 rounded p-1' on:click={() => deleteMessage(message.id)}>
+                            <Trash size='1.5em' />
+                        </button>
+                        <button class='hover:bg-gray-600 rounded p-1'>
+                            <Edit size='1.5em' />
+                        </button>
+                    </div>
+                    <div>
+                        <p>{message.content}</p>
+                    </div>
                     {#if message.attachments}
                         {#each message.attachments as attachment}
                             <AttachmentPreview {attachment} />

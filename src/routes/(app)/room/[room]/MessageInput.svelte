@@ -18,10 +18,12 @@
 
     let outbound: OutboundSession | undefined;
     $: if (browser) {
-        const storedPickle = JSON.parse(localStorage.getItem(`${data.room.id}:pickle`))
+
+        const storedPickle = localStorage.getItem(`${data.room.id}:pickle`)
         if (storedPickle) {
-            const key = new Uint8Array(storedPickle.key)
-            outbound = OutboundSession.from_pickle(storedPickle.ciphertext, key);
+            const parsedPickle = JSON.parse(storedPickle)
+            const key = new Uint8Array(parsedPickle.key)
+            outbound = OutboundSession.from_pickle(parsedPickle.ciphertext, key);
         }
     }
 

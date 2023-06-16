@@ -14,6 +14,7 @@ export async function getMessages(supabase: Supabase, roomId: string) {
             'created_at, content, room_id, id, users_with_profiles(id, username, avatar), attachments_and_objects(*)'
         )
         .eq('room_id', roomId)
+        .eq('deleted', false)
         .order('created_at', { ascending: false })
         .limit(69);
 
@@ -76,7 +77,7 @@ export function subscribeToRoomMessages(
         .on(
             'postgres_changes',
             {
-                event: 'INSERT',
+                event: '*',
                 schema: 'public',
                 table: 'messages',
                 filter: `room_id=eq.${roomId}`
@@ -140,11 +141,20 @@ export async function createMessage(
     }
 }
 
+export async function deleteMessage(supabase: Supabase, messageId: string) {
+    const { error } = await supabase.from('messages').update({ deleted: true }).eq('id', messageId);
+    if (error) {
+        throw error;
+    }
+}
+
 type AttachmentInner = Required<Database['public']['Views']['attachments_and_objects']['Row']>;
 export type Attachment = AttachmentInner & { key?: AttachmentInner['key_ciphertext'] };
 export type Message = Database['public']['Tables']['messages']['Row'] & {
     attachments: Attachment[];
 };
-export type AuthoredMessage = Omit<Message, 'author_id' | 'attachments'> & { author: Profile } & {
-    attachments?: Attachment[];
+export type AuthoredMessage = Omit<Message, 'author_id' | 'attachments' | 'deleted'> & {
+    author: Profile,
+    attachments?: Attachment[],
+    deleted?: boolean,
 };

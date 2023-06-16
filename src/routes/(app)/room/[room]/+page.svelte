@@ -65,6 +65,12 @@
                     console.log('New message received');
                     requestAnimationFrame(() => scrollToBottom(false));
                 });
+            } else if (event.eventType === 'UPDATE') {
+                if (event.new.deleted) {
+                    messages = messages.filter((m) => m.id !== event.old.id);
+                }
+            } else {
+                console.log('Unknown event', event);
             }
         });
     });

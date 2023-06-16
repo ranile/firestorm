@@ -60,28 +60,12 @@ export interface Database {
           type?: string
         }
       }
-      member_session_keys: {
-        Row: {
-          key_for_member: string
-          key_of_member: string
-          room_id: string
-        }
-        Insert: {
-          key_for_member: string
-          key_of_member: string
-          room_id: string
-        }
-        Update: {
-          key_for_member?: string
-          key_of_member?: string
-          room_id?: string
-        }
-      }
       messages: {
         Row: {
           author_id: string
           content: string
           created_at: string
+          deleted: boolean
           id: string
           room_id: string
         }
@@ -89,6 +73,7 @@ export interface Database {
           author_id: string
           content: string
           created_at?: string
+          deleted?: boolean
           id?: string
           room_id: string
         }
@@ -96,6 +81,7 @@ export interface Database {
           author_id?: string
           content?: string
           created_at?: string
+          deleted?: boolean
           id?: string
           room_id?: string
         }
