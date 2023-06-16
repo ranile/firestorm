@@ -33,14 +33,18 @@ async function getImageFromPageAsBuffer(page: Page) {
     return Buffer.from(imgArrayBuf);
 }
 
+function getExpectedFilePath(fileName: string) {
+    return join(process.cwd(), 'playwright/static/', fileName).replace('file:', '')
+}
+
 async function getExpectedFile() {
-    const file = join(process.cwd(), 'playwright/static/image002.jpg').replace('file:', '');
+    const file = getExpectedFilePath('image002.jpg');
     const fileData = await fs.readFile(file);
     const expectedHash = await calculateFileHash(fileData);
     return { file, expectedHash };
 }
 
-async function sendMessageWithAttachment(page: Page, file: string, withText: boolean) {
+async function sendMessageWithAttachment(page: Page, file: string, withText: boolean, wait = true) {
     const fileChooserPromise = page.waitForEvent('filechooser');
     await page.getByRole('button', { name: 'Add files' }).click();
     const fileChooser = await fileChooserPromise;
@@ -49,7 +53,9 @@ async function sendMessageWithAttachment(page: Page, file: string, withText: boo
         await page.getByPlaceholder('Your message...').fill('message');
     }
     await page.getByRole('button', { name: 'Send message' }).click();
-    await page.waitForSelector('.messages img');
+    if (wait) {
+        await page.waitForSelector('.messages img');
+    }
 }
 
 test('should send attachments with a message', async ({ page }) => {
@@ -86,6 +92,20 @@ test('should send attachments in a message with no content', async ({ page }) =>
     expect(actualHash).toEqual(expectedHash);
     const selectedFile = page.getByText(fileName);
     await expect(selectedFile).not.toBeAttached();
+});
+
+test('should send non-image attachments in a message', async ({ page }) => {
+    const file = getExpectedFilePath('test.txt');
+    const fileName = file.split('/').at(-1)!;
+    await login(page);
+    await createRoom(page, ulid());
+
+    // Start waiting for file chooser before clicking. Note no await.
+    await sendMessageWithAttachment(page, file, false, false);
+
+    // expect sent file to be visible
+    const selectedFile = page.getByText(fileName);
+    await expect(selectedFile).toBeVisible();
 });
 
 test.describe('keys', () => {
@@ -133,7 +153,7 @@ test.describe('keys', () => {
         await makeFailedAttemptToSendAMessage(page);
     });
 
-    test.only('should export and import keys successfully', async ({ page, browser }) => {
+    test('should export and import keys successfully', async ({ page, browser }) => {
         await login(page);
         await createRoom(page, ulid());
         await page.waitForTimeout(300);
