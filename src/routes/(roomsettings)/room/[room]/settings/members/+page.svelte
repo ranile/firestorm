@@ -22,7 +22,7 @@
     };
 </script>
 
-<div class="flex flex-col items-start gap-4 p-4">
+<div class="flex flex-col items-start gap-4">
     <Button pill={true} class="my-2" on:click={showInviteMemberDialog}>
         <Plus class="mr-2 text-base" />
         Invite

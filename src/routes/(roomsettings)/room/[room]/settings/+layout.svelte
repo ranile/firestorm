@@ -12,7 +12,7 @@
 
 <SideNav {heading} goBackTo={{ href: `/room/${data.room.id}`, label: 'Back to messages' }}>
     <svelte:fragment slot="sidebar-content">
-        <SidebarItem label="Overview" href={toNavigateBase + 'settings'} bind:heading>
+        <SidebarItem label="Overview" href={toNavigateBase + 'overview'} bind:heading>
             <svelte:fragment slot="icon">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -32,5 +32,9 @@
             <AccountGroup slot="icon" size="1.5em" />
         </SidebarItem>
     </svelte:fragment>
-    <slot />
+    <svelte:fragment slot='body'>
+        <div class=' p-4'>
+            <slot />
+        </div>
+    </svelte:fragment>
 </SideNav>
