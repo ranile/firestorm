@@ -3,6 +3,7 @@
     import PlusCircle from 'svelte-material-icons/PlusCircle.svelte';
     import type { PageData } from './$types';
     import { goto } from '$app/navigation';
+    import { updateProfile } from '$lib/db/users';
 
     export let data: PageData;
 
@@ -15,29 +16,6 @@
     let errorMessage = '';
     let inputErrorMessage = '';
 
-    async function updateProfile(userId, avatarFile) {
-        console.log('creating', avatarUrl, userId, username);
-        const extension = avatarFile.name.split('.').pop() ?? '';
-        const upload = await data.supabase.storage
-            .from('avatars')
-            .upload(`public/${userId}.${extension}`, avatarFile);
-        if (upload.error) {
-            console.error(upload.error);
-            errorMessage = upload.error.message;
-        }
-        const path = data.supabase.storage.from('avatars').getPublicUrl(upload.data!.path);
-        avatarUrl = path.data.publicUrl;
-        try {
-            await data.supabase
-                .from('profiles')
-                .update({ username, avatar: avatarUrl })
-                .eq('id', userId);
-        } catch (error) {
-            if (error instanceof Error) {
-                alert(error.message);
-            }
-        }
-    }
 
     const getStartedClick = async () => {
         if (username === '') {
@@ -45,9 +23,14 @@
             return;
         }
         const userId = data.session!.user.id;
-        await updateProfile(userId);
-        console.log('created user', username);
-        await goto('/');
+        try {
+            await updateProfile(data.supabase, userId, username, files?.item(0));
+            await goto('/');
+        } catch (e) {
+            if (e instanceof Error) {
+                errorMessage = e.message;
+            }
+        }
     };
 </script>
 
