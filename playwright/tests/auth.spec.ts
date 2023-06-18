@@ -70,4 +70,3 @@ test('user should be able to edit their own profiles', async ({ page }) => {
 
     await page.getByText(newUsername).click();
 });
-

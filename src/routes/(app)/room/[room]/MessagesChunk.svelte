@@ -46,7 +46,7 @@
                             on:click={() => deleteMessage(message.id)}
                         >
                             <Trash size="1.5em" />
-                            <span class='sr-only'>Delete Message</span>
+                            <span class="sr-only">Delete Message</span>
                         </button>
                         <button class="hover:bg-gray-600 rounded p-1">
                             <Edit size="1.5em" />

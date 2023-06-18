@@ -1,6 +1,5 @@
 <script lang="ts">
-    import { Button, Input, Avatar, Helper } from 'flowbite-svelte';
-    import PlusCircle from 'svelte-material-icons/PlusCircle.svelte';
+    import { Button, Helper } from 'flowbite-svelte';
     import type { PageData } from './$types';
     import { goto } from '$app/navigation';
     import { updateProfile } from '$lib/db/users';
@@ -12,7 +11,6 @@
     let errorMessage = '';
     let inputErrorMessage = '';
     let avatarFile: File | undefined = undefined;
-
 
     const getStartedClick = async () => {
         if (username === '') {

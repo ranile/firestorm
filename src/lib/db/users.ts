@@ -29,7 +29,12 @@ export async function findUser(supabase: Supabase, query: string) {
     return user.data;
 }
 
-export async function updateProfile(supabase: Supabase, userId: string, username: string | undefined, avatarFile: File | undefined) {
+export async function updateProfile(
+    supabase: Supabase,
+    userId: string,
+    username: string | undefined,
+    avatarFile: File | undefined
+) {
     let avatarUrl: string | null = null;
     if (avatarFile) {
         const extension = avatarFile.name.split('.').pop() ?? '';
@@ -45,7 +50,7 @@ export async function updateProfile(supabase: Supabase, userId: string, username
     let update: Database['public']['Tables']['profiles']['Update'] = {};
     if (username !== undefined && avatarUrl !== null) {
         update = { username, avatar: avatarUrl };
-    } else if (username !== undefined    && avatarUrl === null) {
+    } else if (username !== undefined && avatarUrl === null) {
         update = { username };
     } else if (username === undefined && avatarUrl !== null) {
         update = { avatar: avatarUrl };
@@ -57,16 +62,17 @@ export async function updateProfile(supabase: Supabase, userId: string, username
         .eq('id', userId)
         .select()
         .single();
-    
+
     if (error) {
         throw error;
     }
-    
-    const { data: { session } } = await supabase.auth.getSession();
+
+    const {
+        data: { session }
+    } = await supabase.auth.getSession();
 
     profile.set({ ...data, email: session?.user.email ?? '' });
 }
-
 
 export type Profile = Database['public']['Tables']['profiles']['Row'];
 

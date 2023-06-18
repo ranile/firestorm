@@ -53,7 +53,6 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
             await navigate(onboardingUrl);
         } else if (url.pathname === '/auth') {
             await navigate('/');
-        } else {
         }
     } else {
         if (url.pathname !== '/auth') {
