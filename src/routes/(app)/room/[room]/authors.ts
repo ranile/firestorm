@@ -1,7 +1,7 @@
 import type { Profile } from '$lib/db/users';
 import { getUserProfileById } from '$lib/db/users';
 import type { Supabase } from '$lib/supabase';
-import { InboundSession } from 'moe';
+import { InboundSession, OutboundSession } from 'moe';
 import type { AuthoredMessage } from '$lib/db/messages';
 
 const authors: { [key: string]: Profile } = {};
@@ -62,4 +62,17 @@ export async function decryptMessage(supabase: Supabase, message: AuthoredMessag
         content: plaintext,
         attachments
     } satisfies AuthoredMessage;
+}
+
+let outbound: OutboundSession | undefined;
+
+export function getOutboundSession(roomId: string) {
+    if (outbound) return outbound;
+    const storedPickle = localStorage.getItem(`${roomId}:pickle`);
+    if (storedPickle) {
+        const parsedPickle = JSON.parse(storedPickle);
+        const key = new Uint8Array(parsedPickle.key);
+        outbound = OutboundSession.from_pickle(parsedPickle.ciphertext, key);
+    }
+    return outbound;
 }

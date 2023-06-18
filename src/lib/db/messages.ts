@@ -156,11 +156,19 @@ export async function createMessage(
     }
 }
 
-export async function deleteMessage(supabase: Supabase, messageId: string) {
-    const { error } = await supabase.from('messages').update({ deleted: true }).eq('id', messageId);
+export async function updateMessage(
+    supabase: Supabase,
+    messageId: string,
+    patch: Database['public']['Tables']['messages']['Update']
+) {
+    const { error } = await supabase.from('messages').update(patch).eq('id', messageId);
     if (error) {
         throw error;
     }
+}
+
+export function deleteMessage(supabase: Supabase, messageId: string) {
+    return updateMessage(supabase, messageId, { deleted: true });
 }
 
 type AttachmentInner = Required<Database['public']['Views']['attachments_and_objects']['Row']>;

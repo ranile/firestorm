@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Textarea } from 'flowbite-svelte';
-    import { OutboundSession } from 'moe';
+    import type { OutboundSession } from 'moe';
     import { browser } from '$app/environment';
     import { createMessage } from '$lib/db/messages';
     import { page } from '$app/stores';
@@ -10,6 +10,7 @@
     import { initAttachmentsWorker } from '$lib/attachments';
     import { replyingToMessage } from './utils';
     import MessageReply from './MessageReply.svelte';
+    import { getOutboundSession } from './authors';
 
     $: data = $page.data;
 
@@ -21,12 +22,7 @@
 
     let outbound: OutboundSession | undefined;
     $: if (browser) {
-        const storedPickle = localStorage.getItem(`${data.room.id}:pickle`);
-        if (storedPickle) {
-            const parsedPickle = JSON.parse(storedPickle);
-            const key = new Uint8Array(parsedPickle.key);
-            outbound = OutboundSession.from_pickle(parsedPickle.ciphertext, key);
-        }
+        outbound = getOutboundSession(data.room.id);
     }
 
     $: worker = initAttachmentsWorker((m) => {
