@@ -54,3 +54,20 @@ test('should stay logged in', async ({ page, context }) => {
     await page.goto('/');
     await expect(page.getByRole('button', { name: 'Create room' })).toBeVisible();
 });
+
+test('user should be able to edit their own profiles', async ({ page }) => {
+    await login(page);
+
+    await page.getByRole('img', { name: 'User options' }).click();
+    await page.getByRole('link', { name: 'Settings' }).click();
+
+    const newUsername = 'updated username' + ulid();
+    await page.getByPlaceholder('Username').fill(newUsername);
+    await page.getByRole('button', { name: 'Save Changes' }).click();
+
+    await page.getByRole('link', { name: 'Home' }).click();
+    await page.getByRole('img', { name: 'User options' }).click();
+
+    await page.getByText(newUsername).click();
+});
+

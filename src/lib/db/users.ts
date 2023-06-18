@@ -51,10 +51,20 @@ export async function updateProfile(supabase: Supabase, userId: string, username
         update = { avatar: avatarUrl };
     }
     console.log('update', update);
-    await supabase
+    const { data, error } = await supabase
         .from('profiles')
         .update(update)
-        .eq('id', userId);
+        .eq('id', userId)
+        .select()
+        .single();
+    
+    if (error) {
+        throw error;
+    }
+    
+    const { data: { session } } = await supabase.auth.getSession();
+
+    profile.set({ ...data, email: session?.user.email ?? '' });
 }
 
 
