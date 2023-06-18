@@ -14,27 +14,19 @@
     };
     let errorMessage = '';
     let inputErrorMessage = '';
-    const getStartedClick = async () => {
-        if (username === '') {
-            inputErrorMessage = 'Username is required';
-            return;
-        }
-        const userId = data.session!.user.id;
-        let avatarUrl: string | null = null;
+
+    async function updateProfile(userId, avatarFile) {
         console.log('creating', avatarUrl, userId, username);
-        if (files !== undefined && files.length !== 0) {
-            const avatarFile = files.item(0)!;
-            const extension = avatarFile.name.split('.').pop() ?? '';
-            const upload = await data.supabase.storage
-                .from('avatars')
-                .upload(`public/${userId}.${extension}`, avatarFile);
-            if (upload.error) {
-                console.error(upload.error);
-                errorMessage = upload.error.message;
-            }
-            const path = data.supabase.storage.from('avatars').getPublicUrl(upload.data!.path);
-            avatarUrl = path.data.publicUrl;
+        const extension = avatarFile.name.split('.').pop() ?? '';
+        const upload = await data.supabase.storage
+            .from('avatars')
+            .upload(`public/${userId}.${extension}`, avatarFile);
+        if (upload.error) {
+            console.error(upload.error);
+            errorMessage = upload.error.message;
         }
+        const path = data.supabase.storage.from('avatars').getPublicUrl(upload.data!.path);
+        avatarUrl = path.data.publicUrl;
         try {
             await data.supabase
                 .from('profiles')
@@ -45,6 +37,15 @@
                 alert(error.message);
             }
         }
+    }
+
+    const getStartedClick = async () => {
+        if (username === '') {
+            inputErrorMessage = 'Username is required';
+            return;
+        }
+        const userId = data.session!.user.id;
+        await updateProfile(userId);
         console.log('created user', username);
         await goto('/');
     };

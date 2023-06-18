@@ -25,5 +25,9 @@
             <Security slot="icon" size="1.5em" />
         </SidebarItem>
     </svelte:fragment>
-    <slot />
+    <svelte:fragment slot='body'>
+        <div class=' p-4'>
+            <slot />
+        </div>
+    </svelte:fragment>
 </SideNav>

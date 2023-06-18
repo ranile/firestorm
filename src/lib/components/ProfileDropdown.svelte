@@ -18,7 +18,7 @@
             </span>
             <span class="block truncate text-sm font-medium"> {$profile.email} </span>
         </div>
-        <DropdownItem href="/profile/">Settings</DropdownItem>
+        <DropdownItem href="/profile/settings">Settings</DropdownItem>
         <DropdownItem slot="footer" on:click={signout}>Sign out</DropdownItem>
     </Dropdown>
 {/if}
