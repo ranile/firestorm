@@ -108,7 +108,7 @@ test('should send non-image attachments in a message', async ({ page }) => {
     await expect(selectedFile).toBeVisible();
 });
 
-test.only('should delete message', async ({ page }) => {
+test('should delete message', async ({ page }) => {
     await login(page);
     await createRoom(page, ulid());
 
@@ -118,6 +118,22 @@ test.only('should delete message', async ({ page }) => {
 
     await page.getByRole('button', { name: 'Delete Message' }).click();
     await expect(page.getByText(message)).not.toBeVisible();
+});
+
+test('should edit message', async ({ page }) => {
+    await login(page);
+    await createRoom(page, ulid());
+
+    const message = `${ulid()} ${Date.now()}`;
+    await sendTextMessage(page, message);
+    await page.getByText(message).hover();
+
+    await page.getByRole('button', { name: 'Edit Message' }).click();
+    await page.getByPlaceholder('Edit message...').fill('edited');
+    await page.getByPlaceholder('Edit message...').press('Enter')
+
+    await expect(page.getByText(message)).not.toBeVisible();
+    await expect(page.getByText(`edited`)).toBeVisible();
 });
 
 test.describe('keys', () => {

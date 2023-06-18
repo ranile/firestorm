@@ -70,18 +70,21 @@
                             on:click={() => (editing = true)}
                         >
                             <Edit size="1.5em" />
+                            <span class="sr-only">Edit Message</span>
                         </button>
                         <button
                             class="hover:bg-gray-600 rounded p-1"
                             on:click={() => replyingToMessage.set(message)}
                         >
                             <Reply size="1.5em" />
+                            <span class="sr-only">Reply to message</span>
                         </button>
                     </div>
                     <div>
                         {#if editing}
                             <Textarea
                                 class="w-full"
+                                placeholder='Edit message...'
                                 bind:value={message.content}
                                 on:keydown={(e) => onKeyDown(e, message)}
                             />
