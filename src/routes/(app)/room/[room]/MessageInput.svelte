@@ -28,7 +28,7 @@
     $: worker = initAttachmentsWorker((m) => {
         const { room_id: roomId, uid, ciphertext, files: encryptedFiles } = m;
         createMessage(
-            data.supabase,
+            $page,
             outbound!,
             roomId,
             uid!,

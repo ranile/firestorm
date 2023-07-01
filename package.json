@@ -50,12 +50,17 @@
         "@supabase/auth-ui-shared": "^0.1.6",
         "@supabase/auth-ui-svelte": "^0.2.2",
         "@supabase/supabase-js": "^2.20.0",
+        "@trpc/client": "^10.33.0",
+        "@trpc/server": "^10.33.0",
         "classnames": "^2.3.2",
         "date-fns": "^2.30.0",
         "flowbite": "^1.6.5",
         "flowbite-svelte": "^0.34.9",
+        "postgres": "^3.3.5",
         "svelte-material-icons": "^3.0.4",
         "svelte-media-queries": "^1.5.4",
-        "ulidx": "^1.0.0"
+        "trpc-sveltekit": "^3.5.14",
+        "ulidx": "^1.0.0",
+        "zod": "^3.21.4"
     }
 }
