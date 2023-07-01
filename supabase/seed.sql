@@ -22,3 +22,9 @@ VALUES ('00000000-0000-0000-0000-000000000000', '53c78944-1e31-4476-804c-2bbe2a4
 UPDATE profiles
 SET username = 'test'
 WHERE id = '53c78944-1e31-4476-804c-2bbe2a4a89bf';
+
+insert into private.settings (key, value)
+values ('web_push_endpoint', '172.17.0.1:5173/api/web-push');
+
+insert into private.settings (key, value)
+values ('web_push_secret', 'xxx');
