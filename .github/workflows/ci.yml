@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version: 18
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -32,19 +32,23 @@ jobs:
           cargo +stable install --version $VERSION wasm-bindgen-cli
 
       - run: npm install
-      - run: npm run wasm
+      - run: mv .env.dev .env
 
-      # svelte-check
-      - run: npm run check
-      # pretter & eslint
-      - run: npm run lint
+      - name: svelte-check
+        run: npm run check
 
-      - uses: supabase/setup-cli@v1
-      - run: supabase start
+      - name: prettier & eslint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Setup supabase CLI
+        run: npm run supabase:start
 
       - name: Verify generated types match Postgres schema
         run: |
-          supabase gen types typescript --local > schema.gen.ts
+          npx supabase gen types typescript --local > schema.gen.ts
           if ! git diff --ignore-space-at-eol --exit-code --quiet schema.gen.ts; then
             echo "Detected uncommitted changes after build. See status below:"
             git diff
@@ -54,16 +58,21 @@ jobs:
       - run: npx playwright install-deps
       - run: npx playwright install
 
+      - name: setup web-push endpoint
+        run: |
+          DOCKER_ADDRESS=$(ip address show docker0 | grep -oP 'inet \K(\d{1,3}\.){3}\d{1,3}')
+          nohup npm run preview -- --host $DOCKER_ADDRESS --port 5173 --strictPort &
+
       # run playwright tests
       - run: npm run test
 
-  docker-sveltekit:
+  deploy:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    permissions:
-      packages: write
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 18
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
@@ -79,26 +88,42 @@ jobs:
           VERSION=$(cargo pkgid --frozen wasm-bindgen | cut -d "@" -f 2)
           cargo +stable install --version $VERSION wasm-bindgen-cli
 
-      - name: Build WASM
-        run: npm run wasm:build
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ghcr.io/${{ github.actor }}/firestorm:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
+      # preview deployment
+      - name: Pull Vercel Preview Environment Information
+        if: github.event_name == 'pull_request'
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
+      - name: Build Project Artifacts
+        if: github.event_name == 'pull_request'
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          WEB_PUSH_SECRET: ${{ secrets.WEB_PUSH_ENDPOINT_SECRET }}
+
+      - name: logs
+        run: ls static/dist/*
+
+      - name: Deploy Preview Project Artifacts to Vercel
+        if: github.event_name == 'pull_request'
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+
+      # production deployment
+      - name: Pull Production Vercel Environment Information
+        if: github.event_name == 'push'
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Production Project Artifacts
+        if: github.event_name == 'push'
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          WEB_PUSH_SECRET: ${{ secrets.WEB_PUSH_ENDPOINT_SECRET }}
+
+      - name: Deploy Production Project Artifacts to Vercel
+        if: github.event_name == 'push'
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

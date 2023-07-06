@@ -30,6 +30,9 @@
         <blockquote
             class="text-sm flex gap-2 ml-2 cursor-pointer brightness-80 hover:brightness-100"
             on:click={navToOriginal}
+            on:keypress={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') navToOriginal();
+            }}
         >
             <span class="font-bold">{message.author.username}</span>
             <p>{message.content.slice(0, 69)}</p>

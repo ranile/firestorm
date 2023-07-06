@@ -1,11 +1,8 @@
-// pub key generated using openssl with the following command
-// openssl ec -in private.pem -pubout -outform DER|tail -c 65|base64|tr '/+' '_-'|tr -d '\n'
-import { env } from '$env/dynamic/public';
+import { PUBLIC_VAPID_PUBLIC_KEY as VAPID_PUBLIC_KEY } from '$env/static/public';
 import { browser } from '$app/environment';
 import type { Session } from '@supabase/supabase-js';
 import type { Supabase } from '$lib/supabase';
 
-const { PUBLIC_VAPID_PUBLIC_KEY: VAPID_PUBLIC_KEY } = env;
 const WEB_PUSH_SUBSCRIPTION_ID_KEY = 'webPushSubscriptionId';
 
 function urlB64ToUint8Array(base64String: string) {

@@ -4,10 +4,12 @@
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     export let icon: any | undefined = undefined;
     export let label: string;
+    export let type: 'button' | 'submit' | 'reset' = 'button';
 </script>
 
 <button
     class="focus:ring-4 focus:outline-none inline-flex items-center justify-center p-2 border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-600 focus:ring-blue-800 rounded-full"
+    {type}
     on:click
 >
     <slot>

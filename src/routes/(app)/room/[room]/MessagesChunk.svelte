@@ -84,7 +84,7 @@
                         {#if editing}
                             <Textarea
                                 class="w-full"
-                                placeholder='Edit message...'
+                                placeholder="Edit message..."
                                 bind:value={message.content}
                                 on:keydown={(e) => onKeyDown(e, message)}
                             />

@@ -1,4 +1,4 @@
-import { env } from '$env/dynamic/public';
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit';
 import type { LayoutLoad } from './$types';
 import type { Database } from '../database';
@@ -10,8 +10,6 @@ import { redirect } from '@sveltejs/kit';
 import { subscribeToNotifications } from '$lib/notifications';
 import { loaded } from '$lib/utils';
 import { get } from 'svelte/store';
-
-const { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } = env;
 
 async function navigate(where: string) {
     if (browser) {

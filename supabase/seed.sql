@@ -1,5 +1,7 @@
 alter publication supabase_realtime add table messages;
 
+create extension http;
+
 INSERT INTO auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, invited_at,
                         confirmation_token, confirmation_sent_at, recovery_token, recovery_sent_at,
                         email_change_token_new, email_change, email_change_sent_at, last_sign_in_at, raw_app_meta_data,
@@ -22,3 +24,9 @@ VALUES ('00000000-0000-0000-0000-000000000000', '53c78944-1e31-4476-804c-2bbe2a4
 UPDATE profiles
 SET username = 'test'
 WHERE id = '53c78944-1e31-4476-804c-2bbe2a4a89bf';
+
+insert into private.settings (key, value)
+values ('web_push_endpoint', '172.17.0.1:5173/api/web-push');
+
+insert into private.settings (key, value)
+values ('web_push_secret', 'xxx');

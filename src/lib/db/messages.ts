@@ -1,11 +1,13 @@
 import type { Supabase } from '../supabase';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
-import type { Database, Json as PgJson } from '../../database';
+import type { Database } from '../../database';
 import type { UnionFromValues } from '../utils';
 import { Unreachable } from '../utils';
 import type { Profile } from '$lib/db/users';
 import type { EncryptedFile, OutboundSession } from 'moe';
-import { ulid } from 'ulidx';
+import type { CreateMessage as CreateMessagePayload } from '$lib/trpc/routes/messages';
+import type { Page } from '@sveltejs/kit';
+import { trpc } from '$lib/trpc/client';
 
 export async function getMessages(
     supabase: Supabase,
@@ -101,7 +103,7 @@ export function subscribeToRoomMessages(
 }
 
 export async function createMessage(
-    supabase: Supabase,
+    page: Page,
     outboundSession: OutboundSession,
     roomId: string,
     userId: string,
@@ -109,51 +111,25 @@ export async function createMessage(
     replyTo: string | null,
     attachments: EncryptedFile[]
 ) {
-    interface Attachment {
-        path: string;
-        name: string;
-        type: string;
-        key_ciphertext: string;
-        hashes: Record<string, string>;
-    }
-
-    const files: Attachment[] = [];
-    for (const file of attachments) {
-        const id = ulid();
-        const bytes = new Uint8Array(file.bytes);
-        const { data, error } = await supabase.storage
-            .from('attachments')
-            .upload(`attachments/${id}`, bytes, {
-                contentType: 'application/octet-stream'
-            });
-
-        if (error !== null) {
-            console.error(error);
-            continue;
-        }
-
+    const files = attachments.map((file) => {
         const keyCiphertext = outboundSession.encrypt(JSON.stringify(file.key));
-        files.push({
-            path: data.path,
+        return {
+            bytes: [...file.bytes],
             name: file.name,
             // @ts-expect-error type_ is a valid property, wasm bindgen doesn't like to expose `type`
             type: file.type_,
             key_ciphertext: keyCiphertext,
             hashes: file.key.hashes
-        } satisfies Attachment);
-    }
+        };
+    }) satisfies CreateMessagePayload['files'];
 
-    const { error } = await supabase.rpc('insert_message', {
-        p_uid: userId,
-        p_files: files as unknown as PgJson,
-        p_room_id: roomId,
-        p_ciphertext: ciphertext,
-        p_reply_to: replyTo ?? undefined
+    return trpc(page).messages.createMessage.mutate({
+        roomId,
+        uid: userId,
+        ciphertext,
+        replyTo,
+        files
     });
-
-    if (error !== null) {
-        throw error;
-    }
 }
 
 export async function updateMessage(
