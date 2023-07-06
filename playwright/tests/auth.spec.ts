@@ -55,7 +55,7 @@ test('should stay logged in', async ({ page, context }) => {
     await expect(page.getByRole('button', { name: 'Create room' })).toBeVisible();
 });
 
-test.only('user should be able to edit their own profiles', async ({ page }) => {
+test('user should be able to edit their own profiles', async ({ page }) => {
     await login(page);
 
     await page.locator('#profile-user-avatar').click();

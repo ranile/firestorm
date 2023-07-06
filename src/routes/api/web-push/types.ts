@@ -38,7 +38,7 @@ export const SubscriptionInfo = z.object({
 export const Payload = z.object({
     channel: z.string(),
     message: Message,
-    subscribers: z.array(SubscriptionInfo),
+    subscribers: z.array(SubscriptionInfo).nullable(),
 });
 
 export type Room = z.infer<typeof Room>;

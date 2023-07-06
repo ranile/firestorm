@@ -26,10 +26,10 @@ function callWebPush(sub: SubscriptionInfo, message: Notification) {
 }
 
 async function deliverNotification(data: Payload) {
-    const promises = data.subscribers.map(sub => callWebPush(sub, {
+    const promises = data.subscribers?.map(sub => callWebPush(sub, {
         op: 'MessageCreate',
         content: data.message,
-    }))
+    })) ?? [];
     try {
         await Promise.all(promises);
         return
