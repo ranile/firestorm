@@ -16,7 +16,8 @@
         "lint": "prettier --plugin-search-dir . --check . && eslint .",
         "format": "prettier --plugin-search-dir . --write .",
         "supabase:start": "supabase start && node supabase/waiter.js",
-        "supabase:db:reset": "supabase db reset && node supabase/waiter.js"
+        "supabase:db:reset": "supabase db reset && node supabase/waiter.js",
+        "postinstall": "npm run wasm"
     },
     "devDependencies": {
         "@playwright/test": "^1.34.3",
@@ -39,6 +40,7 @@
         "tailwindcss": "^3.3.1",
         "tslib": "^2.4.1",
         "typescript": "^5.0.0",
+        "vercel": "^31.0.1",
         "vite": "^4.2.0",
         "vite-plugin-top-level-await": "^1.3.0",
         "vite-plugin-wasm": "^3.2.2",
@@ -54,12 +56,12 @@
         "@supabase/supabase-js": "^2.20.0",
         "@trpc/client": "^10.33.0",
         "@trpc/server": "^10.33.0",
-        "supabase": "^1.75.3",
         "classnames": "^2.3.2",
         "date-fns": "^2.30.0",
         "flowbite": "^1.6.5",
         "flowbite-svelte": "^0.34.9",
         "postgres": "^3.3.5",
+        "supabase": "^1.75.3",
         "svelte-material-icons": "^3.0.4",
         "svelte-media-queries": "^1.5.4",
         "trpc-sveltekit": "^3.5.14",
