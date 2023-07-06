@@ -9,7 +9,6 @@
     <Avatar
         class="acs cursor-pointer hover:shadow"
         src={$profile.avatar ?? ''}
-        alt="User options"
     />
     <Dropdown triggeredBy=".acs">
         <div slot="header" class="px-4 py-2">

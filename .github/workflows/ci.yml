@@ -39,8 +39,8 @@ jobs:
       # pretter & eslint
       - run: npm run lint
 
-      - uses: supabase/setup-cli@v1
-      - run: supabase start
+      - name: Setup supabase CLI
+        run: npm run supabase:start
 
       - name: Verify generated types match Postgres schema
         run: |
@@ -59,7 +59,7 @@ jobs:
 
   docker-sveltekit:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: false # github.event_name == 'push' && github.ref == 'refs/heads/master'
     permissions:
       packages: write
     steps:

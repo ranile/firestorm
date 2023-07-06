@@ -1,6 +1,5 @@
-import { env } from '$env/dynamic/private'
+import { DATABASE_URL } from '$env/static/private'
 import postgres from 'postgres'
-const { DATABASE_URL } = env;
 
 const sql = postgres(DATABASE_URL)
 

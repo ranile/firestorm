@@ -1,5 +1,7 @@
 alter publication supabase_realtime add table messages;
 
+create extension http;
+
 INSERT INTO auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, invited_at,
                         confirmation_token, confirmation_sent_at, recovery_token, recovery_sent_at,
                         email_change_token_new, email_change, email_change_sent_at, last_sign_in_at, raw_app_meta_data,

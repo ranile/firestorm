@@ -1,12 +1,10 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { type Notification, Payload, SubscriptionInfo } from './types';
-import { sendNotification } from 'web-push'
-import { VAPID_PRIVATE_KEY } from '$env/static/private'
-import { env } from '$env/dynamic/private'
+import * as webPush from 'web-push'
+import { WEB_PUSH_SECRET, VAPID_PRIVATE_KEY } from '$env/static/private'
 import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public'
 
-const { WEB_PUSH_SECRET } = env;
 function jsonOr400(request: Request): Promise<unknown> {
     try {
         return request.json();
@@ -17,7 +15,7 @@ function jsonOr400(request: Request): Promise<unknown> {
 }
 
 function callWebPush(sub: SubscriptionInfo, message: Notification) {
-    return sendNotification(sub, JSON.stringify(message), {
+    return webPush.sendNotification(sub, JSON.stringify(message), {
         contentEncoding: 'aes128gcm',
         vapidDetails: {
             subject: 'mailto:no-reply@firestorm.chat',
