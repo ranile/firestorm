@@ -3,6 +3,8 @@ node_modules
 /build
 target
 /.svelte-kit
+/.vercel
+/supabase/.*
 /package
 .env
 .env.*

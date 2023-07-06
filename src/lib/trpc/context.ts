@@ -4,7 +4,7 @@ import type { inferAsyncReturnType } from '@trpc/server';
 export async function createContext(event: RequestEvent) {
     return {
         supabase: event.locals.supabase,
-        session: await event.locals.getSession(),
+        session: await event.locals.getSession()
     };
 }
 

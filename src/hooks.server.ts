@@ -6,7 +6,6 @@ import { appRouter } from '$lib/trpc/router';
 import { createTRPCHandle } from 'trpc-sveltekit';
 import { sequence } from '@sveltejs/kit/hooks';
 
-
 const supabaseHookHandle: Handle = async ({ event, resolve }) => {
     event.locals.supabase = createSupabaseServerClient({
         supabaseUrl: PUBLIC_SUPABASE_URL!,
@@ -37,7 +36,6 @@ const supabaseHookHandle: Handle = async ({ event, resolve }) => {
         }
     });
 };
-
 
 const trpcHookHandle: Handle = createTRPCHandle({ router: appRouter, createContext });
 

@@ -35,7 +35,7 @@ export type CreateMessage = z.infer<typeof CreateMessage>;
 export const messagesRouter = router({
     createMessage: publicProcedure
         .input(CreateMessage)
-        .mutation(async ({ ctx: { supabase, session }, input }) => {
+        .mutation(async ({ ctx: { supabase }, input }) => {
             const files: Attachment[] = [];
             for (const file of input.files) {
                 const id = ulid();

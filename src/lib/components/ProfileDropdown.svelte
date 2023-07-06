@@ -7,7 +7,7 @@
 
 {#if $profile !== null}
     <Avatar
-        id='profile-user-avatar'
+        id="profile-user-avatar"
         class="cursor-pointer hover:shadow"
         src={$profile.avatar ?? ''}
     />

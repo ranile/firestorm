@@ -111,7 +111,6 @@ export async function createMessage(
     replyTo: string | null,
     attachments: EncryptedFile[]
 ) {
-
     const files = attachments.map((file) => {
         const keyCiphertext = outboundSession.encrypt(JSON.stringify(file.key));
         return {
@@ -121,18 +120,16 @@ export async function createMessage(
             type: file.type_,
             key_ciphertext: keyCiphertext,
             hashes: file.key.hashes
-        }
-    }) satisfies CreateMessagePayload['files']
-
+        };
+    }) satisfies CreateMessagePayload['files'];
 
     return trpc(page).messages.createMessage.mutate({
         roomId,
         uid: userId,
         ciphertext,
         replyTo,
-        files,
-    })
-
+        files
+    });
 }
 
 export async function updateMessage(

@@ -1,9 +1,9 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { type Notification, Payload, SubscriptionInfo } from './types';
-import * as webPush from 'web-push'
-import { WEB_PUSH_SECRET, VAPID_PRIVATE_KEY } from '$env/static/private'
-import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public'
+import * as webPush from 'web-push';
+import { WEB_PUSH_SECRET, VAPID_PRIVATE_KEY } from '$env/static/private';
+import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
 
 function jsonOr400(request: Request): Promise<unknown> {
     try {
@@ -26,13 +26,16 @@ function callWebPush(sub: SubscriptionInfo, message: Notification) {
 }
 
 async function deliverNotification(data: Payload) {
-    const promises = data.subscribers?.map(sub => callWebPush(sub, {
-        op: 'MessageCreate',
-        content: data.message,
-    })) ?? [];
+    const promises =
+        data.subscribers?.map((sub) =>
+            callWebPush(sub, {
+                op: 'MessageCreate',
+                content: data.message
+            })
+        ) ?? [];
     try {
         await Promise.all(promises);
-        return
+        return;
     } catch (e) {
         console.error(e);
         throw error(500, 'failed to send notification');
@@ -40,12 +43,12 @@ async function deliverNotification(data: Payload) {
 }
 
 export const POST = (async (event) => {
-    const authorization = event.request.headers.get('Authorization')
+    const authorization = event.request.headers.get('Authorization');
     if (authorization !== WEB_PUSH_SECRET) {
         throw error(401);
     }
     const payload = await jsonOr400(event.request);
-    const parsed = await Payload.safeParseAsync(payload)
+    const parsed = await Payload.safeParseAsync(payload);
     if (!parsed.success) {
         console.error('error parsing payload', parsed.error.message);
         throw error(400, JSON.stringify(parsed.error.issues));
