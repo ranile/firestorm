@@ -182,7 +182,7 @@ test.describe('keys', () => {
     });
 
     test('should export and import keys successfully', async ({ page, browser }) => {
-        test.fail(true, 'This test is flaky and fails randomly')
+        test.fail(true, 'This test is flaky and fails randomly');
         await login(page);
         await createRoom(page, ulid());
         await page.waitForTimeout(300);

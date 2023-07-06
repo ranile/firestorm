@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version: 18
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -32,21 +32,23 @@ jobs:
           cargo +stable install --version $VERSION wasm-bindgen-cli
 
       - run: npm install
-      - run: npm run wasm
+      - run: mv .env.dev .env
 
-      # svelte-check
-      - run: npm run check
-      # pretter & eslint
-      - run: npm run lint
-      # Build
-      - run: npm run build
+      - name: svelte-check
+        run: npm run check
+
+      - name: prettier & eslint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
 
       - name: Setup supabase CLI
         run: npm run supabase:start
 
       - name: Verify generated types match Postgres schema
         run: |
-          supabase gen types typescript --local > schema.gen.ts
+          npx supabase gen types typescript --local > schema.gen.ts
           if ! git diff --ignore-space-at-eol --exit-code --quiet schema.gen.ts; then
             echo "Detected uncommitted changes after build. See status below:"
             git diff
@@ -68,6 +70,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 18
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
@@ -87,27 +92,38 @@ jobs:
         run: npm install --global vercel@latest
 
       # preview deployment
-      - name: Pull Vercel Environment Information
+      - name: Pull Vercel Preview Environment Information
         if: github.event_name == 'pull_request'
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Build Project Artifacts
         if: github.event_name == 'pull_request'
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          WEB_PUSH_SECRET: ${{ secrets.WEB_PUSH_ENDPOINT_SECRET }}
 
-      - name: Deploy Project Artifacts to Vercel
+      - name: logs
+        run: ls static/dist/*
+
+      - name: Deploy Preview Project Artifacts to Vercel
         if: github.event_name == 'pull_request'
         run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
 
       # production deployment
-      - name: Pull Vercel Environment Information
+      - name: Pull Production Vercel Environment Information
         if: github.event_name == 'push'
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Build Project Artifacts
+      - name: Build Production Project Artifacts
         if: github.event_name == 'push'
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          WEB_PUSH_SECRET: ${{ secrets.WEB_PUSH_ENDPOINT_SECRET }}
 
-      - name: Deploy Project Artifacts to Vercel
+      - name: Deploy Production Project Artifacts to Vercel
         if: github.event_name == 'push'
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
