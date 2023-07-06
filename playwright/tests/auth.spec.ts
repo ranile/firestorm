@@ -55,10 +55,10 @@ test('should stay logged in', async ({ page, context }) => {
     await expect(page.getByRole('button', { name: 'Create room' })).toBeVisible();
 });
 
-test('user should be able to edit their own profiles', async ({ page }) => {
+test.only('user should be able to edit their own profiles', async ({ page }) => {
     await login(page);
 
-    await page.getByRole('img', { name: 'User options' }).click();
+    await page.locator('#profile-user-avatar').click();
     await page.getByRole('link', { name: 'Settings' }).click();
 
     const newUsername = 'updated username' + ulid();
@@ -66,7 +66,7 @@ test('user should be able to edit their own profiles', async ({ page }) => {
     await page.getByRole('button', { name: 'Save Changes' }).click();
 
     await page.getByRole('link', { name: 'Home' }).click();
-    await page.getByRole('img', { name: 'User options' }).click();
+    await page.locator('#profile-user-avatar').click();
 
     await page.getByText(newUsername).click();
 });

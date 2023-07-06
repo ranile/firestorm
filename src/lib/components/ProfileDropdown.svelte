@@ -7,10 +7,11 @@
 
 {#if $profile !== null}
     <Avatar
-        class="acs cursor-pointer hover:shadow"
+        id='profile-user-avatar'
+        class="cursor-pointer hover:shadow"
         src={$profile.avatar ?? ''}
     />
-    <Dropdown triggeredBy=".acs">
+    <Dropdown triggeredBy="#profile-user-avatar">
         <div slot="header" class="px-4 py-2">
             <span class="block text-sm font-bold text-gray-900 dark:text-white">
                 {$profile.username}
