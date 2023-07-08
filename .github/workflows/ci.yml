@@ -104,9 +104,6 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           WEB_PUSH_SECRET: ${{ secrets.WEB_PUSH_ENDPOINT_SECRET }}
 
-      - name: logs
-        run: ls static/dist/*
-
       - name: Deploy Preview Project Artifacts to Vercel
         if: github.event_name == 'pull_request'
         run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}

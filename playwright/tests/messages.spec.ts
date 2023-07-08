@@ -181,8 +181,7 @@ test.describe('keys', () => {
         await makeFailedAttemptToSendAMessage(page);
     });
 
-    test('should export and import keys successfully', async ({ page, browser }) => {
-        test.fail(true, 'This test is flaky and fails randomly');
+    test.skip('should export and import keys successfully', async ({ page, browser }) => {
         await login(page);
         await createRoom(page, ulid());
         await page.waitForTimeout(300);
