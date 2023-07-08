@@ -6,13 +6,14 @@
         getAttachmentsForMessage,
         subscribeToRoomMessages
     } from '$lib/db/messages';
-    import MessageList from './MessageList.svelte';
     import type { Message } from '$lib/db/messages';
     import { joinRoom } from '$lib/db/rooms';
     import { decryptMessage, get as getAuthor } from './authors';
     import { afterNavigate, beforeNavigate } from '$app/navigation';
     import type { RealtimeChannel } from '@supabase/supabase-js';
     import MessageInput from './MessageInput.svelte';
+    import MessagesChunk from './MessagesChunk.svelte';
+    import { groupMessages } from '$lib/utils/messageChunks';
 
     export let data: PageData;
     let loading = true;
@@ -50,16 +51,18 @@
         sub = subscribeToRoomMessages(data.supabase, room.id, async (event) => {
             if (event.eventType === 'INSERT') {
                 const newMessage = event.new as Message;
-                const author = await getAuthor(data.supabase, newMessage.author_id);
-                const attachments = await getAttachmentsForMessage(data.supabase, newMessage.id);
                 const newAuthoredMessage = {
                     created_at: newMessage.created_at,
                     id: newMessage.id,
                     content: newMessage.content,
                     room_id: newMessage.room_id,
                     reply_to: newMessage.reply_to,
-                    attachments,
-                    author
+                    attachments: undefined,
+                    author: {
+                        id: newMessage.author_id,
+                        username: null,
+                        avatar: null
+                    },
                 } satisfies AuthoredMessage;
                 decryptMessage(data.supabase, newAuthoredMessage).then((plaintextMessage) => {
                     messages = [...messages, plaintextMessage];
@@ -97,9 +100,13 @@
     {#if loading}
         Loading...
     {:else}
-        <MessageList {messages} />
+        <div class="flex flex-col p-4 sm:p-6 gap-2">
+            {#each groupMessages(messages) as chunk (chunk.firstMessageTimestamp)}
+                <MessagesChunk {chunk} />
+            {/each}
+        </div>
     {/if}
-    <div bind:this={bottomContainer} class="w-full h-1" />
+    <div bind:this={bottomContainer} class="w-full h-1"></div>
 </div>
 <div class="self-end mb-4 p-2">
     {#if invited}

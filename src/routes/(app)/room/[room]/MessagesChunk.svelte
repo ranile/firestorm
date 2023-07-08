@@ -1,7 +1,5 @@
 <script lang="ts">
     import type { ChunkMessage, GroupedMessage } from '$lib/utils/messageChunks';
-    import AttachmentPreview from '$lib/components/attachments/AttachmentPreview.svelte';
-    import { formatTimestamp } from '$lib/utils/timestamps';
     import { deleteMessage as doDeleteMessage, updateMessage } from '$lib/db/messages';
     import { supabase } from '$lib/supabase';
     import Trash from 'svelte-material-icons/Delete.svelte';
@@ -10,10 +8,13 @@
     import MessageReply from './MessageReply.svelte';
     import { replyingToMessage } from './utils';
     import { Textarea } from 'flowbite-svelte';
-    import { getOutboundSession } from './authors';
+    import { get as getAuthor, getOutboundSession } from './authors';
+    import MessageAttachments from './MessageAttachments.svelte';
+    import { page } from '$app/stores';
+    import ChunkAuthor from './ChunkAuthor.svelte';
 
     export let chunk: GroupedMessage;
-    $: author = chunk.author;
+    $: author = chunk.author.username === null ? getAuthor($page.data.supabase, chunk.author.id) : Promise.resolve(chunk.author);
 
     const deleteMessage = (id: string) => {
         console.log('delete message', id);
@@ -40,12 +41,11 @@
 
 <div class="relative">
     <div class="static pl-12">
-        <img src={author?.avatar} class="rounded-full w-10 h-10 absolute -left-4 z-10" alt=" " />
-
-        <h3>
-            <span>{author?.username}</span>
-            <span class="text-xs">{formatTimestamp(chunk.firstMessageTimestamp)}</span>
-        </h3>
+        {#await author}
+            <ChunkAuthor username='Loading...' avatar='' firstMessageTimestamp={chunk.firstMessageTimestamp} />
+        {:then author}
+            <ChunkAuthor username={author.username} avatar={author.avatar} firstMessageTimestamp={chunk.firstMessageTimestamp} />
+        {/await}
         <div class="messages">
             {#each chunk.messages as message}
                 {#if message.replyTo}
@@ -92,11 +92,7 @@
                             <p>{message.content}</p>
                         {/if}
                     </div>
-                    {#if message.attachments}
-                        {#each message.attachments as attachment}
-                            <AttachmentPreview {attachment} />
-                        {/each}
-                    {/if}
+                    <MessageAttachments messageId={message.id} attachments={message.attachments} />
                 </div>
             {/each}
         </div>
