@@ -9,12 +9,10 @@
 
     let username = '';
     let errorMessage = '';
-    let inputErrorMessage = '';
     let avatarFile: File | undefined = undefined;
 
     const getStartedClick = async () => {
         if (username === '') {
-            inputErrorMessage = 'Username is required';
             return;
         }
         const userId = data.session!.user.id;

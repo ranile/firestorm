@@ -1,14 +1,10 @@
 <script lang="ts">
     import type { PageData } from './$types';
     import { Button } from 'flowbite-svelte';
-    import {
-        type AuthoredMessage,
-        getAttachmentsForMessage,
-        subscribeToRoomMessages
-    } from '$lib/db/messages';
+    import { type AuthoredMessage, subscribeToRoomMessages } from '$lib/db/messages';
     import type { Message } from '$lib/db/messages';
     import { joinRoom } from '$lib/db/rooms';
-    import { decryptMessage, get as getAuthor } from './authors';
+    import { decryptMessage } from './authors';
     import { afterNavigate, beforeNavigate } from '$app/navigation';
     import type { RealtimeChannel } from '@supabase/supabase-js';
     import MessageInput from './MessageInput.svelte';
@@ -62,7 +58,7 @@
                         id: newMessage.author_id,
                         username: null,
                         avatar: null
-                    },
+                    }
                 } satisfies AuthoredMessage;
                 decryptMessage(data.supabase, newAuthoredMessage).then((plaintextMessage) => {
                     messages = [...messages, plaintextMessage];
@@ -106,7 +102,7 @@
             {/each}
         </div>
     {/if}
-    <div bind:this={bottomContainer} class="w-full h-1"></div>
+    <div bind:this={bottomContainer} class="w-full h-1" />
 </div>
 <div class="self-end mb-4 p-2">
     {#if invited}

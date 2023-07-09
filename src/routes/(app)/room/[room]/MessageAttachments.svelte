@@ -3,7 +3,7 @@
     import AttachmentPreview from '$lib/components/attachments/AttachmentPreview.svelte';
     import { page } from '$app/stores';
 
-    export let messageId: string
+    export let messageId: string;
     export let attachments: Attachment[] | undefined = undefined;
 </script>
 

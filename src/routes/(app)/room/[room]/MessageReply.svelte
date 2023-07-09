@@ -26,7 +26,7 @@
     <p>Loading...</p>
 {:then message}
     <div class="flex justify-between">
-        <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+        <!-- eslint-disable-next-line svelte/valid-compile -->
         <blockquote
             class="text-sm flex gap-2 ml-2 cursor-pointer brightness-80 hover:brightness-100"
             on:click={navToOriginal}

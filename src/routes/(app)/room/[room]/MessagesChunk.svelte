@@ -14,7 +14,10 @@
     import ChunkAuthor from './ChunkAuthor.svelte';
 
     export let chunk: GroupedMessage;
-    $: author = chunk.author.username === null ? getAuthor($page.data.supabase, chunk.author.id) : Promise.resolve(chunk.author);
+    $: author =
+        chunk.author.username === null
+            ? getAuthor($page.data.supabase, chunk.author.id)
+            : Promise.resolve(chunk.author);
 
     const deleteMessage = (id: string) => {
         console.log('delete message', id);
@@ -42,9 +45,17 @@
 <div class="relative">
     <div class="static pl-12">
         {#await author}
-            <ChunkAuthor username='Loading...' avatar='' firstMessageTimestamp={chunk.firstMessageTimestamp} />
+            <ChunkAuthor
+                username="Loading..."
+                avatar=""
+                firstMessageTimestamp={chunk.firstMessageTimestamp}
+            />
         {:then author}
-            <ChunkAuthor username={author.username} avatar={author.avatar} firstMessageTimestamp={chunk.firstMessageTimestamp} />
+            <ChunkAuthor
+                username={author.username}
+                avatar={author.avatar}
+                firstMessageTimestamp={chunk.firstMessageTimestamp}
+            />
         {/await}
         <div class="messages">
             {#each chunk.messages as message}

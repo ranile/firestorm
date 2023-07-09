@@ -7,23 +7,10 @@
 
     let breakPoint = 1024;
     let width = 0;
-    let activateClickOutside = true;
     let drawerHidden = false;
-    $: if (width >= breakPoint) {
-        drawerHidden = false;
-        activateClickOutside = false;
-    } else {
-        drawerHidden = true;
-        activateClickOutside = true;
-    }
+    $: drawerHidden = width < breakPoint;
     onMount(() => {
-        if (width >= breakPoint) {
-            drawerHidden = false;
-            activateClickOutside = false;
-        } else {
-            drawerHidden = true;
-            activateClickOutside = true;
-        }
+        drawerHidden = width < breakPoint;
     });
     const toggleDrawer = () => {
         drawerHidden = !drawerHidden;
