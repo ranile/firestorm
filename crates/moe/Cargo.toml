@@ -20,7 +20,7 @@ serde_json = "1.0.96"
 thiserror = "1.0.40"
 
 # crypto
-vodozemac = { version = "0.3.0", default-features = true, features = ["js"] }
+vodozemac = { version = "0.4.0", default-features = true, features = ["js"] }
 aes = "0.8"
 base64 = "0.21.0"
 rand = { version = "*" }
