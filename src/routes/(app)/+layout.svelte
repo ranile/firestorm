@@ -3,7 +3,7 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import ProfileDropdown from '$lib/components/ProfileDropdown.svelte';
     import { onMount } from 'svelte';
-    import { subscribeToRoomMembers } from '$lib/db/rooms';
+    import { shareMySessionKey, subscribeToRoomMembers } from '$lib/db/rooms';
     import { rooms } from '$lib/db/rooms';
     import { createRoomModalState } from '$lib/components/SideNav/store';
     import SideNavGeneric from '$lib/components/SideNavGeneric.svelte';
@@ -14,6 +14,7 @@
     import SidebarItem from '$lib/components/SideNav/SidebarItem.svelte';
     import type { RealtimeChannel } from '@supabase/supabase-js';
     import { decryptMessage } from './room/[room]/authors';
+    import { olmAccount, raise } from '$lib/utils';
 
     export let data: LayoutData;
     const signout = () => {
@@ -62,6 +63,29 @@
             }
         });
     });
+
+    onMount(() => {
+        const sub = data.supabase
+            .channel(`key-requests`)
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'room_session_key_request',
+                filter: `requested_from=eq.${data.session?.user.id}`
+            }, (event) => {
+                if (event.eventType === 'INSERT') {
+                    console.log('got key request', event);
+                    shareMySessionKey(data.supabase, $olmAccount ?? raise('olm account must be set'), event.new.room_id, event.new.requested_by)
+                    data.supabase.from('room_session_key_request')
+                        .delete()
+                        .eq('id', event.new.id)
+                        .eq('requested_from', event.new.requested_from)
+                        .eq('requested_by', event.new.requested_by)
+                }
+            })
+            .subscribe()
+        return () => sub.unsubscribe();
+    })
 </script>
 
 <SideNavGeneric>

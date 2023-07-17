@@ -114,7 +114,7 @@ export function subscribeToRoomMembers(
         .subscribe();
 }
 
-export async function inviteMember(supabase: Supabase, userAccount: UserAccount, roomId: string, userId: string) {
+export async function shareMySessionKey(supabase: Supabase, userAccount: UserAccount, roomId: string, userId: string) {
     const session = await getSession(supabase)
     const outboundSession = buildOutboundSession(roomId);
     if (outboundSession === null) {
@@ -149,6 +149,10 @@ export async function inviteMember(supabase: Supabase, userAccount: UserAccount,
         throw sessKeysIns.error;
     }
 
+}
+
+export async function inviteMember(supabase: Supabase, userAccount: UserAccount, roomId: string, userId: string) {
+    await shareMySessionKey(supabase, userAccount, roomId, userId)
 
     const { data, error } = await supabase
         .from('room_members')

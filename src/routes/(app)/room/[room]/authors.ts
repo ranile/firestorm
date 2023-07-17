@@ -49,7 +49,7 @@ export async function decryptMessage(supabase: Supabase, message: AuthoredMessag
     if (sess === null) {
         return {
             ...message,
-            content: 'This message could not be decrypted because you have not yet shared a key with this person.',
+            content: 'This message could not be decrypted because this person has not yet shared their keys with you. You will receive the keys next time they come online.',
             attachments: []
         };
     }
