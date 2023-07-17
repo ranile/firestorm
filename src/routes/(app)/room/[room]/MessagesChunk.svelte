@@ -104,12 +104,12 @@
                         {/if}
                     </div>
                     {#await author then author}
-                    <MessageAttachments
-                        messageId={message.id}
-                        authorId={author.id}
-                        attachments={message.attachments}
-                    />
-                        {/await}
+                        <MessageAttachments
+                            messageId={message.id}
+                            authorId={author.id}
+                            attachments={message.attachments}
+                        />
+                    {/await}
                 </div>
             {/each}
         </div>

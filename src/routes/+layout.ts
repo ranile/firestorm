@@ -33,10 +33,10 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
     const {
         data: { session }
     } = await supabase.auth.getSession();
-    const fromLocalStorage = browser ? localStorage.getItem('account:pickle') : null
+    const fromLocalStorage = browser ? localStorage.getItem('account:pickle') : null;
     if (fromLocalStorage) {
         const { pickle, key } = JSON.parse(fromLocalStorage);
-        olmAccount.set(UserAccount.from_pickle(pickle, key))
+        olmAccount.set(UserAccount.from_pickle(pickle, key));
     }
 
     const reCacheProfile = async () => {

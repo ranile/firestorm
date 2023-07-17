@@ -57,7 +57,7 @@ export const raise = (e: string | Error): never => {
     } else {
         throw e;
     }
-}
+};
 if (import.meta.vitest) {
     const { it, expect } = import.meta.vitest;
     it('splitWith', async () => {

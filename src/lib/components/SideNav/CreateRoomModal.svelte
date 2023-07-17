@@ -18,7 +18,11 @@
             return;
         }
         try {
-            const { room } = await createRoom($page.data.supabase, $olmAccount ?? raise('olm account must be set up'), name);
+            const { room } = await createRoom(
+                $page.data.supabase,
+                $olmAccount ?? raise('olm account must be set up'),
+                name
+            );
             rooms.set([]);
             await invalidate('rooms:load');
             await goto(`/room/${room.id}`);

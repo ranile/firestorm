@@ -41,11 +41,20 @@
                 if (attachment.key) {
                     await worker.decryptAttachment(blob, attachment.key);
                 } else {
-                    console.log('decrypting attachment with key', $page.data.room.id, authorId, attachment.key_ciphertext!);
-                    const dec = await decryptAttachment($supabase, $page.data.room.id, authorId, attachment.key_ciphertext!)
+                    console.log(
+                        'decrypting attachment with key',
+                        $page.data.room.id,
+                        authorId,
+                        attachment.key_ciphertext!
+                    );
+                    const dec = await decryptAttachment(
+                        $page.data.supabase,
+                        $page.data.room.id,
+                        authorId,
+                        attachment.key_ciphertext!
+                    );
                     await worker.decryptAttachment(blob, dec);
                 }
-
             });
     };
 

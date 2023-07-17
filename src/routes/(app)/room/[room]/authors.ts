@@ -21,7 +21,12 @@ export async function get(supabase: Supabase, id: string): Promise<Profile> {
     return profile;
 }
 
-async function getInboundSessionViaOlmSessionKey(supabase: Supabase, selfId: string, authorId: string, roomId: string) {
+async function getInboundSessionViaOlmSessionKey(
+    supabase: Supabase,
+    selfId: string,
+    authorId: string,
+    roomId: string
+) {
     const sessionKey = await getDecryptedSessionKey(supabase, selfId, authorId, roomId);
     if (sessionKey === null) {
         // this is the case where they haven't given us a key
@@ -30,8 +35,8 @@ async function getInboundSessionViaOlmSessionKey(supabase: Supabase, selfId: str
         await supabase.from('room_session_key_request').insert({
             room_id: roomId,
             requested_by: selfId,
-            requested_from: authorId,
-        })
+            requested_from: authorId
+        });
         return null;
     }
     localStorage.setItem(`${roomId}:${authorId}:sessionKey`, sessionKey);
@@ -41,15 +46,19 @@ async function getInboundSessionViaOlmSessionKey(supabase: Supabase, selfId: str
 
 async function getInboundSession(supabase: Supabase, roomId: string, authorId: string) {
     const session = await getSession(supabase);
-    
+
     const sessionKeyFromLocalStorage = localStorage.getItem(`${roomId}:${authorId}:sessionKey`);
     return sessionKeyFromLocalStorage
         ? new InboundSession(sessionKeyFromLocalStorage)
         : await getInboundSessionViaOlmSessionKey(supabase, session.user.id, authorId, roomId);
 }
 
-
-export async function decryptAttachment(supabase: Supabase, roomId: string, authorId: string, ciphertext: string) {
+export async function decryptAttachment(
+    supabase: Supabase,
+    roomId: string,
+    authorId: string,
+    ciphertext: string
+) {
     const sess = await getInboundSession(supabase, roomId, authorId);
     if (sess === null) {
         return null;
@@ -62,7 +71,8 @@ export async function decryptMessage(supabase: Supabase, message: AuthoredMessag
     if (sess === null) {
         return {
             ...message,
-            content: 'This message could not be decrypted because this person has not yet shared their keys with you. You will receive the keys next time they come online.',
+            content:
+                'This message could not be decrypted because this person has not yet shared their keys with you. You will receive the keys next time they come online.',
             attachments: []
         };
     }
@@ -86,9 +96,9 @@ let outbound: OutboundSession | undefined;
 
 export function getOutboundSession(roomId: string) {
     if (outbound) return outbound;
-    const newOutbound = buildOutboundSession(roomId)
+    const newOutbound = buildOutboundSession(roomId);
     if (newOutbound) {
-        outbound = newOutbound
+        outbound = newOutbound;
     }
-    return outbound
+    return outbound;
 }

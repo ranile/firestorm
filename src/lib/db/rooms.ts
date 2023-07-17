@@ -85,7 +85,7 @@ export async function createRoom(supabase: Supabase, userAccount: UserAccount, n
     if (error) {
         throw error;
     }
-    const member = await joinRoom(supabase, userAccount, room.id)
+    const member = await joinRoom(supabase, userAccount, room.id);
 
     return { room: room, member: member };
 }
@@ -114,8 +114,13 @@ export function subscribeToRoomMembers(
         .subscribe();
 }
 
-export async function shareMySessionKey(supabase: Supabase, userAccount: UserAccount, roomId: string, userId: string) {
-    const session = await getSession(supabase)
+export async function shareMySessionKey(
+    supabase: Supabase,
+    userAccount: UserAccount,
+    roomId: string,
+    userId: string
+) {
+    const session = await getSession(supabase);
     const outboundSession = buildOutboundSession(roomId);
     if (outboundSession === null) {
         throw new Error('cannot build outbound session for room');
@@ -131,28 +136,39 @@ export async function shareMySessionKey(supabase: Supabase, userAccount: UserAcc
         throw keysError;
     }
 
-    const members = memberKeys.map(({ identity_key_curve25519, one_time_key_curve25519, member_id }) => ({
-        user_id: member_id,
-        identity_key: identity_key_curve25519,
-        one_time_key: one_time_key_curve25519,
-    }))
+    const members = memberKeys.map(
+        ({ identity_key_curve25519, one_time_key_curve25519, member_id }) => ({
+            user_id: member_id,
+            identity_key: identity_key_curve25519,
+            one_time_key: one_time_key_curve25519
+        })
+    );
 
     type RoomSessionKey = Database['public']['Tables']['room_session_keys']['Insert'];
-    const sessionKeysForMembers = encryptRoomSessionKey(userAccount, sessionKey, members)
-    const rowsToInsert: RoomSessionKey[] = []
+    const sessionKeysForMembers = encryptRoomSessionKey(userAccount, sessionKey, members);
+    const rowsToInsert: RoomSessionKey[] = [];
     for (const [memberId, sessionKey] of sessionKeysForMembers) {
-        rowsToInsert.push({ room_id: roomId, key_of: session.user.id, key_for: memberId, key: sessionKey } satisfies RoomSessionKey)
+        rowsToInsert.push({
+            room_id: roomId,
+            key_of: session.user.id,
+            key_for: memberId,
+            key: sessionKey
+        } satisfies RoomSessionKey);
     }
 
-    const sessKeysIns = await supabase.from('room_session_keys').insert(rowsToInsert)
+    const sessKeysIns = await supabase.from('room_session_keys').insert(rowsToInsert);
     if (sessKeysIns.error) {
         throw sessKeysIns.error;
     }
-
 }
 
-export async function inviteMember(supabase: Supabase, userAccount: UserAccount, roomId: string, userId: string) {
-    await shareMySessionKey(supabase, userAccount, roomId, userId)
+export async function inviteMember(
+    supabase: Supabase,
+    userAccount: UserAccount,
+    roomId: string,
+    userId: string
+) {
+    await shareMySessionKey(supabase, userAccount, roomId, userId);
 
     const { data, error } = await supabase
         .from('room_members')
@@ -199,7 +215,7 @@ export async function joinRoom(supabase: Supabase, userAccount: UserAccount, roo
     }
 
     const selfMember = async () => {
-        const { data, error } = await supabase.rpc('get_one_time_key', { uid: session.user.id })
+        const { data, error } = await supabase.rpc('get_one_time_key', { uid: session.user.id });
         if (error) {
             throw error;
         }
@@ -207,36 +223,46 @@ export async function joinRoom(supabase: Supabase, userAccount: UserAccount, roo
             identity_key_curve25519: userAccount.identityKeys().curve25519,
             one_time_key_curve25519: data.curve25519,
             member_id: session.user.id
-        }
-    }
+        };
+    };
 
-    const keys = memberKeys.length !== 0 ? memberKeys : [await selfMember()]
+    const keys = memberKeys.length !== 0 ? memberKeys : [await selfMember()];
     console.log('keys', keys);
 
     const members = keys.map(({ identity_key_curve25519, one_time_key_curve25519, member_id }) => ({
         user_id: member_id,
         identity_key: identity_key_curve25519,
-        one_time_key: one_time_key_curve25519,
-    }))
+        one_time_key: one_time_key_curve25519
+    }));
     console.log('members', members);
-    const sessionKey = sess.sessionKey
+    const sessionKey = sess.sessionKey;
     console.log('members', members);
 
     type RoomSessionKey = Database['public']['Tables']['room_session_keys']['Insert'];
-    const sessionKeysForMembers = encryptRoomSessionKey(userAccount, sessionKey, members)
-    const rowsToInsert: RoomSessionKey[] = []
+    const sessionKeysForMembers = encryptRoomSessionKey(userAccount, sessionKey, members);
+    const rowsToInsert: RoomSessionKey[] = [];
     for (const [memberId, sessionKey] of sessionKeysForMembers) {
-        rowsToInsert.push({ room_id: roomId, key_of: session.user.id, key_for: memberId, key: sessionKey } satisfies RoomSessionKey)
+        rowsToInsert.push({
+            room_id: roomId,
+            key_of: session.user.id,
+            key_for: memberId,
+            key: sessionKey
+        } satisfies RoomSessionKey);
     }
 
-    const sessKeysIns = await supabase.from('room_session_keys').upsert(rowsToInsert)
+    const sessKeysIns = await supabase.from('room_session_keys').upsert(rowsToInsert);
     if (sessKeysIns.error) {
         throw sessKeysIns.error;
     }
 
     const member = await supabase
         .from('room_members')
-        .upsert({ room_id: roomId, member_id: session.user.id, session_key: null, join_state: 'joined' })
+        .upsert({
+            room_id: roomId,
+            member_id: session.user.id,
+            session_key: null,
+            join_state: 'joined'
+        })
         .match({ room_id: roomId, member_id: session.user.id })
         .select()
         .single();

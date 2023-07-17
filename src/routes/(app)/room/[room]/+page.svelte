@@ -84,7 +84,7 @@
 
     const onJoinRoomClick = async () => {
         console.log('Joining room');
-        await joinRoom(data.supabase, $olmAccount ?? raise("olmAccount must not be null"), room.id);
+        await joinRoom(data.supabase, $olmAccount ?? raise('olmAccount must not be null'), room.id);
         invited = false;
     };
 </script>
