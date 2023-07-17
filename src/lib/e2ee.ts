@@ -30,8 +30,6 @@ export async function getDecryptedSessionKey(
         throw sessKeyErr;
     }
     if (sessKey === null) {
-        // TODO: this is the case where they haven't given us a key
-        // they should give us a key when inviting(/adding?) us to a room
         return null;
     }
 

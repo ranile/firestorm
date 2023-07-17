@@ -24,6 +24,14 @@ export async function get(supabase: Supabase, id: string): Promise<Profile> {
 async function getInboundSessionViaOlmSessionKey(supabase: Supabase, selfId: string, authorId: string, roomId: string) {
     const sessionKey = await getDecryptedSessionKey(supabase, selfId, authorId, roomId);
     if (sessionKey === null) {
+        // this is the case where they haven't given us a key
+        // they should give us a key when inviting(/adding?) us to a room,
+        // but we should also be able to request a key from them
+        await supabase.from('room_session_key_request').insert({
+            room_id: roomId,
+            requested_by: selfId,
+            requested_from: authorId,
+        })
         return null;
     }
     localStorage.setItem(`${roomId}:${authorId}:sessionKey`, sessionKey);
