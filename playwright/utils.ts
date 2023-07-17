@@ -1,13 +1,19 @@
-import { auth } from './config';
 import { Page } from '@playwright/test';
+import { ulid } from 'ulidx';
 
 export async function login(page: Page) {
     await page.goto('/auth');
     await page.waitForLoadState('networkidle');
 
-    await page.getByPlaceholder('Your email address').fill(auth.username);
-    await page.getByPlaceholder('Your password').fill(auth.password);
-    await page.getByRole('button', { name: 'Sign in' }).click();
+    const email = ulid();
+    const password = ulid();
+    await page.getByRole('link', { name: 'Don\'t have an account? Sign up' }).click();
+    await page.getByPlaceholder('Your email address').fill(email + '@firestorm.chat');
+    await page.getByPlaceholder('Your password').fill(password);
+    await page.getByRole('button', { name: 'Sign up' }).click();
+    await page.getByPlaceholder('Username').click();
+    await page.getByPlaceholder('Username').fill('username ' + Math.random() * 100);
+    await page.getByRole('button', { name: 'Get Started' }).click();
 }
 
 export async function createRoom(page: Page, roomName: string) {
