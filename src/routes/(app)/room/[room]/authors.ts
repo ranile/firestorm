@@ -39,13 +39,26 @@ async function getInboundSessionViaOlmSessionKey(supabase: Supabase, selfId: str
     return new InboundSession(sessionKey);
 }
 
+async function getInboundSession(supabase: Supabase, roomId: string, authorId: string) {
+    const session = await getSession(supabase);
+    
+    const sessionKeyFromLocalStorage = localStorage.getItem(`${roomId}:${authorId}:sessionKey`);
+    return sessionKeyFromLocalStorage
+        ? new InboundSession(sessionKeyFromLocalStorage)
+        : await getInboundSessionViaOlmSessionKey(supabase, session.user.id, authorId, roomId);
+}
+
+
+export async function decryptAttachment(supabase: Supabase, roomId: string, authorId: string, ciphertext: string) {
+    const sess = await getInboundSession(supabase, roomId, authorId);
+    if (sess === null) {
+        return null;
+    }
+    return JSON.parse(sess.decrypt(ciphertext));
+}
 export async function decryptMessage(supabase: Supabase, message: AuthoredMessage) {
     const { content, author, room_id: roomId } = message;
-    const session = await getSession(supabase);
-    const sessionKeyFromLocalStorage = localStorage.getItem(`${roomId}:${author.id}:sessionKey`);
-    const sess = sessionKeyFromLocalStorage
-        ? new InboundSession(sessionKeyFromLocalStorage)
-        : await getInboundSessionViaOlmSessionKey(supabase, session.user.id, author.id, roomId);
+    const sess = await getInboundSession(supabase, roomId, author.id);
     if (sess === null) {
         return {
             ...message,

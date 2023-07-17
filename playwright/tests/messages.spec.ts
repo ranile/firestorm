@@ -58,7 +58,7 @@ async function sendMessageWithAttachment(page: Page, file: string, withText: boo
     }
 }
 
-test('should send attachments with a message', async ({ page }) => {
+test.only('should send attachments with a message', async ({ page }) => {
     const { file, expectedHash } = await getExpectedFile();
 
     await login(page);

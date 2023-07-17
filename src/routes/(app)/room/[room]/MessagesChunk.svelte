@@ -103,7 +103,13 @@
                             <p>{message.content}</p>
                         {/if}
                     </div>
-                    <MessageAttachments messageId={message.id} attachments={message.attachments} />
+                    {#await author then author}
+                    <MessageAttachments
+                        messageId={message.id}
+                        authorId={author.id}
+                        attachments={message.attachments}
+                    />
+                        {/await}
                 </div>
             {/each}
         </div>
