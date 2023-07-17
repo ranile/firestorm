@@ -6,7 +6,7 @@ import type { Database } from '../../database';
 import type { UnionFromValues } from '../utils';
 import { get, writable } from 'svelte/store';
 import { encryptRoomSessionKey, OutboundSession, UserAccount } from 'moe';
-import { buildOutboundSession } from '$lib/e2ee';
+import { buildOutboundSession, getDecryptedSessionKey } from '$lib/e2ee';
 
 export async function getRoomsWithMember(supabase: Supabase, memberId: string) {
     const rooms = await supabase
@@ -131,12 +131,6 @@ export async function inviteMember(supabase: Supabase, userAccount: UserAccount,
         throw keysError;
     }
 
-    const { data: oneTimeKey, error: oneTimeKeyError } = await supabase.rpc('get_one_time_key', { uid: userId })
-    if (oneTimeKeyError) {
-        throw oneTimeKeyError;
-
-    }
-
     const members = memberKeys.map(({ identity_key_curve25519, one_time_key_curve25519, member_id }) => ({
         user_id: member_id,
         identity_key: identity_key_curve25519,
@@ -192,7 +186,8 @@ export async function joinRoom(supabase: Supabase, userAccount: UserAccount, roo
     }
 
     const { data: memberKeys, error } = await supabase.rpc('get_keys_for_members', {
-        _room_id: roomId
+        _room_id: roomId,
+        member_ids: []
     });
 
     if (error) {
@@ -230,7 +225,7 @@ export async function joinRoom(supabase: Supabase, userAccount: UserAccount, roo
         rowsToInsert.push({ room_id: roomId, key_of: session.user.id, key_for: memberId, key: sessionKey } satisfies RoomSessionKey)
     }
 
-    const sessKeysIns = await supabase.from('room_session_keys').insert(rowsToInsert)
+    const sessKeysIns = await supabase.from('room_session_keys').upsert(rowsToInsert)
     if (sessKeysIns.error) {
         throw sessKeysIns.error;
     }
