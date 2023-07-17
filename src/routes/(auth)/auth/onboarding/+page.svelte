@@ -5,6 +5,7 @@
     import { updateProfile } from '$lib/db/users';
     import ProfileUpdate from '$lib/components/ProfileUpdate.svelte';
     import { UserAccount } from 'moe';
+    import { olmAccount as olmAccountStore } from '$lib/utils';
 
     export let data: PageData;
 
@@ -21,32 +22,33 @@
             await updateProfile(data.supabase, userId, username, avatarFile);
             const olmAccount = new UserAccount();
             const oneTimeKeys = olmAccount.generateOneTimeKeys(10);
-            const { curve25519, ed25519 } = olmAccount.identityKeys()
-
+            const { curve25519, ed25519 } = olmAccount.identityKeys();
 
             const idKeys = await data.supabase
                 .from('user_identity_keys')
-                .insert({ id: userId, curve25519, ed25519 })
+                .insert({ id: userId, curve25519, ed25519 });
 
-            const rows = []
+            const rows = [];
             for (const [id, key] of oneTimeKeys) {
-                rows.push({ id: userId, key_id: id, curve25519: key })
+                rows.push({ id: userId, key_id: id, curve25519: key });
             }
 
-            const otk = await data.supabase
-                .from('user_one_time_keys')
-                .insert(rows)
+            const otk = await data.supabase.from('user_one_time_keys').insert(rows);
 
-            olmAccount.markKeysAsPublished()
+            olmAccount.markKeysAsPublished();
 
             const arr = new Uint8Array(32);
             crypto.getRandomValues(arr);
-            const pickle = olmAccount.to_pickle(arr)
+            const pickle = olmAccount.to_pickle(arr);
 
-            localStorage.setItem('account:pickle', JSON.stringify({
-                pickle,
-                key: [...arr]
-            }))
+            localStorage.setItem(
+                'account:pickle',
+                JSON.stringify({
+                    pickle,
+                    key: [...arr]
+                })
+            );
+            olmAccountStore.set(olmAccount);
             await goto('/');
         } catch (e) {
             if (e instanceof Error) {

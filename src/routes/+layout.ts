@@ -8,8 +8,9 @@ import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { redirect } from '@sveltejs/kit';
 import { subscribeToNotifications } from '$lib/notifications';
-import { loaded } from '$lib/utils';
+import { loaded, olmAccount } from '$lib/utils';
 import { get } from 'svelte/store';
+import { UserAccount } from 'moe';
 
 async function navigate(where: string) {
     if (browser) {
@@ -32,6 +33,11 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
     const {
         data: { session }
     } = await supabase.auth.getSession();
+    const fromLocalStorage = browser ? localStorage.getItem('account:pickle') : null
+    if (fromLocalStorage) {
+        const { pickle, key } = JSON.parse(fromLocalStorage);
+        olmAccount.set(UserAccount.from_pickle(pickle, key))
+    }
 
     const reCacheProfile = async () => {
         const fetched = await getUserProfile(supabase, session!);

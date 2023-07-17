@@ -6,6 +6,21 @@ use wasm_bindgen::prelude::*;
 use ducktor::FromJsValue;
 use vodozemac::olm::{OlmMessage, PreKeyMessage, SessionConfig};
 
+trait JsMapExt {
+    fn from_hash_map<K: Into<JsValue>, V: Into<JsValue>>(map: HashMap<K, V>) -> Self;
+}
+
+impl JsMapExt for Map {
+    fn from_hash_map<K: Into<JsValue>, V: Into<JsValue>>(hashmap: HashMap<K, V>) -> Self {
+        let map = Map::new();
+        for (key, value) in hashmap {
+            map.set(&key.into(), &value.into());
+        }
+        map
+    }
+}
+
+
 #[derive(FromJsValue)]
 struct UserIdentityKeys {
     curve25519: String,
@@ -39,11 +54,9 @@ impl UserAccount {
     #[wasm_bindgen(js_name = "generateOneTimeKeys")]
     pub fn generate_one_time_keys(&mut self, count: usize) -> Map {
         self.inner.generate_one_time_keys(count);
-        let map = Map::new();
-        for (key, value) in self.inner.one_time_keys() {
-            map.set(&key.to_base64().into(), &value.to_base64().into());
-        }
-        map
+        Map::from_hash_map(self.inner.one_time_keys().into_iter().map(|(key_id, key)| {
+            (key_id.to_base64(), key.to_base64())
+        }).collect())
     }
 
     #[wasm_bindgen(js_name = "markKeysAsPublished")]
@@ -63,38 +76,54 @@ impl UserAccount {
     }
 }
 
+#[derive(FromJsValue)]
 pub struct RoomMember {
     user_id: String,
     identity_key: String,
     one_time_key: String,
-
 }
 
-pub fn encrypt_room_session_key(user_account: &UserAccount, session_key: String, room_members: Vec<RoomMember>) -> Result<HashMap<String, PreKeyMessage>, KeyError> {
+#[wasm_bindgen(js_name = "encryptRoomSessionKey")]
+pub fn encrypt_room_session_key(user_account: &UserAccount, session_key: &str, room_members: js_sys::Array) -> Result<Map, JsError> {
+    let mut room_members = {
+        let mut v = Vec::with_capacity(room_members.length() as usize);
+        room_members.for_each(&mut |value, _, _| {
+            let value = value.into();
+            let value = RoomMember::from(&value);
+            v.push(value);
+        });
+        v
+    };
     let mut map = HashMap::new();
     for member in room_members {
         let mut outbound = user_account.inner.create_outbound_session(
             SessionConfig::version_2(),
-            Curve25519PublicKey::from_base64(&member.identity_key)?,
-            Curve25519PublicKey::from_base64(&member.one_time_key)?,
+            Curve25519PublicKey::from_base64(&member.identity_key).map_err(JsError::from)?,
+            Curve25519PublicKey::from_base64(&member.one_time_key).map_err(JsError::from)?,
         );
         let ciphertext = outbound.encrypt(session_key.as_bytes());
         match ciphertext {
             OlmMessage::Normal(_) => unreachable!("first message should be a PreKeyMessage"),
-            OlmMessage::PreKey(pkm) => { map.insert(member.user_id, pkm); }
+            OlmMessage::PreKey(pkm) => { map.insert(member.user_id, serde_json::to_string(&pkm).map_err(JsError::from)?); }
         }
     }
 
 
-    Ok(map)
+    Ok(Map::from_hash_map(map))
 }
 
-pub fn decrypt_room_session_key(user_account: &mut UserAccount, encryptor_identity_key: String, message: PreKeyMessage) -> Result<Vec<u8>, JsValue> {
-    let mut inbound = user_account.inner.create_inbound_session(
-        Curve25519PublicKey::from_base64(&encryptor_identity_key).unwrap(),
+#[wasm_bindgen(js_name = "decryptRoomSessionKey")]
+pub fn decrypt_room_session_key(
+    user_account: &mut UserAccount,
+    encryptor_identity_key: String,
+    message: String) -> Result<String, JsValue> {
+    let message = serde_json::from_str(&message).map_err(JsError::from)?;
+    let inbound = user_account.inner.create_inbound_session(
+        Curve25519PublicKey::from_base64(&encryptor_identity_key).map_err(JsError::from)?,
         &message,
-    ).unwrap();
-    Ok(inbound.plaintext)
+    ).map_err(JsError::from)?;
+    let plain_text = String::from_utf8(inbound.plaintext).map_err(JsError::from)?;
+    Ok(plain_text)
 }
 
 #[cfg(test)]

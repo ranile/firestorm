@@ -215,6 +215,7 @@ dependencies = [
 [[package]]
 name = "ducktor"
 version = "0.1.0"
+source = "git+https://github.com/hamza1311/ducktor.git#52bbe631d26b36eef70e4c18a3c9b660ecf25c42"
 dependencies = [
  "proc-macro2",
  "quote",
