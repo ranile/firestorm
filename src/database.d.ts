@@ -512,17 +512,30 @@ export interface Database {
       }
     }
     Functions: {
-      get_keys_for_members: {
-        Args: {
-          _room_id: string
-        }
-        Returns: {
-          member_id: string
-          identity_key_curve25519: string
-          one_time_key_id: string
-          one_time_key_curve25519: string
-        }[]
-      }
+      get_keys_for_members:
+        | {
+            Args: {
+              _room_id: string
+            }
+            Returns: {
+              member_id: string
+              identity_key_curve25519: string
+              one_time_key_id: string
+              one_time_key_curve25519: string
+            }[]
+          }
+        | {
+            Args: {
+              _room_id: string
+              member_ids: string[]
+            }
+            Returns: {
+              member_id: string
+              identity_key_curve25519: string
+              one_time_key_id: string
+              one_time_key_curve25519: string
+            }[]
+          }
       get_one_time_key: {
         Args: {
           uid: string

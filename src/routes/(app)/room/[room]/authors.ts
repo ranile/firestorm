@@ -6,6 +6,7 @@ import { decryptRoomSessionKey, InboundSession, OutboundSession } from 'moe';
 import type { AuthoredMessage } from '$lib/db/messages';
 import { olmAccount, raise } from '$lib/utils';
 import { get as getStore } from 'svelte/store';
+import { buildOutboundSession } from '$lib/e2ee';
 
 const authors: { [key: string]: Profile } = {};
 
@@ -118,11 +119,9 @@ let outbound: OutboundSession | undefined;
 
 export function getOutboundSession(roomId: string) {
     if (outbound) return outbound;
-    const storedPickle = localStorage.getItem(`${roomId}:pickle`);
-    if (storedPickle) {
-        const parsedPickle = JSON.parse(storedPickle);
-        const key = new Uint8Array(parsedPickle.key);
-        outbound = OutboundSession.from_pickle(parsedPickle.ciphertext, key);
+    const newOutbound = buildOutboundSession(roomId)
+    if (newOutbound) {
+        outbound = newOutbound
     }
-    return outbound;
+    return outbound
 }

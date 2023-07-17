@@ -6,6 +6,7 @@ import type { Database } from '../../database';
 import type { UnionFromValues } from '../utils';
 import { get, writable } from 'svelte/store';
 import { encryptRoomSessionKey, OutboundSession, UserAccount } from 'moe';
+import { buildOutboundSession } from '$lib/e2ee';
 
 export async function getRoomsWithMember(supabase: Supabase, memberId: string) {
     const rooms = await supabase
@@ -113,7 +114,48 @@ export function subscribeToRoomMembers(
         .subscribe();
 }
 
-export async function inviteMember(supabase: Supabase, roomId: string, userId: string) {
+export async function inviteMember(supabase: Supabase, userAccount: UserAccount, roomId: string, userId: string) {
+    const session = await getSession(supabase)
+    const outboundSession = buildOutboundSession(roomId);
+    if (outboundSession === null) {
+        throw new Error('cannot build outbound session for room');
+    }
+    const sessionKey = outboundSession.session_key();
+
+    const { data: memberKeys, error: keysError } = await supabase.rpc('get_keys_for_members', {
+        _room_id: roomId,
+        member_ids: [userId]
+    });
+
+    if (keysError) {
+        throw keysError;
+    }
+
+    const { data: oneTimeKey, error: oneTimeKeyError } = await supabase.rpc('get_one_time_key', { uid: userId })
+    if (oneTimeKeyError) {
+        throw oneTimeKeyError;
+
+    }
+
+    const members = memberKeys.map(({ identity_key_curve25519, one_time_key_curve25519, member_id }) => ({
+        user_id: member_id,
+        identity_key: identity_key_curve25519,
+        one_time_key: one_time_key_curve25519,
+    }))
+
+    type RoomSessionKey = Database['public']['Tables']['room_session_keys']['Insert'];
+    const sessionKeysForMembers = encryptRoomSessionKey(userAccount, sessionKey, members)
+    const rowsToInsert: RoomSessionKey[] = []
+    for (const [memberId, sessionKey] of sessionKeysForMembers) {
+        rowsToInsert.push({ room_id: roomId, key_of: session.user.id, key_for: memberId, key: sessionKey } satisfies RoomSessionKey)
+    }
+
+    const sessKeysIns = await supabase.from('room_session_keys').insert(rowsToInsert)
+    if (sessKeysIns.error) {
+        throw sessKeysIns.error;
+    }
+
+
     const { data, error } = await supabase
         .from('room_members')
         .insert({
