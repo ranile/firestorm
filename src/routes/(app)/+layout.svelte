@@ -64,7 +64,36 @@
         });
     });
 
-    onMount(() => {
+    onMount(async () => {
+        const { data: requests, error } = await data.supabase.from('room_session_key_request')
+            .select('*')
+            .eq('requested_from', data.session?.user.id)
+        if (error) {
+            console.error(error);
+            return;
+        }
+
+        requests.forEach((request) => {
+            handleRequest(request);
+        });
+
+        console.info('subscribing to key requests');
+
+        function handleRequest(request) {
+            shareMySessionKey(
+                data.supabase,
+                $olmAccount ?? raise('olm account must be set'),
+                request.room_id,
+                request.requested_by
+            );
+            data.supabase
+                .from('room_session_key_request')
+                .delete()
+                .eq('id', request.id)
+                .eq('requested_from', request.requested_from)
+                .eq('requested_by', request.requested_by);
+        }
+
         const sub = data.supabase
             .channel(`key-requests`)
             .on(
@@ -76,20 +105,9 @@
                     filter: `requested_from=eq.${data.session?.user.id}`
                 },
                 (event) => {
+                    console.log('got key request', event);
                     if (event.eventType === 'INSERT') {
-                        console.log('got key request', event);
-                        shareMySessionKey(
-                            data.supabase,
-                            $olmAccount ?? raise('olm account must be set'),
-                            event.new.room_id,
-                            event.new.requested_by
-                        );
-                        data.supabase
-                            .from('room_session_key_request')
-                            .delete()
-                            .eq('id', event.new.id)
-                            .eq('requested_from', event.new.requested_from)
-                            .eq('requested_by', event.new.requested_by);
+                        handleRequest(event.new)
                     }
                 }
             )

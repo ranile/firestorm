@@ -1,4 +1,5 @@
 alter publication supabase_realtime add table messages;
+alter publication supabase_realtime add table room_session_key_request;
 
 create extension http;
 

@@ -5,15 +5,18 @@ export async function login(page: Page) {
     await page.goto('/auth');
     await page.waitForLoadState('networkidle');
 
-    const email = ulid();
+    const email = ulid() + '@firestorm.chat';
     const password = ulid();
+    const username = 'username ' + Math.random() * 100
     await page.getByRole('link', { name: "Don't have an account? Sign up" }).click();
-    await page.getByPlaceholder('Your email address').fill(email + '@firestorm.chat');
+    await page.getByPlaceholder('Your email address').fill(email);
     await page.getByPlaceholder('Your password').fill(password);
     await page.getByRole('button', { name: 'Sign up' }).click();
     await page.getByPlaceholder('Username').click();
-    await page.getByPlaceholder('Username').fill('username ' + Math.random() * 100);
+    await page.getByPlaceholder('Username').fill(username);
     await page.getByRole('button', { name: 'Get Started' }).click();
+
+    return { email, password, username };
 }
 
 export async function createRoom(page: Page, roomName: string) {

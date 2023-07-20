@@ -168,8 +168,6 @@ export async function inviteMember(
     roomId: string,
     userId: string
 ) {
-    await shareMySessionKey(supabase, userAccount, roomId, userId);
-
     const { data, error } = await supabase
         .from('room_members')
         .insert({
