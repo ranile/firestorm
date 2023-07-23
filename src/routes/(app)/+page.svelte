@@ -25,4 +25,4 @@
     };
 </script>
 
-<button on:click={click}>add one time keys</button>
+<button on:click={click} hidden class='hidden'>add one time keys</button>
