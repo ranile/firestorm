@@ -83,7 +83,9 @@ export function subscribeToRoomMessages(
     roomId: string,
     callback: (
         messages: RealtimePostgresChangesPayload<
-            UnionFromValues<Database['public']['Tables']['messages']>
+            UnionFromValues<
+                Pick<Database['public']['Tables']['messages'], 'Insert' | 'Update' | 'Row'>
+            >
         >
     ) => void
 ) {

@@ -3,6 +3,8 @@
     import { createRoomModalState } from './store';
     import { createRoom, rooms } from '$lib/db/rooms';
     import { goto, invalidate } from '$app/navigation';
+    import { page } from '$app/stores';
+    import { olmAccount, raise } from '$lib/utils.js';
 
     let name = '';
     let errorMessage: string | null = null;
@@ -16,7 +18,11 @@
             return;
         }
         try {
-            const { room } = await createRoom(name);
+            const { room } = await createRoom(
+                $page.data.supabase,
+                $olmAccount ?? raise('olm account must be set up'),
+                name
+            );
             rooms.set([]);
             await invalidate('rooms:load');
             await goto(`/room/${room.id}`);

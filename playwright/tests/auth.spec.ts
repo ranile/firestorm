@@ -9,6 +9,7 @@ test('should navigate to home after sign in', async ({ page }) => {
 });
 
 test('should onboard new users', async ({ page, request }) => {
+    test.skip(true, 'email verification is disabled for now');
     await page.goto('/');
 
     await page.getByRole('link', { name: "Don't have an account? Sign up" }).click();

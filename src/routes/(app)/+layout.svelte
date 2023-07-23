@@ -3,7 +3,7 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import ProfileDropdown from '$lib/components/ProfileDropdown.svelte';
     import { onMount } from 'svelte';
-    import { subscribeToRoomMembers } from '$lib/db/rooms';
+    import { shareMySessionKey, subscribeToRoomMembers } from '$lib/db/rooms';
     import { rooms } from '$lib/db/rooms';
     import { createRoomModalState } from '$lib/components/SideNav/store';
     import SideNavGeneric from '$lib/components/SideNavGeneric.svelte';
@@ -14,6 +14,8 @@
     import SidebarItem from '$lib/components/SideNav/SidebarItem.svelte';
     import type { RealtimeChannel } from '@supabase/supabase-js';
     import { decryptMessage } from './room/[room]/authors';
+    import { olmAccount, raise } from '$lib/utils';
+    import type { Database } from '../../database';
 
     export let data: LayoutData;
     const signout = () => {
@@ -61,6 +63,61 @@
                 });
             }
         });
+    });
+
+    onMount(() => {
+        type Request = Database['public']['Tables']['room_session_key_request']['Row'];
+
+        function handleRequest(request: Request) {
+            shareMySessionKey(
+                data.supabase,
+                $olmAccount ?? raise('olm account must be set'),
+                request.room_id,
+                request.requested_by
+            );
+            data.supabase
+                .from('room_session_key_request')
+                .delete()
+                .eq('room_id', request.room_id)
+                .eq('requested_from', request.requested_from)
+                .eq('requested_by', request.requested_by);
+        }
+
+        (async () => {
+            const { data: requests, error } = await data.supabase
+                .from('room_session_key_request')
+                .select('*')
+                .eq('requested_from', data.session?.user.id);
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            requests.forEach((request) => {
+                handleRequest(request);
+            });
+        })();
+
+        console.info('subscribing to key requests');
+        const sub = data.supabase
+            .channel(`key-requests`)
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'room_session_key_request',
+                    filter: `requested_from=eq.${data.session?.user.id}`
+                },
+                (event) => {
+                    console.log('got key request', event);
+                    if (event.eventType === 'INSERT') {
+                        handleRequest(event.new as Request);
+                    }
+                }
+            )
+            .subscribe();
+        return () => sub.unsubscribe();
     });
 </script>
 

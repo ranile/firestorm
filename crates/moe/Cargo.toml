@@ -20,7 +20,7 @@ serde_json = "1.0.96"
 thiserror = "1.0.40"
 
 # crypto
-vodozemac = { version = "0.3.0", default-features = true, features = ["js"] }
+vodozemac = { version = "0.4.0", default-features = true, features = ["js"] }
 aes = "0.8"
 base64 = "0.21.0"
 rand = { version = "*" }
@@ -28,7 +28,7 @@ zeroize = "*"
 sha2 = "*"
 ctr = "0.9.2"
 wasm-bindgen-futures = "0.4.36"
-
+ducktor = { git = "https://github.com/hamza1311/ducktor.git" }
 [dependencies.web-sys]
 version = "0.3.61"
 features = [

@@ -10,6 +10,7 @@
     import MessageInput from './MessageInput.svelte';
     import MessagesChunk from './MessagesChunk.svelte';
     import { groupMessages } from '$lib/utils/messageChunks';
+    import { olmAccount, raise } from '$lib/utils.js';
 
     export let data: PageData;
     let loading = true;
@@ -83,7 +84,7 @@
 
     const onJoinRoomClick = async () => {
         console.log('Joining room');
-        await joinRoom(data.supabase, room.id);
+        await joinRoom(data.supabase, $olmAccount ?? raise('olmAccount must not be null'), room.id);
         invited = false;
     };
 </script>

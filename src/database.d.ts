@@ -1,4 +1,4 @@
-export type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export interface Database {
     graphql_public: {
@@ -53,6 +53,26 @@ export interface Database {
                     name?: string;
                     type?: string;
                 };
+                Relationships: [
+                    {
+                        foreignKeyName: 'attachments_id_fkey';
+                        columns: ['id'];
+                        referencedRelation: 'objects';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'attachments_id_fkey';
+                        columns: ['id'];
+                        referencedRelation: 'attachments_and_objects';
+                        referencedColumns: ['object_id'];
+                    },
+                    {
+                        foreignKeyName: 'attachments_message_id_fkey';
+                        columns: ['message_id'];
+                        referencedRelation: 'messages';
+                        referencedColumns: ['id'];
+                    }
+                ];
             };
             messages: {
                 Row: {
@@ -82,6 +102,38 @@ export interface Database {
                     reply_to?: string | null;
                     room_id?: string;
                 };
+                Relationships: [
+                    {
+                        foreignKeyName: 'messages_author_id_fkey';
+                        columns: ['author_id'];
+                        referencedRelation: 'users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'messages_author_id_fkey';
+                        columns: ['author_id'];
+                        referencedRelation: 'room_members_with_users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'messages_author_id_fkey';
+                        columns: ['author_id'];
+                        referencedRelation: 'users_with_profiles';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'messages_reply_to_fkey';
+                        columns: ['reply_to'];
+                        referencedRelation: 'messages';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'messages_room_id_fkey';
+                        columns: ['room_id'];
+                        referencedRelation: 'rooms';
+                        referencedColumns: ['id'];
+                    }
+                ];
             };
             profiles: {
                 Row: {
@@ -99,6 +151,26 @@ export interface Database {
                     id?: string;
                     username?: string | null;
                 };
+                Relationships: [
+                    {
+                        foreignKeyName: 'profiles_id_fkey';
+                        columns: ['id'];
+                        referencedRelation: 'users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'profiles_id_fkey';
+                        columns: ['id'];
+                        referencedRelation: 'room_members_with_users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'profiles_id_fkey';
+                        columns: ['id'];
+                        referencedRelation: 'users_with_profiles';
+                        referencedColumns: ['id'];
+                    }
+                ];
             };
             room_members: {
                 Row: {
@@ -122,6 +194,157 @@ export interface Database {
                     room_id?: string;
                     session_key?: string | null;
                 };
+                Relationships: [
+                    {
+                        foreignKeyName: 'room_members_member_id_fkey';
+                        columns: ['member_id'];
+                        referencedRelation: 'users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'room_members_member_id_fkey';
+                        columns: ['member_id'];
+                        referencedRelation: 'room_members_with_users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'room_members_member_id_fkey';
+                        columns: ['member_id'];
+                        referencedRelation: 'users_with_profiles';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'room_members_room_id_fkey';
+                        columns: ['room_id'];
+                        referencedRelation: 'rooms';
+                        referencedColumns: ['id'];
+                    }
+                ];
+            };
+            room_session_key_request: {
+                Row: {
+                    requested_by: string;
+                    requested_from: string;
+                    room_id: string;
+                };
+                Insert: {
+                    requested_by: string;
+                    requested_from: string;
+                    room_id: string;
+                };
+                Update: {
+                    requested_by?: string;
+                    requested_from?: string;
+                    room_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'room_session_key_request_requested_by_fkey';
+                        columns: ['requested_by'];
+                        referencedRelation: 'users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'room_session_key_request_requested_by_fkey';
+                        columns: ['requested_by'];
+                        referencedRelation: 'room_members_with_users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'room_session_key_request_requested_by_fkey';
+                        columns: ['requested_by'];
+                        referencedRelation: 'users_with_profiles';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'room_session_key_request_requested_from_fkey';
+                        columns: ['requested_from'];
+                        referencedRelation: 'users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'room_session_key_request_requested_from_fkey';
+                        columns: ['requested_from'];
+                        referencedRelation: 'room_members_with_users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'room_session_key_request_requested_from_fkey';
+                        columns: ['requested_from'];
+                        referencedRelation: 'users_with_profiles';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'room_session_key_request_room_id_fkey';
+                        columns: ['room_id'];
+                        referencedRelation: 'rooms';
+                        referencedColumns: ['id'];
+                    }
+                ];
+            };
+            room_session_keys: {
+                Row: {
+                    key: string | null;
+                    key_for: string;
+                    key_of: string;
+                    room_id: string;
+                };
+                Insert: {
+                    key?: string | null;
+                    key_for: string;
+                    key_of: string;
+                    room_id: string;
+                };
+                Update: {
+                    key?: string | null;
+                    key_for?: string;
+                    key_of?: string;
+                    room_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'room_session_keys_key_for_fkey';
+                        columns: ['key_for'];
+                        referencedRelation: 'users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'room_session_keys_key_for_fkey';
+                        columns: ['key_for'];
+                        referencedRelation: 'room_members_with_users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'room_session_keys_key_for_fkey';
+                        columns: ['key_for'];
+                        referencedRelation: 'users_with_profiles';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'room_session_keys_key_of_fkey';
+                        columns: ['key_of'];
+                        referencedRelation: 'users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'room_session_keys_key_of_fkey';
+                        columns: ['key_of'];
+                        referencedRelation: 'room_members_with_users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'room_session_keys_key_of_fkey';
+                        columns: ['key_of'];
+                        referencedRelation: 'users_with_profiles';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'room_session_keys_room_id_fkey';
+                        columns: ['room_id'];
+                        referencedRelation: 'rooms';
+                        referencedColumns: ['id'];
+                    }
+                ];
             };
             rooms: {
                 Row: {
@@ -142,34 +365,100 @@ export interface Database {
                     id?: string;
                     name?: string;
                 };
+                Relationships: [
+                    {
+                        foreignKeyName: 'rooms_created_by_fkey';
+                        columns: ['created_by'];
+                        referencedRelation: 'users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'rooms_created_by_fkey';
+                        columns: ['created_by'];
+                        referencedRelation: 'room_members_with_users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'rooms_created_by_fkey';
+                        columns: ['created_by'];
+                        referencedRelation: 'users_with_profiles';
+                        referencedColumns: ['id'];
+                    }
+                ];
             };
             user_identity_keys: {
                 Row: {
+                    curve25519: string;
+                    ed25519: string;
                     id: string;
-                    identity_key: string;
                 };
                 Insert: {
+                    curve25519: string;
+                    ed25519: string;
                     id: string;
-                    identity_key: string;
                 };
                 Update: {
+                    curve25519?: string;
+                    ed25519?: string;
                     id?: string;
-                    identity_key?: string;
                 };
+                Relationships: [
+                    {
+                        foreignKeyName: 'user_identity_keys_id_fkey';
+                        columns: ['id'];
+                        referencedRelation: 'users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'user_identity_keys_id_fkey';
+                        columns: ['id'];
+                        referencedRelation: 'room_members_with_users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'user_identity_keys_id_fkey';
+                        columns: ['id'];
+                        referencedRelation: 'users_with_profiles';
+                        referencedColumns: ['id'];
+                    }
+                ];
             };
             user_one_time_keys: {
                 Row: {
+                    curve25519: string;
                     id: string;
-                    one_time_key: string;
+                    key_id: string;
                 };
                 Insert: {
+                    curve25519: string;
                     id: string;
-                    one_time_key: string;
+                    key_id: string;
                 };
                 Update: {
+                    curve25519?: string;
                     id?: string;
-                    one_time_key?: string;
+                    key_id?: string;
                 };
+                Relationships: [
+                    {
+                        foreignKeyName: 'user_one_time_keys_id_fkey';
+                        columns: ['id'];
+                        referencedRelation: 'users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'user_one_time_keys_id_fkey';
+                        columns: ['id'];
+                        referencedRelation: 'room_members_with_users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'user_one_time_keys_id_fkey';
+                        columns: ['id'];
+                        referencedRelation: 'users_with_profiles';
+                        referencedColumns: ['id'];
+                    }
+                ];
             };
             web_push_subscriptions: {
                 Row: {
@@ -193,6 +482,26 @@ export interface Database {
                     keys_p256dh?: string;
                     user_id?: string;
                 };
+                Relationships: [
+                    {
+                        foreignKeyName: 'web_push_subscriptions_user_id_fkey';
+                        columns: ['user_id'];
+                        referencedRelation: 'users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'web_push_subscriptions_user_id_fkey';
+                        columns: ['user_id'];
+                        referencedRelation: 'room_members_with_users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'web_push_subscriptions_user_id_fkey';
+                        columns: ['user_id'];
+                        referencedRelation: 'users_with_profiles';
+                        referencedColumns: ['id'];
+                    }
+                ];
             };
         };
         Views: {
@@ -207,6 +516,26 @@ export interface Database {
                     path: string | null;
                     type: string | null;
                 };
+                Relationships: [
+                    {
+                        foreignKeyName: 'attachments_id_fkey';
+                        columns: ['attachment_id'];
+                        referencedRelation: 'objects';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'attachments_id_fkey';
+                        columns: ['attachment_id'];
+                        referencedRelation: 'attachments_and_objects';
+                        referencedColumns: ['object_id'];
+                    },
+                    {
+                        foreignKeyName: 'attachments_message_id_fkey';
+                        columns: ['message_id'];
+                        referencedRelation: 'messages';
+                        referencedColumns: ['id'];
+                    }
+                ];
             };
             room_members_with_users: {
                 Row: {
@@ -218,6 +547,14 @@ export interface Database {
                     room_id: string | null;
                     username: string | null;
                 };
+                Relationships: [
+                    {
+                        foreignKeyName: 'room_members_room_id_fkey';
+                        columns: ['room_id'];
+                        referencedRelation: 'rooms';
+                        referencedColumns: ['id'];
+                    }
+                ];
             };
             users_with_profiles: {
                 Row: {
@@ -226,29 +563,140 @@ export interface Database {
                     id: string | null;
                     username: string | null;
                 };
+                Relationships: [];
             };
         };
         Functions: {
-            insert_message:
+            get_keys_for_members: {
+                Args: {
+                    _room_id: string;
+                    member_ids: string[];
+                };
+                Returns: {
+                    member_id: string;
+                    identity_key_curve25519: string;
+                    one_time_key_id: string;
+                    one_time_key_curve25519: string;
+                }[];
+            };
+            get_one_time_key: {
+                Args: {
+                    uid: string;
+                };
+                Returns: {
+                    curve25519: string;
+                    id: string;
+                    key_id: string;
+                };
+            };
+            http: {
+                Args: {
+                    request: Database['public']['CompositeTypes']['http_request'];
+                };
+                Returns: unknown;
+            };
+            http_delete:
                 | {
                       Args: {
-                          p_uid: string;
-                          p_files: Json;
-                          p_room_id: string;
-                          p_ciphertext: string;
+                          uri: string;
                       };
-                      Returns: undefined;
+                      Returns: unknown;
                   }
                 | {
                       Args: {
-                          p_uid: string;
-                          p_files: Json;
-                          p_room_id: string;
-                          p_ciphertext: string;
-                          p_reply_to: string;
+                          uri: string;
+                          content: string;
+                          content_type: string;
                       };
-                      Returns: undefined;
+                      Returns: unknown;
                   };
+            http_get:
+                | {
+                      Args: {
+                          uri: string;
+                          data: Json;
+                      };
+                      Returns: unknown;
+                  }
+                | {
+                      Args: {
+                          uri: string;
+                      };
+                      Returns: unknown;
+                  };
+            http_head: {
+                Args: {
+                    uri: string;
+                };
+                Returns: unknown;
+            };
+            http_header: {
+                Args: {
+                    field: string;
+                    value: string;
+                };
+                Returns: Database['public']['CompositeTypes']['http_header'];
+            };
+            http_list_curlopt: {
+                Args: Record<PropertyKey, never>;
+                Returns: {
+                    curlopt: string;
+                    value: string;
+                }[];
+            };
+            http_patch: {
+                Args: {
+                    uri: string;
+                    content: string;
+                    content_type: string;
+                };
+                Returns: unknown;
+            };
+            http_post:
+                | {
+                      Args: {
+                          uri: string;
+                          data: Json;
+                      };
+                      Returns: unknown;
+                  }
+                | {
+                      Args: {
+                          uri: string;
+                          content: string;
+                          content_type: string;
+                      };
+                      Returns: unknown;
+                  };
+            http_put: {
+                Args: {
+                    uri: string;
+                    content: string;
+                    content_type: string;
+                };
+                Returns: unknown;
+            };
+            http_reset_curlopt: {
+                Args: Record<PropertyKey, never>;
+                Returns: boolean;
+            };
+            http_set_curlopt: {
+                Args: {
+                    curlopt: string;
+                    value: string;
+                };
+                Returns: boolean;
+            };
+            insert_message: {
+                Args: {
+                    p_uid: string;
+                    p_files: Json;
+                    p_room_id: string;
+                    p_ciphertext: string;
+                    p_reply_to?: string;
+                };
+                Returns: undefined;
+            };
             is_member_of: {
                 Args: {
                     _user_id: string;
@@ -256,12 +704,47 @@ export interface Database {
                 };
                 Returns: boolean;
             };
+            urlencode:
+                | {
+                      Args: {
+                          string: string;
+                      };
+                      Returns: string;
+                  }
+                | {
+                      Args: {
+                          string: string;
+                      };
+                      Returns: string;
+                  }
+                | {
+                      Args: {
+                          data: Json;
+                      };
+                      Returns: string;
+                  };
         };
         Enums: {
             member_join_state: 'invited' | 'joined';
         };
         CompositeTypes: {
-            [_ in never]: never;
+            http_header: {
+                field: string;
+                value: string;
+            };
+            http_request: {
+                method: unknown;
+                uri: string;
+                headers: unknown;
+                content_type: string;
+                content: string;
+            };
+            http_response: {
+                status: number;
+                content_type: string;
+                headers: unknown;
+                content: string;
+            };
         };
     };
     storage: {
@@ -300,6 +783,26 @@ export interface Database {
                     public?: boolean | null;
                     updated_at?: string | null;
                 };
+                Relationships: [
+                    {
+                        foreignKeyName: 'buckets_owner_fkey';
+                        columns: ['owner'];
+                        referencedRelation: 'users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'buckets_owner_fkey';
+                        columns: ['owner'];
+                        referencedRelation: 'room_members_with_users';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'buckets_owner_fkey';
+                        columns: ['owner'];
+                        referencedRelation: 'users_with_profiles';
+                        referencedColumns: ['id'];
+                    }
+                ];
             };
             migrations: {
                 Row: {
@@ -320,6 +823,7 @@ export interface Database {
                     id?: number;
                     name?: string;
                 };
+                Relationships: [];
             };
             objects: {
                 Row: {
@@ -358,6 +862,14 @@ export interface Database {
                     updated_at?: string | null;
                     version?: string | null;
                 };
+                Relationships: [
+                    {
+                        foreignKeyName: 'objects_bucketId_fkey';
+                        columns: ['bucket_id'];
+                        referencedRelation: 'buckets';
+                        referencedColumns: ['id'];
+                    }
+                ];
             };
         };
         Views: {
@@ -389,7 +901,7 @@ export interface Database {
                 Args: {
                     name: string;
                 };
-                Returns: string[];
+                Returns: unknown;
             };
             get_size_by_bucket: {
                 Args: Record<PropertyKey, never>;

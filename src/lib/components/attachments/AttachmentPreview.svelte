@@ -5,7 +5,10 @@
     import { onDestroy } from 'svelte';
     import ImagePlaceholder from 'svelte-material-icons/Image.svelte';
     import DownloadIcon from 'svelte-material-icons/Download.svelte';
+    import { decryptAttachment } from '../../../routes/(app)/room/[room]/authors';
+    import { page } from '$app/stores';
 
+    export let authorId: string;
     export let attachment: Attachment;
     $: isImage = attachment.type?.startsWith('image') ?? false;
 
@@ -31,11 +34,27 @@
         $supabase!.storage
             .from('attachments')
             .download(attachment.path!)
-            .then(({ data: blob }) => {
+            .then(async ({ data: blob }) => {
                 if (blob === null) {
                     throw Error('blob is null');
                 }
-                worker.decryptAttachment(blob, attachment.key);
+                if (attachment.key) {
+                    await worker.decryptAttachment(blob, attachment.key);
+                } else {
+                    console.log(
+                        'decrypting attachment with key',
+                        $page.data.room.id,
+                        authorId,
+                        attachment.key_ciphertext!
+                    );
+                    const dec = await decryptAttachment(
+                        $page.data.supabase,
+                        $page.data.room.id,
+                        authorId,
+                        attachment.key_ciphertext!
+                    );
+                    await worker.decryptAttachment(blob, dec);
+                }
             });
     };
 

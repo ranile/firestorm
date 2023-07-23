@@ -4,6 +4,7 @@ pub mod attachments;
 pub mod json_web_key;
 pub mod serde;
 pub mod worker;
+pub mod account;
 
 use vodozemac::megolm::{
     GroupSession, GroupSessionPickle, InboundGroupSession, MegolmMessage, SessionConfig, SessionKey,

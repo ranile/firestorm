@@ -4,6 +4,7 @@
     import Plus from 'svelte-material-icons/AccountPlus.svelte';
     import { inviteMember } from '$lib/db/rooms';
     import { findUser } from '$lib/db/users';
+    import { olmAccount, raise } from '$lib/utils.js';
 
     export let data: PageData;
 
@@ -16,7 +17,12 @@
         const formData = new FormData(e.target as HTMLFormElement);
         const who = formData.get('who') as string;
         const user = await findUser(data.supabase, who);
-        await inviteMember(data.supabase, data.room.id, user.id!);
+        await inviteMember(
+            data.supabase,
+            $olmAccount ?? raise('olm account must be initialized'),
+            data.room.id,
+            user.id!
+        );
         alert(`invited ${user.username} (${user.email}) to ${data.room.name}`);
         console.log(user);
     };
