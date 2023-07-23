@@ -1,6 +1,7 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import { olmAccount, raise } from '$lib/utils';
+    import { trpc } from '$lib/trpc/client.ts';
 
     const click = async () => {
         const oneTimeKeys = $olmAccount!.generateOneTimeKeys(100);
@@ -23,6 +24,13 @@
             })
         );
     };
+
+    const trpcTest = async () => {
+        console.log($page);
+        const t = trpc($page);
+        console.log(await t.messages.query());
+    }
 </script>
 
-<button on:click={click}>add one time keys</button>
+<!--<button on:click={click}>add one time keys</button>-->
+<button on:click={trpcTest}>test</button>

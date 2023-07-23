@@ -5,7 +5,7 @@ import type { UnionFromValues } from '../utils';
 import { Unreachable } from '../utils';
 import type { Profile } from '$lib/db/users';
 import type { EncryptedFile, OutboundSession } from 'moe';
-import type { CreateMessage as CreateMessagePayload } from '$lib/trpc/routes/messages';
+import type { CreateMessage as CreateMessagePayload } from '../../../supabase/functions/_shared/routes/messages';
 import type { Page } from '@sveltejs/kit';
 import { trpc } from '$lib/trpc/client';
 

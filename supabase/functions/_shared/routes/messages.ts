@@ -1,7 +1,6 @@
-import { router, publicProcedure } from '$lib/trpc/trpc';
+import { router, publicProcedure } from '../trpc.ts';
 import { z } from 'zod';
-import sql from '$lib/server/db';
-import { ulid } from 'ulidx';
+import { ulid } from 'https://deno.land/x/ulid@v0.2.0/mod.ts';
 
 const AttachmentMetadata = z.object({
     name: z.string(),
@@ -35,7 +34,7 @@ export type CreateMessage = z.infer<typeof CreateMessage>;
 export const messagesRouter = router({
     createMessage: publicProcedure
         .input(CreateMessage)
-        .mutation(async ({ ctx: { supabase }, input }) => {
+        .mutation(async ({ ctx: { supabase, db }, input }) => {
             const files: Attachment[] = [];
             for (const file of input.files) {
                 const id = ulid();
@@ -60,24 +59,29 @@ export const messagesRouter = router({
                 } satisfies Attachment);
             }
 
-            await sql.begin(async (sql) => {
-                const [{ id }] = await sql`
-                    INSERT INTO messages (content, room_id, author_id, reply_to)
-                    VALUES (${input.ciphertext}, ${input.roomId}, ${input.uid}, ${input.replyTo})
-                    RETURNING id;
-                `;
+            const transaction = db.createTransaction('new_message_' + Date.now());
+            await transaction.begin();
 
-                for (const file of files) {
-                    const hashes = JSON.stringify(file.hashes);
-                    await sql`
-                        INSERT INTO attachments (id, name, type, key_ciphertext, hashes, message_id)
-                        VALUES ((SELECT id
-                                 FROM storage.objects
-                                 WHERE name = ${file.path}), ${file.name}, ${file.type},
-                                ${file.key_ciphertext}, ${hashes}::jsonb, ${id})
-                    `;
-                }
-            });
+            const {
+                rows: [{ id }]
+            } = await transaction.queryObject`
+                INSERT INTO messages (content, room_id, author_id, reply_to)
+                VALUES (${input.ciphertext}, ${input.roomId}, ${input.uid}, ${input.replyTo})
+                RETURNING id;
+            `;
+
+            for (const file of files) {
+                const hashes = JSON.stringify(file.hashes);
+                await transaction.queryObject`
+                    INSERT INTO attachments (id, name, type, key_ciphertext, hashes, message_id)
+                    VALUES ((SELECT id
+                             FROM storage.objects
+                             WHERE name = ${file.path}), ${file.name}, ${file.type},
+                            ${file.key_ciphertext}, ${hashes}::jsonb, ${id})
+                `;
+            }
+
+            await transaction.commit();
         })
 });
 
