@@ -7,7 +7,7 @@ export async function login(page: Page) {
 
     const email = ulid() + '@firestorm.chat';
     const password = ulid();
-    const username = 'username ' + Math.random() * 100
+    const username = 'username ' + Math.random() * 100;
     await page.getByRole('link', { name: "Don't have an account? Sign up" }).click();
     await page.getByPlaceholder('Your email address').fill(email);
     await page.getByPlaceholder('Your password').fill(password);

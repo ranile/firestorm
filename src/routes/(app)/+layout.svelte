@@ -15,6 +15,7 @@
     import type { RealtimeChannel } from '@supabase/supabase-js';
     import { decryptMessage } from './room/[room]/authors';
     import { olmAccount, raise } from '$lib/utils';
+    import type { Database } from '../../database';
 
     export let data: LayoutData;
     const signout = () => {
@@ -64,22 +65,10 @@
         });
     });
 
-    onMount(async () => {
-        const { data: requests, error } = await data.supabase.from('room_session_key_request')
-            .select('*')
-            .eq('requested_from', data.session?.user.id)
-        if (error) {
-            console.error(error);
-            return;
-        }
+    onMount(() => {
+        type Request = Database['public']['Tables']['room_session_key_request']['Row'];
 
-        requests.forEach((request) => {
-            handleRequest(request);
-        });
-
-        console.info('subscribing to key requests');
-
-        function handleRequest(request) {
+        function handleRequest(request: Request) {
             shareMySessionKey(
                 data.supabase,
                 $olmAccount ?? raise('olm account must be set'),
@@ -89,11 +78,27 @@
             data.supabase
                 .from('room_session_key_request')
                 .delete()
-                .eq('id', request.id)
+                .eq('room_id', request.room_id)
                 .eq('requested_from', request.requested_from)
                 .eq('requested_by', request.requested_by);
         }
 
+        (async () => {
+            const { data: requests, error } = await data.supabase
+                .from('room_session_key_request')
+                .select('*')
+                .eq('requested_from', data.session?.user.id);
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            requests.forEach((request) => {
+                handleRequest(request);
+            });
+        })();
+
+        console.info('subscribing to key requests');
         const sub = data.supabase
             .channel(`key-requests`)
             .on(
@@ -107,7 +112,7 @@
                 (event) => {
                     console.log('got key request', event);
                     if (event.eventType === 'INSERT') {
-                        handleRequest(event.new)
+                        handleRequest(event.new as Request);
                     }
                 }
             )
