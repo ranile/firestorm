@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { type Notification, Payload, SubscriptionInfo } from './types';
-import * as webPush from 'web-push';
+import  webPush from 'web-push';
 import { WEB_PUSH_SECRET, VAPID_PRIVATE_KEY } from '$env/static/private';
 import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
 
