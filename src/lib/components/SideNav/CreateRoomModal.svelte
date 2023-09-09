@@ -20,7 +20,6 @@
         try {
             const { room } = await createRoom(
                 $page.data.supabase,
-                $olmAccount ?? raise('olm account must be set up'),
                 name
             );
             rooms.set([]);

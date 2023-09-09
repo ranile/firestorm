@@ -106,31 +106,30 @@ export function subscribeToRoomMessages(
 
 export async function createMessage(
     page: Page,
-    outboundSession: OutboundSession,
     roomId: string,
     userId: string,
     ciphertext: string,
     replyTo: string | null,
     attachments: EncryptedFile[]
 ) {
-    const files = attachments.map((file) => {
-        const keyCiphertext = outboundSession.encrypt(JSON.stringify(file.key));
-        return {
-            bytes: [...file.bytes],
-            name: file.name,
-            // @ts-expect-error type_ is a valid property, wasm bindgen doesn't like to expose `type`
-            type: file.type_,
-            key_ciphertext: keyCiphertext,
-            hashes: file.key.hashes
-        };
-    }) satisfies CreateMessagePayload['files'];
+    // const files = attachments.map((file) => {
+    //     const keyCiphertext = outboundSession.encrypt(JSON.stringify(file.key));
+    //     return {
+    //         bytes: [...file.bytes],
+    //         name: file.name,
+    //         // @ts-expect-error type_ is a valid property, wasm bindgen doesn't like to expose `type`
+    //         type: file.type_,
+    //         key_ciphertext: keyCiphertext,
+    //         hashes: file.key.hashes
+    //     };
+    // }) satisfies CreateMessagePayload['files'];
 
     return trpc(page).messages.createMessage.mutate({
         roomId,
         uid: userId,
         ciphertext,
         replyTo,
-        files
+        files: []
     });
 }
 

@@ -1,11 +1,11 @@
 <script lang="ts">
     import type { Attachment } from '$lib/db/messages';
     import { supabase } from '$lib/supabase';
-    import { initDecryptAttachmentsWorker } from '$lib/attachments';
+    // import { initDecryptAttachmentsWorker } from '$lib/attachments';
     import { onDestroy } from 'svelte';
     import ImagePlaceholder from 'svelte-material-icons/Image.svelte';
     import DownloadIcon from 'svelte-material-icons/Download.svelte';
-    import { decryptAttachment } from '../../../routes/(app)/room/[room]/authors';
+    // import { decryptAttachment } from '../../../routes/(app)/room/[room]/authors';
     import { page } from '$app/stores';
 
     export let authorId: string;
@@ -14,15 +14,7 @@
 
     let src: string | null = null;
 
-    $: worker = initDecryptAttachmentsWorker((workerOutput: Uint8Array) => {
-        src = URL.createObjectURL(new Blob([workerOutput.buffer], { type: attachment.type! }));
-        if (!isImage) {
-            const a = document.createElement('a');
-            a.href = src;
-            a.download = attachment.name!;
-            a.click();
-        }
-    });
+    $: worker = null;
 
     onDestroy(() => {
         if (src !== null) {

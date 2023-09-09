@@ -1,4 +1,4 @@
-use crate::sessions::{InboundGroupSession, OutboundGroupSession};
+use crate::sessions::{InboundGroupSession, OutboundGroupSession, PickledOutboundSession};
 use crate::{Account, DeviceId, PickledAccount, RoomId, UserId};
 use serde::{Deserialize, Serialize};
 use gloo::storage::{LocalStorage, Storage};
@@ -17,7 +17,15 @@ pub fn save_account(account: &Account) {
     LocalStorage::set(format!("{}:{}", user_id.0, device_id.0), account.pickled()).unwrap()
 }
 
-pub(crate) fn save_outbound_group_sessions(p0: OutboundGroupSession) {}
+pub(crate) fn save_outbound_group_sessions(outbound: OutboundGroupSession) {
+    let pickled = outbound.pickle();
+    LocalStorage::set(&pickled.room_id.0, &pickled).unwrap()
+}
+
+pub(crate) fn get_outbound_group_sessions(room_id: &str) -> Option<OutboundGroupSession> {
+    let pickled: PickledOutboundSession = LocalStorage::get(room_id).ok()?;
+    Some(OutboundGroupSession::unpickle(pickled))
+}
 
 pub(crate) fn save_inbound_group_session(
     room_id: &RoomId,
@@ -32,7 +40,7 @@ pub(crate) fn get_devices_for_user(user_id: &UserId) -> Vec<super::device::Devic
     (0..1)
         .map(|i| {
             super::device::Device::generate(
-                get_account(user_id, &DeviceId("device_id".to_string())).unwrap(),
+                get_account(user_id, &DeviceId("505c1678-2e23-47b3-9b3d-63cbf16137a8device_id".to_string())).unwrap(),
             )
         })
         .collect()

@@ -1,6 +1,7 @@
 use std::sync::{Arc, RwLock};
 use std::time::SystemTime;
-use vodozemac::megolm::{GroupSession, MegolmMessage, SessionConfig, SessionKey};
+use serde::{Deserialize, Serialize};
+use vodozemac::megolm::{GroupSession, GroupSessionPickle, MegolmMessage, SessionConfig, SessionKey};
 use crate::RoomId;
 
 
@@ -36,4 +37,29 @@ impl OutboundGroupSession {
 
         (ciphertext, inner.session_id())
     }
+
+    pub fn pickle(&self) -> PickledOutboundSession {
+        let inner = self.inner.read().unwrap();
+        let pickle = inner.pickle();
+        PickledOutboundSession {
+            room_id: self.room_id.clone(),
+            creation_time: self.creation_time,
+            pickle,
+        }
+    }
+
+    pub(crate) fn unpickle(pickle: PickledOutboundSession) -> OutboundGroupSession {
+        Self {
+            inner: Arc::new(RwLock::new(GroupSession::from_pickle(pickle.pickle))),
+            room_id: pickle.room_id,
+            creation_time: pickle.creation_time,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct PickledOutboundSession {
+    pub room_id: RoomId,
+    pub creation_time: u64,
+    pub pickle: GroupSessionPickle
 }

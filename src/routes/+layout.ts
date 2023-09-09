@@ -10,7 +10,7 @@ import { redirect } from '@sveltejs/kit';
 import { subscribeToNotifications } from '$lib/notifications';
 import { loaded, olmAccount } from '$lib/utils';
 import { get } from 'svelte/store';
-import { UserAccount } from 'moe';
+import { init } from '$lib/e2ee';
 
 async function navigate(where: string) {
     if (browser) {
@@ -33,11 +33,9 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
     const {
         data: { session }
     } = await supabase.auth.getSession();
-    const fromLocalStorage = browser ? localStorage.getItem('account:pickle') : null;
-    if (fromLocalStorage) {
-        const { pickle, key } = JSON.parse(fromLocalStorage);
-        olmAccount.set(UserAccount.from_pickle(pickle, key));
-    }
+    const device_id = session?.user.id + 'device_id'
+    console.log('device_id', device_id);
+    init(session!.user.id, device_id);
 
     const reCacheProfile = async () => {
         const fetched = await getUserProfile(supabase, session!);

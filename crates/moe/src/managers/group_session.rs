@@ -113,8 +113,7 @@ impl MegOlmGroupSessionManager {
         content: &[u8],
     ) -> Option<EncryptedMessage> {
         gloo::console::log!("encrypting message for");
-        let pin = self.sessions.pin();
-        let outbound = match pin.get(room_id) {
+        let outbound = match crate::store::get_outbound_group_sessions(&room_id.0) {
             None => {
                 eprintln!("I am {:?}", self.account.user_id);
                 self.request_session_keys(room_id);
@@ -125,7 +124,6 @@ impl MegOlmGroupSessionManager {
         };
 
         let encrypted = outbound.encrypt(content);
-        drop(pin);
 
         Some(EncryptedMessage {
             megolm: encrypted.0,

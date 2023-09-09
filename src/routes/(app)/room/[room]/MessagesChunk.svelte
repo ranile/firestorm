@@ -8,16 +8,15 @@
     import MessageReply from './MessageReply.svelte';
     import { replyingToMessage } from './utils';
     import { Textarea } from 'flowbite-svelte';
-    import { get as getAuthor, getOutboundSession } from './authors';
     import MessageAttachments from './MessageAttachments.svelte';
     import { page } from '$app/stores';
     import ChunkAuthor from './ChunkAuthor.svelte';
 
     export let chunk: GroupedMessage;
     $: author =
-        chunk.author.username === null
+        /*chunk.author.username === null
             ? getAuthor($page.data.supabase, chunk.author.id)
-            : Promise.resolve(chunk.author);
+            : */Promise.resolve(chunk.author);
 
     const deleteMessage = (id: string) => {
         console.log('delete message', id);

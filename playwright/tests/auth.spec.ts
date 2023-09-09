@@ -8,7 +8,7 @@ test('should navigate to home after sign in', async ({ page }) => {
     await expect(page.getByRole('button', { name: 'Create room' })).toBeVisible();
 });
 
-test('should onboard new users', async ({ page, request }) => {
+test('should onboard new users.ts', async ({ page, request }) => {
     test.skip(true, 'email verification is disabled for now');
     await page.goto('/');
 

@@ -1,5 +1,4 @@
 import { writable } from 'svelte/store';
-import type { UserAccount } from 'moe';
 
 export type UnionFromValues<T> = T[keyof T];
 
@@ -49,7 +48,7 @@ export const clickOutside = (node: HTMLElement, callback: () => void) => {
     };
 };
 
-export const olmAccount = writable<UserAccount | null>(null);
+export const olmAccount = writable<null>(null);
 
 export const raise = (e: string | Error): never => {
     if (typeof e === 'string') {

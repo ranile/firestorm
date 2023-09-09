@@ -7,10 +7,11 @@
     import AttachmentIcon from 'svelte-material-icons/Attachment.svelte';
     import SendIcon from 'svelte-material-icons/Send.svelte';
     import IconButton from '$lib/components/IconButton.svelte';
-    import { initAttachmentsWorker } from '$lib/attachments';
+    // import { initAttachmentsWorker } from '$lib/attachments';
     import { replyingToMessage } from './utils';
     import MessageReply from './MessageReply.svelte';
-    import { getOutboundSession } from './authors';
+    import { encrypt } from '$lib/e2ee';
+    // import { getOutboundSession } from './authors';
 
     $: data = $page.data;
 
@@ -20,39 +21,13 @@
     let value = '';
     let files: FileList | undefined = undefined;
 
-    let outbound: OutboundSession | undefined;
-    $: if (browser) {
-        outbound = getOutboundSession(data.room.id);
-    }
 
-    $: worker = initAttachmentsWorker((m) => {
-        const { room_id: roomId, uid, ciphertext, files: encryptedFiles } = m;
-        createMessage(
-            $page,
-            outbound!,
-            roomId,
-            uid!,
-            ciphertext,
-            $replyingToMessage?.id ?? null,
-            encryptedFiles
-        ).then(() => {
-            value = '';
-            files = undefined;
-            replyingToMessage.set(null);
-            bottomContainer.scrollIntoView(false);
-        });
-    });
+    $: worker = null;
 
     const sendMessage = (e: Event) => {
         e.preventDefault();
         if (value === '' && files?.length === 0) {
             // no empty messages
-            return;
-        }
-        if (outbound === undefined) {
-            alert(
-                'No keys for this room found. Please import the keys from another device to send messages here'
-            );
             return;
         }
         const uid = data.session?.user.id;
@@ -61,6 +36,30 @@
         }
         const roomId = data.room.id;
         console.log(files);
+        const ciphertext = encrypt(roomId, value);
+        if (ciphertext === undefined) {
+            alert(
+                'No keys for this room found. Please import the keys from another device to send messages here'
+            );
+            return;
+        }
+
+        createMessage(
+            $page,
+            roomId,
+            uid!,
+            ciphertext,
+            $replyingToMessage?.id ?? null,
+            []
+        ).then(() => {
+            value = '';
+            files = undefined;
+            replyingToMessage.set(null);
+            bottomContainer.scrollIntoView(false);
+        });
+
+        /*
+        TODO
         worker.newMessage(
             outbound,
             roomId,
@@ -68,7 +67,7 @@
             value,
             // @ts-expect-error Vec<File> is not assignable to FileList
             files ?? []
-        );
+        );*/
     };
     const addFile = () => {
         inputEl.click();

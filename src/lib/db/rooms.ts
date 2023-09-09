@@ -5,9 +5,9 @@ import { REALTIME_LISTEN_TYPES } from '@supabase/realtime-js/src/RealtimeChannel
 import type { Database } from '../../database';
 import type { UnionFromValues } from '../utils';
 import { get, writable } from 'svelte/store';
-import { encryptRoomSessionKey, OutboundSession, UserAccount } from 'moe';
-import { buildOutboundSession, getDecryptedSessionKey } from '$lib/e2ee';
+import { machine } from '$lib/e2ee';
 
+type UserAccount = unknown
 export async function getRoomsWithMember(supabase: Supabase, memberId: string) {
     const rooms = await supabase
         .from('rooms')
@@ -75,7 +75,7 @@ function storePickleInLocalStorage(roomId: string, sess: ReturnType<typeof initR
     );
 }
 
-export async function createRoom(supabase: Supabase, userAccount: UserAccount, name: string) {
+export async function createRoom(supabase: Supabase, name: string) {
     const session = await getSession();
     const { data: room, error } = await supabase
         .from('rooms')
@@ -85,9 +85,37 @@ export async function createRoom(supabase: Supabase, userAccount: UserAccount, n
     if (error) {
         throw error;
     }
-    const member = await joinRoom(supabase, userAccount, room.id);
+    const keys = machine.shareRoomKey(room.id, [session.user.id]);
+    const inserts = [];
+    for (const [memberId, deviceKey] of Object.entries(keys)) {
+        for (const [deviceId, key] of Object.entries(deviceKey)) {
+            inserts.push({
+                room_id: room.id,
+                member_id: memberId,
+                device_id: deviceId,
+                key: JSON.stringify(key.key),
+                session_id: key.session_id
+            })
+        }
+    }
 
-    return { room: room, member: member };
+    await supabase
+        .from('room_session_keys')
+        .insert(inserts);
+
+    const member = await supabase
+        .from('room_members')
+        .insert({
+            room_id: room.id,
+            member_id: session.user.id,
+            join_state: 'joined'
+        })
+        .match({ room_id: room.id, member_id: session.user.id })
+        .select()
+        .single();
+
+
+    return { room: room, member: member.data };
 }
 
 export function subscribeToRoomMembers(
@@ -120,7 +148,7 @@ export async function shareMySessionKey(
     roomId: string,
     userId: string
 ) {
-    const session = await getSession(supabase);
+    /*const session = await getSession(supabase);
     const outboundSession = buildOutboundSession(roomId);
     if (outboundSession === null) {
         throw new Error('cannot build outbound session for room');
@@ -159,7 +187,7 @@ export async function shareMySessionKey(
     const sessKeysIns = await supabase.from('room_session_keys').insert(rowsToInsert);
     if (sessKeysIns.error) {
         throw sessKeysIns.error;
-    }
+    }*/
 }
 
 export async function inviteMember(
@@ -237,7 +265,7 @@ export async function joinRoom(supabase: Supabase, userAccount: UserAccount, roo
     console.log('members', members);
 
     type RoomSessionKey = Database['public']['Tables']['room_session_keys']['Insert'];
-    const sessionKeysForMembers = encryptRoomSessionKey(userAccount, sessionKey, members);
+    const sessionKeysForMembers = 'encryptRoomSessionKey(userAccount, sessionKey, members)';
     const rowsToInsert: RoomSessionKey[] = [];
     for (const [memberId, sessionKey] of sessionKeysForMembers) {
         rowsToInsert.push({
