@@ -4,7 +4,6 @@ use moe::*;
 fn main() {
     let alice = UserId("alice".to_string());
     let bob = UserId("bob".to_string());
-    store::init();
     let alice_machine = Machine::new(alice.clone(), DeviceId("fuck".to_string()));
     let bob_machine = Machine::new(bob.clone(), DeviceId("0".to_string()));
 

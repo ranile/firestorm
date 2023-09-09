@@ -14,7 +14,7 @@ pub struct OutboundGroupSession {
 impl OutboundGroupSession {
     pub fn new(room_id: RoomId) -> Self {
         let inner = GroupSession::new(SessionConfig::version_2());
-        let creation_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs();
+        let creation_time = js_sys::Date::now() as u64;
 
         Self {
             inner: Arc::new(RwLock::new(inner)),

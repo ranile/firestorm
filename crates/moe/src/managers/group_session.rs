@@ -112,6 +112,7 @@ impl MegOlmGroupSessionManager {
         room_id: &RoomId,
         content: &[u8],
     ) -> Option<EncryptedMessage> {
+        gloo::console::log!("encrypting message for");
         let pin = self.sessions.pin();
         let outbound = match pin.get(room_id) {
             None => {
@@ -146,10 +147,7 @@ impl MegOlmGroupSessionManager {
             room_id: room_id.clone(),
         };
         let req = bincode::serialize(&request).unwrap();
-        let db = crate::store::sled();
-        db.insert("request_session_keys", req).unwrap();
-        db.flush().unwrap();
-        println!("requested session keys for {}", room_id.0);
+        todo!()
     }
 
     pub fn answer_key_request(&self, request: KeyRequest) -> SendableDeviceKey {

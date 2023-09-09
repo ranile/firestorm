@@ -1,50 +1,16 @@
-import { decryptRoomSessionKey, OutboundSession } from 'moe';
-import type { Supabase } from '$lib/supabase';
-import { get as getStore } from 'svelte/store';
-import { olmAccount, raise } from '$lib/utils';
+import { EncryptedMessage, Machine } from 'moe';
+// init()
 
-export function buildOutboundSession(roomId: string) {
-    const storedPickle = localStorage.getItem(`${roomId}:pickle`);
-    if (!storedPickle) {
-        return null;
-    }
-    const parsedPickle = JSON.parse(storedPickle);
-    const key = new Uint8Array(parsedPickle.key);
-    return OutboundSession.from_pickle(parsedPickle.ciphertext, key);
+export const machine = new Machine('user_id', 'device_id');
+const encoder = new TextEncoder();
+const decoder = new TextDecoder()
+
+export function encrypt(roomId: string, plaintext: string) {
+    const bytes = encoder.encode(plaintext);
+    return machine.encrypt(roomId, bytes);
 }
 
-export async function getDecryptedSessionKey(
-    supabase: Supabase,
-    selfId: string,
-    authorId: string,
-    roomId: string
-) {
-    const { data: sessKey, error: sessKeyErr } = await supabase
-        .from('room_session_keys')
-        .select('*')
-        .eq('room_id', roomId)
-        .eq('key_of', authorId)
-        .eq('key_for', selfId)
-        .maybeSingle();
-    if (sessKeyErr) {
-        throw sessKeyErr;
-    }
-    if (sessKey === null) {
-        return null;
-    }
-
-    const { data, error: idKeyErr } = await supabase
-        .from('user_identity_keys')
-        .select('curve25519')
-        .eq('id', authorId)
-        .single();
-
-    if (idKeyErr) {
-        throw idKeyErr;
-    }
-
-    const ciphertext = sessKey.key!;
-    const encryptorIdentityKey = data.curve25519;
-    const userAccount = getStore(olmAccount) ?? raise('olm account not initialized');
-    return decryptRoomSessionKey(userAccount, encryptorIdentityKey, ciphertext);
+export function decrypt(roomId: string, message: EncryptedMessage) {
+    const bytes = machine.decrypt(roomId, message);
+    return decoder.decode(bytes);
 }

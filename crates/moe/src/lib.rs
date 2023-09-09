@@ -9,8 +9,10 @@ pub use account::*;
 use flurry::HashMap;
 use serde::{Deserialize, Serialize};
 use vodozemac::megolm::DecryptionError;
-use vodozemac::olm::{Account as OlmAccount, IdentityKeys, OlmMessage, SessionCreationError};
+use vodozemac::olm::{IdentityKeys, OlmMessage, SessionCreationError};
 use vodozemac::Curve25519PublicKey;
+
+use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Ord, PartialOrd, Serialize, Deserialize)]
 pub struct UserId(pub String);
@@ -35,112 +37,10 @@ macro_rules! module {
 module!(managers(group_session, olm_session));
 module!(pub(crate) sessions(outbound, inbound));
 
-pub mod store {
-    use crate::sessions::{InboundGroupSession, OutboundGroupSession};
-    use crate::{Account, DeviceId, PickledAccount, RoomId, UserId};
-    use serde::{Deserialize, Serialize};
-    use sled::Db;
-    use std::cell::OnceCell;
-    use std::sync::OnceLock;
+pub mod store;
+mod wasm;
 
-    static SLED: OnceLock<Db> = OnceLock::new();
-
-    pub fn init() {
-        SLED.set(sled::open("./_sled").expect("failed to open sled"))
-            .unwrap();
-    }
-
-    pub fn sled() -> &'static Db {
-        SLED.get().expect("sled not initialized")
-    }
-
-    pub fn get_account(user_id: &UserId, device_id: &DeviceId) -> Option<super::Account> {
-        let account = sled()
-            .get(format!("{}:{}", user_id.0, device_id.0))
-            .expect("failed to get account");
-        println!("account {}", account.is_some());
-        let account: PickledAccount = bincode::deserialize(&account?).ok()?;
-        Some(account.unpickle())
-    }
-
-    pub fn save_account(account: &Account) {
-        let user_id = &account.user_id;
-        let device_id = &account.device_id;
-
-        let encoded: Vec<u8> = bincode::serialize(&account.pickled()).unwrap();
-
-        let saved = sled()
-            .insert(format!("{}:{}", user_id.0, device_id.0), encoded)
-            .expect("failed to save account");
-        sled().flush().unwrap();
-        // assert!(saved.is_none());
-    }
-
-    pub(crate) fn save_outbound_group_sessions(p0: OutboundGroupSession) {}
-
-    pub(crate) fn save_inbound_group_session(
-        room_id: &RoomId,
-        inbound: InboundGroupSession,
-        session_id: String,
-    ) {
-        let pickle = inbound.pickle();
-        let encoded: Vec<u8> = bincode::serialize(&pickle).unwrap();
-        let saved = sled()
-            .insert(format!("{}:{}", room_id.0, session_id), encoded)
-            .expect("failed to save account");
-        sled().flush().unwrap();
-        assert!(saved.is_none());
-    }
-
-    pub(crate) fn get_devices_for_user(user_id: &UserId) -> Vec<super::device::Device> {
-        (0..1)
-            .map(|i| {
-                super::device::Device::generate(
-                    get_account(user_id, &DeviceId(i.to_string())).unwrap(),
-                )
-            })
-            .collect()
-    }
-
-    pub(crate) fn get_inbound_group_session(
-        room_id: &RoomId,
-        session_id: &str,
-    ) -> InboundGroupSession {
-        let saved = sled()
-            .get(format!("{}:{}", room_id.0, session_id))
-            .expect("failed to get inbound group session")
-            .expect("inbound group session not found");
-        let pickle: super::sessions::PickledInboundGroupSession =
-            bincode::deserialize(&saved).unwrap();
-        InboundGroupSession::unpickle(pickle)
-    }
-
-    pub(crate) fn save_otk(
-        user_id: &UserId,
-        device_id: &DeviceId,
-        key: &[super::Curve25519PublicKey],
-    ) {
-        let serialized = bincode::serialize(key).unwrap();
-        sled()
-            .insert(format!("{}:{}:otk", user_id.0, device_id.0), serialized)
-            .expect("failed to save otk");
-        sled().flush().unwrap();
-    }
-
-    pub(crate) fn use_otk(
-        user_id: &UserId,
-        device_id: &DeviceId,
-    ) -> Option<super::Curve25519PublicKey> {
-        let saved = sled()
-            .get(format!("{}:{}:otk", user_id.0, device_id.0))
-            .expect("failed to get otk")?;
-        let mut deser: Vec<super::Curve25519PublicKey> = bincode::deserialize(&saved).unwrap();
-        let otk = deser.pop()?;
-        save_otk(user_id, device_id, &deser);
-        Some(otk)
-    }
-}
-
+#[wasm_bindgen]
 pub struct Machine {
     account: Account,
     olm_session_manager: OlmSessionManager,
@@ -150,7 +50,13 @@ pub struct Machine {
 impl Machine {
     pub fn new(user_id: UserId, device_id: DeviceId) -> Self {
         let account = store::get_account(&user_id, &device_id)
-            .unwrap_or_else(|| Self::create_account(user_id, device_id));
+            .unwrap_or_else(|| {
+                println!("creating account");
+                let acc = Account::new(user_id, device_id);
+
+                store::save_account(&acc);
+                acc
+            });
         let olm_session_manager = OlmSessionManager::new(account.clone());
         let meg_olm_group_session_manager =
             MegOlmGroupSessionManager::new(account.clone(), olm_session_manager.clone());
@@ -161,15 +67,6 @@ impl Machine {
             meg_olm_group_session_manager,
         }
     }
-
-    fn create_account(user_id: UserId, device_id: DeviceId) -> Account {
-        println!("creating account");
-        let acc = Account::new(user_id, device_id);
-
-        store::save_account(&acc);
-        acc
-    }
-
     pub fn identity_keys(&self) -> IdentityKeys {
         self.account.identity_keys()
     }
@@ -222,9 +119,11 @@ impl Machine {
     }
 
     pub fn answer_key_requests(&self) -> SendableDeviceKey {
-        let db = crate::store::sled();
-        let request = db.get("request_session_keys").unwrap().unwrap();
-        let req: KeyRequest = bincode::deserialize(&request).unwrap();
-        self.meg_olm_group_session_manager.answer_key_request(req)
+        todo!()
     }
+}
+
+#[wasm_bindgen]
+pub fn init() {
+    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 }
