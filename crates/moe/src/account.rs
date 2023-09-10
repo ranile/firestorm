@@ -1,53 +1,58 @@
-use crate::device::Device;
+use crate::device::{Device, TrustState, PickledDevice};
 use crate::sessions::{InboundGroupSession, OutboundGroupSession};
 use crate::{DeviceId, RoomId, UserId};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
-use vodozemac::olm::{
-    Account as OlmAccount, IdentityKeys, InboundCreationResult, PreKeyMessage, Session,
-    SessionConfig, SessionCreationError,
-};
-use vodozemac::{Curve25519PublicKey, KeyId};
+use vodozemac::olm::{Account as OlmAccount, IdentityKeys, InboundCreationResult, OneTimeKeyGenerationResult, PreKeyMessage, Session, SessionConfig, SessionCreationError};
+use vodozemac::{Curve25519PublicKey};
 
 #[derive(Clone)]
 pub struct Account {
     olm: Arc<RwLock<OlmAccount>>,
     pub user_id: UserId,
-    pub device_id: DeviceId,
+    pub device: Device,
     // pub one_time_keys: Vec<Curve25519PublicKey>,
 }
 
 impl Account {
     pub fn new(user_id: UserId, device_id: DeviceId) -> Self {
-        let mut olm = OlmAccount::new();
+        let olm = OlmAccount::new();
+        let keys = olm.identity_keys();
 
-        let keys = olm.generate_one_time_keys(10);
-        crate::store::save_otk(&user_id, &device_id, &keys.created);
-        olm.mark_keys_as_published();
         Self {
             olm: Arc::new(RwLock::new(olm)),
             user_id,
-            device_id,
-            // one_time_keys: keys.created,
+            device: Device {
+                trust: TrustState::Untrusted,
+                keys,
+                id: device_id,
+            },
         }
     }
 
     pub fn pickled(&self) -> PickledAccount {
         PickledAccount {
             user_id: self.user_id.clone(),
-            device_id: self.device_id.clone(),
+            device: self.device.pickle(),
             pickle: self.olm.read().unwrap().pickle(),
-            // one_time_keys: self.one_time_keys.clone(),
         }
     }
 
     pub fn identity_keys(&self) -> IdentityKeys {
         self.olm.read().unwrap().identity_keys()
     }
-    // pub fn one_time_keys(&mut self) -> &mut Vec<Curve25519PublicKey> {
-    //     &mut self.one_time_keys
-    // }
+    pub fn generate_one_time_keys(&self, count: usize) -> OneTimeKeyGenerationResult {
+        let mut olm = self.olm.write().unwrap();
+        let result = olm.generate_one_time_keys(count);
+        drop(olm);
+        result
+    }
+
+    pub fn mark_keys_as_published(&self) {
+        let mut olm = self.olm.write().unwrap();
+        olm.mark_keys_as_published();
+    }
+
     pub fn create_outbound_session(
         &self,
         identity_key: Curve25519PublicKey,
@@ -84,7 +89,7 @@ impl Account {
 #[derive(Serialize, Deserialize)]
 pub struct PickledAccount {
     pub user_id: UserId,
-    pub device_id: DeviceId,
+    pub device: PickledDevice,
     pub pickle: vodozemac::olm::AccountPickle,
     // pub one_time_keys: Vec<Curve25519PublicKey>,
 }
@@ -95,8 +100,7 @@ impl PickledAccount {
         Account {
             olm: Arc::new(RwLock::new(account)),
             user_id: self.user_id,
-            device_id: self.device_id,
-            // one_time_keys: self.one_time_keys,
+            device: self.device.unpickle(),
         }
     }
 }

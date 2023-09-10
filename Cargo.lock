@@ -226,8 +226,7 @@ dependencies = [
 [[package]]
 name = "ducktor"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c421abf6328bda65f53e6a76ee9837fd197b23bdfdbcebc4d7917dfaa1cf88ae"
+source = "git+https://github.com/hamza1311/ducktor#d7a33cfd8b06b4f68abfd8a64de6c5fb369a07a0"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -742,6 +741,7 @@ dependencies = [
  "tracing",
  "vodozemac",
  "wasm-bindgen",
+ "wasm-bindgen-futures",
  "wasm-bindgen-test",
  "web-sys",
 ]

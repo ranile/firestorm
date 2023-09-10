@@ -1,9 +1,12 @@
+use std::sync::Arc;
 use flurry::HashMap;
 use serde::{Deserialize, Serialize};
 use vodozemac::Curve25519PublicKey;
 use vodozemac::megolm::{MegolmMessage, SessionKey};
 use vodozemac::olm::{IdentityKeys, OlmMessage, PreKeyMessage,};
+use wasm_bindgen::UnwrapThrowExt;
 use crate::{Account, DeviceId, RoomId, UserId};
+use crate::api::Api;
 use crate::device::Device;
 use crate::managers::OlmSessionManager;
 use crate::message::EncryptedMessage;
@@ -13,14 +16,16 @@ pub struct MegOlmGroupSessionManager {
     account: Account,
     sessions: HashMap<RoomId, OutboundGroupSession>,
     pub olm_session_manager: OlmSessionManager,
+    pub api: Arc<Api>,
 }
 
 impl MegOlmGroupSessionManager {
-    pub fn new(account: Account, olm_session_manager: OlmSessionManager) -> Self {
+    pub fn new(account: Account, olm_session_manager: OlmSessionManager, api: Arc<Api>) -> Self {
         Self {
             account,
             sessions: HashMap::new(), // build from store
             olm_session_manager,
+            api,
         }
     }
 
@@ -38,7 +43,7 @@ impl MegOlmGroupSessionManager {
         (outbound, inbound)
     }
 
-    pub(crate) fn share_room_key<'a>(&self, room_id: &RoomId, users: impl Iterator<Item=&'a UserId>) -> HashMap<UserId, HashMap<DeviceId, SendableDeviceKey>> {
+    pub(crate) async fn share_room_key(&self, room_id: &RoomId, users: impl Iterator<Item=UserId>) -> HashMap<UserId, HashMap<DeviceId, SendableDeviceKey>> {
         let (outbound, inbound) = self.get_or_create_outbound_session(room_id);
 
         let session_key = outbound.session_key();
@@ -54,14 +59,14 @@ impl MegOlmGroupSessionManager {
         let map = HashMap::new();
         for user in users {
             let devices_keys = HashMap::new();
-            let devices: Vec<Device> = crate::store::get_devices_for_user(user); // get_devices_for_user(user);
+            let devices: Vec<Device> = self.get_devices_for_user(&user).await;
             for mut device in devices {
                 let (ciphertext, session_id) = self.olm_session_manager.encrypt(
                     &user,
                     &device.id,
                     device.keys.curve25519,
                     &session_key
-                );
+                ).await;
 
                 let device_key = SendableDeviceKey {
                     key: ciphertext,
@@ -97,7 +102,7 @@ impl MegOlmGroupSessionManager {
         session_id: &str,
         pre_key: &PreKeyMessage,
     ) {
-        // dbg!("creating inbound session", &room_id, &self.account.device_id);
+        // dbg!("creating inbound session", &room_id, &self.account.device.id);
         let session_key = self.olm_session_manager.decrypt(
             keys.curve25519,
             pre_key
@@ -115,9 +120,9 @@ impl MegOlmGroupSessionManager {
         gloo::console::log!("encrypting message for");
         let outbound = match crate::store::get_outbound_group_sessions(&room_id.0) {
             None => {
-                eprintln!("I am {:?}", self.account.user_id);
-                self.request_session_keys(room_id);
-                // todo!("session neither created nor shared; place a request")
+                wasm_bindgen_futures::spawn_local(async move {
+                    self.request_session_keys(room_id).await;
+                });
                 return None
             }
             Some(outbound) => outbound
@@ -135,20 +140,19 @@ impl MegOlmGroupSessionManager {
         let inbound = crate::store::get_inbound_group_session(&room_id, session_id);
         Ok(inbound.decrypt(message)?.plaintext)
     }
-    fn request_session_keys(&self, room_id: &RoomId) {
+    async fn request_session_keys(&self, room_id: &RoomId) {
         // todo!("API request for {}", room_id.0)'
         let request = KeyRequest {
             requested_from: UserId("alice".to_string()), // TODO: room_members
             requester_id: self.account.user_id.clone(),
-            requester_device_id: self.account.device_id.clone(),
+            requester_device_id: self.account.device.id.clone(),
             requester_identity_key: self.account.identity_keys().curve25519,
             room_id: room_id.clone(),
         };
-        let req = bincode::serialize(&request).unwrap();
-        todo!()
+        self.api.request_session_keys(request).await;
     }
 
-    pub fn answer_key_request(&self, request: KeyRequest) -> SendableDeviceKey {
+    pub async fn answer_key_request(&self, request: KeyRequest) -> SendableDeviceKey {
         eprintln!("answering key request {request:?}");
         let pin = self.sessions.pin();
         let outbound = pin.get(&request.room_id).expect("no outbound session");
@@ -159,12 +163,15 @@ impl MegOlmGroupSessionManager {
             &request.requester_device_id,
             request.requester_identity_key,
             &session_key
-        );
+        ).await;
 
         SendableDeviceKey {
             key: ciphertext,
             session_id,
         }
+    }
+    async fn get_devices_for_user(&self, user_id: &UserId) -> Vec<Device> {
+        self.api.get_devices_for_user(user_id.clone()).await.expect_throw("failed to get devices")
     }
 }
 

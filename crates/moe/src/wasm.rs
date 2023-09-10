@@ -4,9 +4,10 @@ use ducktor::FromJsValue;
 use gloo::utils::format::JsValueSerdeExt;
 use js_sys::{Array, JsString};
 use wasm_bindgen::UnwrapThrowExt;
+use crate::api::Api;
 use crate::message::EncryptedMessage;
 
-#[derive(Debug, Clone, FromJsValue)]
+#[derive(Debug, Clone)]
 #[wasm_bindgen]
 pub struct IdentityKeys {
     curve25519: String,
@@ -46,10 +47,9 @@ impl Into<vodozemac::olm::IdentityKeys> for IdentityKeys {
 #[wasm_bindgen]
 impl Machine {
     #[wasm_bindgen(constructor)]
-    pub fn new_js(user_id: String, device_id: String) -> Self {
+    pub fn new_js(user_id: String, device_id: String, api: Api) -> Self {
         console_error_panic_hook::set_once();
-
-        Self::new(UserId(user_id), DeviceId(device_id))
+        Self::new(UserId(user_id), DeviceId(device_id), api)
     }
 
     #[wasm_bindgen(getter, js_name = "identityKeys")]
@@ -57,17 +57,16 @@ impl Machine {
         self.identity_keys().into()
     }
     #[wasm_bindgen(js_name = "shareRoomKey")]
-    pub fn share_room_key_js(
+    pub async fn share_room_key_js(
         &self,
         room_id: &str,
         // Vec<String> when https://github.com/rustwasm/wasm-bindgen/pull/3554 is released
         users: Array,
     ) -> JsValue {
-        let users: Vec<UserId> = users.to_vec().into_iter()
-            .map(|js_value| UserId(js_value.as_string().expect_throw("ids must be strings"))).collect();
+        let users = users.to_vec().into_iter()
+            .map(|js_value| UserId(js_value.as_string().expect_throw("ids must be strings")));
 
-        let keys = self.meg_olm_group_session_manager
-            .share_room_key(&RoomId(room_id.to_string()), users.iter());
+        let keys = self.share_room_key(&RoomId(room_id.to_string()), users).await;
         JsValue::from_serde(&keys).unwrap_throw()
     }
 
@@ -80,6 +79,28 @@ impl Machine {
     #[wasm_bindgen(js_name = "decrypt")]
     pub fn decrypt_js(&self, room_id: &str, message: EncryptedMessage) -> Result<Vec<u8>, JsError> {
         self.decrypt_message(&RoomId(room_id.to_string()), message).map_err(JsError::from)
+    }
+
+    #[wasm_bindgen(js_name = getOneTimeKeys)]
+    pub fn get_one_time_keys(&self, count: usize) -> Vec<js_sys::JsString> {
+        let result = self.account.generate_one_time_keys(count);
+        result.created.into_iter().map(|it| JsValue::from(it.to_base64()).unchecked_into()).collect()
+    }
+    #[wasm_bindgen(js_name = markOneTimeKeysAsPublished)]
+    pub fn mark_one_time_keys_as_published(&self) {
+        self.account.mark_keys_as_published();
+    }
+
+    #[wasm_bindgen(js_name = "doWork")]
+    pub async fn do_work(&self) {
+        let fut = match self.api.get_devices_for_user(UserId("079e586f-e715-4d5e-8e32-3381075cbe25".to_string())).await {
+            Ok(v) =>v,
+            Err(e) => {
+                gloo::console::error!(format!("error: {:?}", e));
+                return;
+            }
+        };
+        gloo::console::log!(format!("got devices: {:?}", fut));
     }
 
 

@@ -33,10 +33,11 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
     const {
         data: { session }
     } = await supabase.auth.getSession();
-    const device_id = session?.user.id + 'device_id'
-    console.log('device_id', device_id);
-    init(session!.user.id, device_id);
-
+    if (session && browser) {
+        const device_id = session.user.id + 'device_id';
+        console.log('device_id', device_id);
+        init(session.user.id, device_id);
+    }
     const reCacheProfile = async () => {
         const fetched = await getUserProfile(supabase, session!);
         const cachedProfile = { ...fetched, email: data.session?.user.email ?? '' };

@@ -1,9 +1,21 @@
-import { EncryptedMessage, Machine } from 'moe';
+import { EncryptedMessage, Machine, Api as API } from 'moe';
+import { supabase } from '$lib/supabase';
+import { get } from 'svelte/store';
+import { trpc } from '$lib/trpc/client';
+import { page } from '$app/stores';
 // init()
 
 let machine: Machine;
 export function init(user_id: string, device_id: string) {
-    machine = new Machine(user_id, device_id);
+    const getDevicesForUser = async (userId: string) => {
+        return await trpc(get(page)).users.getDevicesForUser.query(userId);
+    }
+    const getOneTimeKeys = async (userId: string, deviceId: string) => {
+        return await trpc(get(page)).users.getOneTimeKey.query({ userId, deviceId });
+    }
+    const api = new API(getDevicesForUser, getOneTimeKeys);
+    machine = new Machine(user_id, device_id, api);
+    return machine;
 }
 
 export { machine }
@@ -28,4 +40,12 @@ export function decrypt(roomId: string, text: string) {
         return null;
     }
     return decoder.decode(bytes);
+}
+
+export function getOneTimeKeys(count: number) {
+    return machine.getOneTimeKeys(count);
+}
+
+export function markOneTimeKeysAsPublished() {
+    machine.markOneTimeKeysAsPublished();
 }

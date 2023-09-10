@@ -21,18 +21,20 @@
         }
         const userId = data.session!.user.id;
         try {
+            const deviceId = 'device_id' + performance.now();
             // await updateProfile(data.supabase, userId, username, avatarFile);
-            init(userId, 'device_id' + performance.now());
-            // const oneTimeKeys = olmAccount.generateOneTimeKeys(10);
             const { curve25519, ed25519 } = machine.identityKeys;
+            init(userId, deviceId);
 
+            const otk = machine.getOneTimeKeys(50);
+            console.log(otk);
             await trpc($page).users.updateProfile.mutate({
-                userId,
+                deviceId,
                 identityKeys: {
                     curve25519,
                     ed25519,
                 },
-                oneTimeKeys: []
+                oneTimeKeys: otk
             });
             await goto('/');
 

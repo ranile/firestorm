@@ -12,7 +12,7 @@ pub fn get_account(user_id: &UserId, device_id: &DeviceId) -> Option<super::Acco
 
 pub fn save_account(account: &Account) {
     let user_id = &account.user_id;
-    let device_id = &account.device_id;
+    let device_id = &account.device.id;
 
     LocalStorage::set(format!("{}:{}", user_id.0, device_id.0), account.pickled()).unwrap()
 }
