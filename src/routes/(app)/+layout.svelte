@@ -3,7 +3,7 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import ProfileDropdown from '$lib/components/ProfileDropdown.svelte';
     import { onMount } from 'svelte';
-    import { shareMySessionKey, subscribeToRoomMembers } from '$lib/db/rooms';
+    import { subscribeToRoomMembers } from '$lib/db/rooms';
     import { rooms } from '$lib/db/rooms';
     import { createRoomModalState } from '$lib/components/SideNav/store';
     import SideNavGeneric from '$lib/components/SideNavGeneric.svelte';
@@ -66,26 +66,32 @@
     });
 
     onMount(() => {
-        type Request = Database['public']['Tables']['room_session_key_request']['Row'];
+        // TODO:
+        // listen for key requests (room_session_key_requests) -- if we got the key, share it
+        // listen for key shares (room_session_keys) -- accept the key
+        // ----
+
+        type Request = Database['public']['Tables']['room_session_key_requests']['Row'];
 
         function handleRequest(request: Request) {
-            shareMySessionKey(
-                data.supabase,
-                $olmAccount ?? raise('olm account must be set'),
-                request.room_id,
-                request.requested_by
-            );
-            data.supabase
-                .from('room_session_key_request')
-                .delete()
-                .eq('room_id', request.room_id)
-                .eq('requested_from', request.requested_from)
-                .eq('requested_by', request.requested_by);
+
+            // shareMySessionKey(
+            //     data.supabase,
+            //     $olmAccount ?? raise('olm account must be set'),
+            //     request.room_id,
+            //     request.requested_by
+            // );
+            // data.supabase
+            //     .from('room_session_key_requests')
+            //     .delete()
+            //     .eq('room_id', request.room_id)
+            //     .eq('requested_from', request.requested_from)
+            //     .eq('requested_by', request.requested_by);
         }
 
         (async () => {
             const { data: requests, error } = await data.supabase
-                .from('room_session_key_request')
+                .from('room_session_key_requests')
                 .select('*')
                 .eq('requested_from', data.session?.user.id);
             if (error) {
@@ -106,7 +112,7 @@
                 {
                     event: 'INSERT',
                     schema: 'public',
-                    table: 'room_session_key_request',
+                    table: 'room_session_key_requests',
                     filter: `requested_from=eq.${data.session?.user.id}`
                 },
                 (event) => {

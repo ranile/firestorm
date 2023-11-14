@@ -4,10 +4,6 @@ import type { Database } from '../../database';
 import type { UnionFromValues } from '../utils';
 import { Unreachable } from '../utils';
 import type { Profile } from '$lib/db/users';
-import type { EncryptedFile, OutboundSession } from 'moe';
-import type { CreateMessage as CreateMessagePayload } from '$lib/trpc/routes/messages';
-import type { Page } from '@sveltejs/kit';
-import { trpc } from '$lib/trpc/client';
 
 export async function getMessages(
     supabase: Supabase,
@@ -15,6 +11,7 @@ export async function getMessages(
     limit = 69,
     messageId?: string
 ) {
+    console.groupCollapsed('getMessages')
     let query = supabase
         .from('messages')
         .select(
@@ -22,6 +19,7 @@ export async function getMessages(
         )
         .eq('deleted', false);
 
+    console.log('roomId', roomId);
     if (roomId) {
         query = query.eq('room_id', roomId);
     }
@@ -32,10 +30,12 @@ export async function getMessages(
 
     const { data, error } = await query.order('created_at', { ascending: false }).limit(limit);
 
+    console.log('data', data);
     if (error !== null) {
         console.error(error);
         throw error;
     }
+    console.groupEnd()
 
     return (
         data?.reverse()?.map((message) => {
@@ -104,34 +104,6 @@ export function subscribeToRoomMessages(
         .subscribe();
 }
 
-export async function createMessage(
-    page: Page,
-    roomId: string,
-    userId: string,
-    ciphertext: string,
-    replyTo: string | null,
-    attachments: EncryptedFile[]
-) {
-    // const files = attachments.map((file) => {
-    //     const keyCiphertext = outboundSession.encrypt(JSON.stringify(file.key));
-    //     return {
-    //         bytes: [...file.bytes],
-    //         name: file.name,
-    //         // @ts-expect-error type_ is a valid property, wasm bindgen doesn't like to expose `type`
-    //         type: file.type_,
-    //         key_ciphertext: keyCiphertext,
-    //         hashes: file.key.hashes
-    //     };
-    // }) satisfies CreateMessagePayload['files'];
-
-    return trpc(page).messages.createMessage.mutate({
-        roomId,
-        uid: userId,
-        ciphertext,
-        replyTo,
-        files: []
-    });
-}
 
 export async function updateMessage(
     supabase: Supabase,

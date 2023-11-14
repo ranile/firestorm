@@ -21,20 +21,27 @@
         }
         const userId = data.session!.user.id;
         try {
-            const deviceId = 'device_id' + performance.now();
+            const deviceId = crypto.randomUUID();
             // await updateProfile(data.supabase, userId, username, avatarFile);
             const { curve25519, ed25519 } = machine.identityKeys;
             init(userId, deviceId);
 
             const otk = machine.getOneTimeKeys(50);
             console.log(otk);
-            await trpc($page).users.updateProfile.mutate({
-                deviceId,
-                identityKeys: {
-                    curve25519,
-                    ed25519,
+            await fetch('/auth/onboarding', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-                oneTimeKeys: otk
+                body: JSON.stringify({
+                    deviceId,
+                    username,
+                    identityKeys: {
+                        curve25519,
+                        ed25519,
+                    },
+                    oneTimeKeys: otk
+                }),
             });
             await goto('/');
 

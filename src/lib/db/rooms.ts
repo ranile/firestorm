@@ -1,11 +1,10 @@
 import type { Supabase } from '../supabase';
 import { getSession, supabase } from '../supabase';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
-import { REALTIME_LISTEN_TYPES } from '@supabase/realtime-js/src/RealtimeChannel';
 import type { Database } from '../../database';
 import type { UnionFromValues } from '../utils';
 import { get, writable } from 'svelte/store';
-import { machine } from '$lib/e2ee';
+import { machine, shareRoomKey } from '$lib/e2ee';
 
 type UserAccount = unknown
 export async function getRoomsWithMember(supabase: Supabase, memberId: string) {
@@ -32,6 +31,7 @@ export async function getRoomsWithMember(supabase: Supabase, memberId: string) {
     });
 }
 
+/*
 export function initRoomEncryption() {
     const outboundSession = new OutboundSession();
     const arr = new Uint8Array(32);
@@ -39,6 +39,7 @@ export function initRoomEncryption() {
     const pickle = outboundSession.pickle(arr);
     return { pickle: { ciphertext: pickle, key: arr }, sessionKey: outboundSession.session_key() };
 }
+*/
 
 export async function getRoomById(supabase: Supabase, id: string) {
     const rooms = await supabase
@@ -65,15 +66,6 @@ export async function getRoomMembers(supabase: Supabase, roomId: string) {
     return members.data;
 }
 
-function storePickleInLocalStorage(roomId: string, sess: ReturnType<typeof initRoomEncryption>) {
-    localStorage.setItem(
-        `${roomId}:pickle`,
-        JSON.stringify({
-            ciphertext: sess.pickle.ciphertext,
-            key: Array.from(sess.pickle.key)
-        })
-    );
-}
 
 export async function createRoom(supabase: Supabase, name: string) {
     const session = await getSession();
@@ -93,14 +85,15 @@ export async function createRoom(supabase: Supabase, name: string) {
                 room_id: room.id,
                 member_id: memberId,
                 device_id: deviceId,
-                key: JSON.stringify(key.key),
-                session_id: key.session_id
+                // @ts-ignore
+                key: JSON.stringify(key.key), session_id: key.session_id
             })
         }
     }
 
     await supabase
         .from('room_session_keys')
+        // @ts-expect-error supabase types are wrong
         .insert(inserts);
 
     const member = await supabase
@@ -130,7 +123,7 @@ export function subscribeToRoomMembers(
     return supabase
         .channel('table-db-changes')
         .on(
-            REALTIME_LISTEN_TYPES.POSTGRES_CHANGES,
+            'postgres_changes',
             {
                 event: '*',
                 schema: 'public',
@@ -142,60 +135,12 @@ export function subscribeToRoomMembers(
         .subscribe();
 }
 
-export async function shareMySessionKey(
-    supabase: Supabase,
-    userAccount: UserAccount,
-    roomId: string,
-    userId: string
-) {
-    /*const session = await getSession(supabase);
-    const outboundSession = buildOutboundSession(roomId);
-    if (outboundSession === null) {
-        throw new Error('cannot build outbound session for room');
-    }
-    const sessionKey = outboundSession.session_key();
-
-    const { data: memberKeys, error: keysError } = await supabase.rpc('get_keys_for_members', {
-        _room_id: roomId,
-        member_ids: [userId]
-    });
-
-    if (keysError) {
-        throw keysError;
-    }
-
-    const members = memberKeys.map(
-        ({ identity_key_curve25519, one_time_key_curve25519, member_id }) => ({
-            user_id: member_id,
-            identity_key: identity_key_curve25519,
-            one_time_key: one_time_key_curve25519
-        })
-    );
-
-    type RoomSessionKey = Database['public']['Tables']['room_session_keys']['Insert'];
-    const sessionKeysForMembers = encryptRoomSessionKey(userAccount, sessionKey, members);
-    const rowsToInsert: RoomSessionKey[] = [];
-    for (const [memberId, sessionKey] of sessionKeysForMembers) {
-        rowsToInsert.push({
-            room_id: roomId,
-            key_of: session.user.id,
-            key_for: memberId,
-            key: sessionKey
-        } satisfies RoomSessionKey);
-    }
-
-    const sessKeysIns = await supabase.from('room_session_keys').insert(rowsToInsert);
-    if (sessKeysIns.error) {
-        throw sessKeysIns.error;
-    }*/
-}
-
 export async function inviteMember(
     supabase: Supabase,
-    userAccount: UserAccount,
     roomId: string,
     userId: string
 ) {
+    console.log('inviting', userId + ' to ' + roomId);
     const { data, error } = await supabase
         .from('room_members')
         .insert({
@@ -223,7 +168,62 @@ export async function getRoomMemberForRoom(supabase: Supabase, roomId: string, u
 
     return member.data;
 }
+export async function joinRoom(supabase: Supabase, roomId: string) {
+    const session = await getSession(supabase);
 
+    const roomMembers = await getRoomMembers(supabase, roomId)
+        .then(m => m.filter(it => it.join_state === 'joined').map(it => it.id));
+
+    // step 1: share _own_ key with the _other_ room members
+    // @ts-expect-error typescript is confused
+    const keys = await shareRoomKey(roomId, roomMembers)
+    console.log('keys', keys);
+    const inserts = [];
+    for (const [memberId, deviceKey] of Object.entries(keys)) {
+        for (const [deviceId, key] of Object.entries(deviceKey)) {
+            inserts.push({
+                // my key, for the other member's device
+                room_id: roomId,
+                key_of: session.user.id,
+                key_for_user: memberId,
+                key_for_device: deviceId,
+                key: JSON.stringify(key)
+            })
+        }
+    }
+    console.log('inserts', inserts);
+    await supabase
+        .from('room_session_keys')
+        // @ts-expect-error supabase types are wrong
+        .insert(inserts);
+
+    // step 2: request keys from other room members
+    const requests = roomMembers.map(it => ({
+        requester_user_id: session.user.id,
+        room_id: roomId,
+        requester_device_id: 'cda1435f-97bf-4232-a218-53403283e050',
+        requested_from: it
+    }))
+    await supabase
+        .from('room_session_key_requests')
+        .insert(requests);
+
+
+    // step 3: update membership status
+    const member = await supabase
+        .from('room_members')
+        .upsert({
+            room_id: roomId,
+            member_id: session.user.id,
+            session_key: null,
+            join_state: 'joined'
+        })
+        .match({ room_id: roomId, member_id: session.user.id })
+        .select()
+        .single();
+
+}
+/*
 export async function joinRoom(supabase: Supabase, userAccount: UserAccount, roomId: string) {
     const session = await getSession(supabase);
     const sess = initRoomEncryption();
@@ -296,6 +296,7 @@ export async function joinRoom(supabase: Supabase, userAccount: UserAccount, roo
 
     return member.data;
 }
+*/
 
 export type Room = Database['public']['Tables']['rooms']['Row'];
 interface Membership {

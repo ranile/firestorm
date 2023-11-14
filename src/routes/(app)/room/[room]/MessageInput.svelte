@@ -2,7 +2,6 @@
     import { Textarea } from 'flowbite-svelte';
     import type { OutboundSession } from 'moe';
     import { browser } from '$app/environment';
-    import { createMessage } from '$lib/db/messages';
     import { page } from '$app/stores';
     import AttachmentIcon from 'svelte-material-icons/Attachment.svelte';
     import SendIcon from 'svelte-material-icons/Send.svelte';
@@ -24,7 +23,7 @@
 
     $: worker = null;
 
-    const sendMessage = (e: Event) => {
+    const sendMessage = async (e: Event) => {
         e.preventDefault();
         if (value === '' && files?.length === 0) {
             // no empty messages
@@ -35,8 +34,8 @@
             throw Error('User not logged in');
         }
         const roomId = data.room.id;
-        console.log(files);
-        const ciphertext = encrypt(roomId, value);
+
+        const ciphertext = await encrypt(roomId, value);
         if (ciphertext === undefined) {
             alert(
                 'No keys for this room found. Please import the keys from another device to send messages here'
@@ -44,30 +43,26 @@
             return;
         }
 
-        createMessage(
-            $page,
-            roomId,
-            uid!,
-            ciphertext,
-            $replyingToMessage?.id ?? null,
-            []
-        ).then(() => {
-            value = '';
-            files = undefined;
-            replyingToMessage.set(null);
-            bottomContainer.scrollIntoView(false);
-        });
-
-        /*
-        TODO
-        worker.newMessage(
-            outbound,
+        const body = {
             roomId,
             uid,
-            value,
-            // @ts-expect-error Vec<File> is not assignable to FileList
-            files ?? []
-        );*/
+            ciphertext,
+            replyTo: $replyingToMessage?.id ?? null,
+            files: []
+        }
+
+        await fetch('/api/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+        value = '';
+        files = undefined;
+        replyingToMessage.set(null);
+        bottomContainer.scrollIntoView(false);
+
     };
     const addFile = () => {
         inputEl.click();

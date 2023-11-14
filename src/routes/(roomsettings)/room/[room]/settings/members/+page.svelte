@@ -19,7 +19,6 @@
         const user = await findUser(data.supabase, who);
         await inviteMember(
             data.supabase,
-            $olmAccount ?? raise('olm account must be initialized'),
             data.room.id,
             user.id!
         );

@@ -5,7 +5,8 @@
 
     onMount(() => {
         if (browser) {
-            machine.doWork()
+            // Starts listening for requests
+
         }
     });
 </script>

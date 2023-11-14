@@ -112,7 +112,7 @@ impl MegOlmGroupSessionManager {
         crate::store::save_inbound_group_session(room_id, inbound, session_id.to_string());
     }
 
-    pub fn encrypt(
+    pub async fn encrypt(
         &self,
         room_id: &RoomId,
         content: &[u8],
@@ -120,9 +120,7 @@ impl MegOlmGroupSessionManager {
         gloo::console::log!("encrypting message for");
         let outbound = match crate::store::get_outbound_group_sessions(&room_id.0) {
             None => {
-                wasm_bindgen_futures::spawn_local(async move {
-                    self.request_session_keys(room_id).await;
-                });
+                self.request_session_keys(room_id).await;
                 return None
             }
             Some(outbound) => outbound

@@ -71,8 +71,8 @@ impl Machine {
     }
 
     #[wasm_bindgen(js_name = "encrypt")]
-    pub fn encrypt_js(&self, room_id: &str, plaintext: &[u8]) -> Option<EncryptedMessage> {
-        self.encrypt_message(&RoomId(room_id.to_string()), plaintext)
+    pub async fn encrypt_js(&self, room_id: &str, plaintext: &[u8]) -> Option<EncryptedMessage> {
+        self.encrypt_message(&RoomId(room_id.to_string()), plaintext).await
     }
 
 

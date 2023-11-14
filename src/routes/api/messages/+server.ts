@@ -1,4 +1,5 @@
-import { router, publicProcedure } from '$lib/trpc/trpc';
+import type { RequestHandler } from './$types';
+import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import sql from '$lib/server/db';
 import { ulid } from 'ulidx';
@@ -32,53 +33,60 @@ const CreateMessage = z.object({
 
 export type CreateMessage = z.infer<typeof CreateMessage>;
 
-export const messagesRouter = router({
-    createMessage: publicProcedure
-        .input(CreateMessage)
-        .mutation(async ({ ctx: { supabase }, input }) => {
-            const files: Attachment[] = [];
-            for (const file of input.files) {
-                const id = ulid();
-                const bytes = new Uint8Array(file.bytes);
-                const { data, error } = await supabase.storage
-                    .from('attachments')
-                    .upload(`attachments/${id}`, bytes, {
-                        contentType: 'application/octet-stream'
-                    });
 
-                if (error !== null) {
-                    console.error(error);
-                    continue;
-                }
+export const POST: RequestHandler = async ({ request, locals: { supabase, getSession } }) => {
+    const session = await getSession();
+    if (!session) {
+        // the user is not signed in
+        throw error(401, { message: 'Unauthorized' });
+    }
 
-                files.push({
-                    path: data.path,
-                    name: file.name,
-                    type: file.type,
-                    key_ciphertext: file.key_ciphertext,
-                    hashes: file.hashes
-                } satisfies Attachment);
-            }
+    const req = await request.json();
+    const input = CreateMessage.parse(req);
 
-            await sql.begin(async (sql) => {
-                const [{ id }] = await sql`
+    const files: Attachment[] = [];
+    for (const file of input.files) {
+        const id = ulid();
+        const bytes = new Uint8Array(file.bytes);
+        const { data, error } = await supabase.storage
+            .from('attachments')
+            .upload(`attachments/${id}`, bytes, {
+                contentType: 'application/octet-stream'
+            });
+
+        if (error !== null) {
+            console.error(error);
+            continue;
+        }
+
+        files.push({
+            path: data.path,
+            name: file.name,
+            type: file.type,
+            key_ciphertext: file.key_ciphertext,
+            hashes: file.hashes
+        } satisfies Attachment);
+    }
+
+    await sql.begin(async (sql) => {
+        const [{ id }] = await sql`
                     INSERT INTO messages (content, room_id, author_id, reply_to)
                     VALUES (${input.ciphertext}, ${input.roomId}, ${input.uid}, ${input.replyTo})
                     RETURNING id;
                 `;
 
-                for (const file of files) {
-                    const hashes = JSON.stringify(file.hashes);
-                    await sql`
+        for (const file of files) {
+            const hashes = JSON.stringify(file.hashes);
+            await sql`
                         INSERT INTO attachments (id, name, type, key_ciphertext, hashes, message_id)
                         VALUES ((SELECT id
                                  FROM storage.objects
                                  WHERE name = ${file.path}), ${file.name}, ${file.type},
                                 ${file.key_ciphertext}, ${hashes}::jsonb, ${id})
                     `;
-                }
-            });
-        })
-});
+        }
+    });
 
-export {};
+    return json({ ok: true });
+};
+

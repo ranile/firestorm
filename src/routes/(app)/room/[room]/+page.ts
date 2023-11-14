@@ -11,6 +11,7 @@ export const load = (async ({ parent }) => {
     const room = getStore(rooms)!.find((room) => room.id === data.currentRoomId)!; // this is checked in +layout.ts and will never be undefined
 
     const encryptedMessages = await getMessages(data.supabase, room.id);
+    console.log('encryptedMessages', encryptedMessages);
     const messages = Promise.all(
         encryptedMessages.map((message) => decryptMessage(data.supabase, message))
     );

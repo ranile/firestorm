@@ -111,9 +111,8 @@ impl Machine {
         Ok(())
     }
 
-    pub fn encrypt_message(&self, room_id: &RoomId, plaintext: &[u8]) -> Option<EncryptedMessage> {
-        self.meg_olm_group_session_manager
-            .encrypt(room_id, plaintext)
+    pub async fn encrypt_message(&self, room_id: &RoomId, plaintext: &[u8]) -> Option<EncryptedMessage> {
+        self.meg_olm_group_session_manager.encrypt(room_id, plaintext).await
     }
 
     pub fn decrypt_message(
