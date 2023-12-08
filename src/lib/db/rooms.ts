@@ -1,6 +1,6 @@
 import type { Supabase } from '../supabase';
 import { getSession, supabase } from '../supabase';
-import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import type { RealtimePostgresChangesPayload, Session } from '@supabase/supabase-js';
 import type { Database } from '../../database';
 import type { UnionFromValues } from '../utils';
 import { get, writable } from 'svelte/store';
@@ -168,16 +168,8 @@ export async function getRoomMemberForRoom(supabase: Supabase, roomId: string, u
 
     return member.data;
 }
-export async function joinRoom(supabase: Supabase, roomId: string) {
-    const session = await getSession(supabase);
 
-    const roomMembers = await getRoomMembers(supabase, roomId)
-        .then(m => m.filter(it => it.join_state === 'joined').map(it => it.id));
-
-    // step 1: share _own_ key with the _other_ room members
-    // @ts-expect-error typescript is confused
-    const keys = await shareRoomKey(roomId, roomMembers)
-    console.log('keys', keys);
+export function saveSharedKeys(supabase: Supabase, session: Session, roomId: string, keys: Awaited<ReturnType<typeof shareRoomKey>>) {
     const inserts = [];
     for (const [memberId, deviceKey] of Object.entries(keys)) {
         for (const [deviceId, key] of Object.entries(deviceKey)) {
@@ -188,26 +180,47 @@ export async function joinRoom(supabase: Supabase, roomId: string) {
                 key_for_user: memberId,
                 key_for_device: deviceId,
                 key: JSON.stringify(key)
-            })
+            });
         }
     }
+
     console.log('inserts', inserts);
-    await supabase
+    return supabase
         .from('room_session_keys')
         // @ts-expect-error supabase types are wrong
         .insert(inserts);
 
-    // step 2: request keys from other room members
-    const requests = roomMembers.map(it => ({
+}
+
+export function requestKeys(supabase: Supabase, session: Session, roomId: string, requestFrom: string[]) {
+    const requests = requestFrom.map(it => ({
         requester_user_id: session.user.id,
         room_id: roomId,
-        requester_device_id: 'cda1435f-97bf-4232-a218-53403283e050',
+        requester_device_id: localStorage.getItem('deviceId')!,
         requested_from: it
     }))
-    await supabase
+    return supabase
         .from('room_session_key_requests')
         .insert(requests);
 
+}
+
+
+export async function joinRoom(supabase: Supabase, roomId: string) {
+    const session = await getSession(supabase);
+
+    const roomMembers = await getRoomMembers(supabase, roomId)
+        .then(m => m.filter(it => it.join_state === 'joined').map(it => it.id));
+
+    // step 1: share _own_ key with the _other_ room members
+    // @ts-expect-error typescript is confused
+    const keys = await shareRoomKey(roomId, roomMembers)
+    console.log('keys', keys);
+
+    await saveSharedKeys(supabase, session, roomId, keys);
+
+    // step 2: request keys from other room members
+    await requestKeys(supabase, session, roomId, (roomMembers.filter(it => it !== null) as string[]));
 
     // step 3: update membership status
     const member = await supabase

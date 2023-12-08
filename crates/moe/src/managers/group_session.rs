@@ -134,9 +134,14 @@ impl MegOlmGroupSessionManager {
         })
     }
 
-    pub fn decrypt(&self, room_id: &RoomId, session_id: &str, message: &MegolmMessage) -> Result<Vec<u8>, vodozemac::megolm::DecryptionError> {
+    pub fn decrypt(&self, room_id: &RoomId, session_id: &str, message: &MegolmMessage) -> Result<Vec<u8>, DecryptError> {
         let inbound = crate::store::get_inbound_group_session(&room_id, session_id);
-        Ok(inbound.decrypt(message)?.plaintext)
+        match inbound {
+            None => {
+                Err(DecryptError::NoKeys)
+            }
+            Some(inbound) => Ok(inbound.decrypt(message).map_err(DecryptError::DecryptionError)?.plaintext)
+        }
     }
     async fn request_session_keys(&self, room_id: &RoomId) {
         // todo!("API request for {}", room_id.0)'
@@ -186,4 +191,9 @@ pub struct KeyRequest {
     pub requester_device_id: DeviceId,
     pub requester_identity_key: Curve25519PublicKey,
     pub room_id: RoomId,
+}
+
+pub enum DecryptError {
+    NoKeys,
+    DecryptionError(vodozemac::megolm::DecryptionError),
 }

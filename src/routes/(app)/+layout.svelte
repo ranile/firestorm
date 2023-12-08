@@ -3,7 +3,7 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import ProfileDropdown from '$lib/components/ProfileDropdown.svelte';
     import { onMount } from 'svelte';
-    import { subscribeToRoomMembers } from '$lib/db/rooms';
+    import { saveSharedKeys, subscribeToRoomMembers } from '$lib/db/rooms';
     import { rooms } from '$lib/db/rooms';
     import { createRoomModalState } from '$lib/components/SideNav/store';
     import SideNavGeneric from '$lib/components/SideNavGeneric.svelte';
@@ -16,6 +16,8 @@
     import { decryptMessage } from './room/[room]/authors';
     import { olmAccount, raise } from '$lib/utils';
     import type { Database } from '../../database';
+    import { getKeyRequests, getSharedKeys } from '$lib/db/keys';
+    import { shareRoomKey } from '$lib/e2ee';
 
     export let data: LayoutData;
     const signout = () => {
@@ -65,46 +67,33 @@
         });
     });
 
+    // listen for key requests (room_session_key_requests) -- if we got the key, share it
+    // listen for key shares (room_session_keys) -- accept the key
+    // ----
+
     onMount(() => {
-        // TODO:
-        // listen for key requests (room_session_key_requests) -- if we got the key, share it
-        // listen for key shares (room_session_keys) -- accept the key
-        // ----
+        getKeyRequests(data.supabase).then(async (requests) => {
+            console.log('read key requests', requests);
 
-        type Request = Database['public']['Tables']['room_session_key_requests']['Row'];
+            for (const request of requests) {
+                const keys = await shareRoomKey(request.room_id, [request.requester_user_id])
+                console.log('shared keys', keys);
+                await saveSharedKeys(data.supabase, data.session, request.room_id, keys)
+                await data.supabase.from('room_session_key_requests').delete()
+                    .eq('requested_from', request.requested_from)
+                    .eq('requester_user_id', request.requester_user_id)
+                    .eq('room_id', request.room_id)
 
-        function handleRequest(request: Request) {
-
-            // shareMySessionKey(
-            //     data.supabase,
-            //     $olmAccount ?? raise('olm account must be set'),
-            //     request.room_id,
-            //     request.requested_by
-            // );
-            // data.supabase
-            //     .from('room_session_key_requests')
-            //     .delete()
-            //     .eq('room_id', request.room_id)
-            //     .eq('requested_from', request.requested_from)
-            //     .eq('requested_by', request.requested_by);
-        }
-
-        (async () => {
-            const { data: requests, error } = await data.supabase
-                .from('room_session_key_requests')
-                .select('*')
-                .eq('requested_from', data.session?.user.id);
-            if (error) {
-                console.error(error);
-                return;
             }
+        })
 
-            requests.forEach((request) => {
-                handleRequest(request);
-            });
-        })();
+        getSharedKeys(data.supabase, localStorage.getItem('deviceId')!)
+            .then((keys) => {
+                console.log('got keys to accept', keys);
+                // TODO: accept this key
+            })
 
-        console.info('subscribing to key requests');
+        console.info('subscribing to keys');
         const sub = data.supabase
             .channel(`key-requests`)
             .on(
@@ -116,12 +105,29 @@
                     filter: `requested_from=eq.${data.session?.user.id}`
                 },
                 (event) => {
-                    console.log('got key request', event);
                     if (event.eventType === 'INSERT') {
-                        handleRequest(event.new as Request);
+                        console.log('got key request', event);
+                        // share the key
                     }
                 }
             )
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'room_session_keys',
+                    filter: `key_for_user=eq.${data.session?.user.id}`
+                },
+                (event) => {
+
+                    if (event.eventType === 'INSERT') {
+                        console.log('time to share key', event);
+                        // accept the key
+                    }
+                }
+            )
+
             .subscribe();
         return () => sub.unsubscribe();
     });

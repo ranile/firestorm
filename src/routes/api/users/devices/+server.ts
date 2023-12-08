@@ -16,7 +16,7 @@ export const GET: RequestHandler = async ({ request }) => {
     const userId = url.searchParams.get('userId');
 
     if (userId === null) {
-        return error(400, 'userId is required')
+        throw error(400, 'userId is required')
     }
 
     const rows = await sql<UserDevices>`

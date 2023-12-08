@@ -50,8 +50,9 @@
                 firstMessageTimestamp={chunk.firstMessageTimestamp}
             />
         {:then author}
+            <!-- TODO-->
             <ChunkAuthor
-                username={author.username}
+                username={author.username ?? 'TODO'}
                 avatar={author.avatar}
                 firstMessageTimestamp={chunk.firstMessageTimestamp}
             />

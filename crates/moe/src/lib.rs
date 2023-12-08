@@ -119,7 +119,7 @@ impl Machine {
         &self,
         room_id: &RoomId,
         message: EncryptedMessage,
-    ) -> Result<Vec<u8>, DecryptionError> {
+    ) -> Result<Vec<u8>, managers::DecryptError> {
         self.meg_olm_group_session_manager
             .decrypt(room_id, &message.session_id, &message.megolm)
     }

@@ -15,12 +15,12 @@ console_error_panic_hook = "0.1.7"
 ducktor = { git = "https://github.com/hamza1311/ducktor", version = "0.1.0" }
 flurry = { version = "0.4.0", features = ["serde"] }
 getrandom = { version = "0.2.10", features = ["js"] }
-gloo = "0.10.0"
+gloo = "0.11.0"
 js-sys = "0.3.64"
 serde = { version = "1.0.188", features = ["derive"] }
 serde_json = "1.0.105"
 tracing = "0.1.37"
-vodozemac = { git = "https://github.com/matrix-org/vodozemac", version = "0.4.0" }
+vodozemac = { git = "https://github.com/matrix-org/vodozemac" }
 wasm-bindgen = "0.2.87"
 wasm-bindgen-futures = "0.4.37"
 wasm-bindgen-test = "0.3.37"

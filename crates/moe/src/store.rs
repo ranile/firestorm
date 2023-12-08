@@ -49,9 +49,9 @@ pub(crate) fn get_devices_for_user(user_id: &UserId) -> Vec<super::device::Devic
 pub(crate) fn get_inbound_group_session(
     room_id: &RoomId,
     session_id: &str,
-) -> InboundGroupSession {
-    let pickle: super::sessions::PickledInboundGroupSession = LocalStorage::get(format!("{}:{}", room_id.0, session_id)).unwrap();
-    InboundGroupSession::unpickle(pickle)
+) -> Option<InboundGroupSession> {
+    let pickle: super::sessions::PickledInboundGroupSession = LocalStorage::get(format!("{}:{}", room_id.0, session_id)).ok()?;
+    Some(InboundGroupSession::unpickle(pickle))
 }
 
 pub(crate) fn save_otk(

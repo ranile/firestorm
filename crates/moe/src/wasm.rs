@@ -5,6 +5,7 @@ use gloo::utils::format::JsValueSerdeExt;
 use js_sys::{Array, JsString};
 use wasm_bindgen::UnwrapThrowExt;
 use crate::api::Api;
+use crate::managers::DecryptError;
 use crate::message::EncryptedMessage;
 
 #[derive(Debug, Clone)]
@@ -77,8 +78,13 @@ impl Machine {
 
 
     #[wasm_bindgen(js_name = "decrypt")]
-    pub fn decrypt_js(&self, room_id: &str, message: EncryptedMessage) -> Result<Vec<u8>, JsError> {
-        self.decrypt_message(&RoomId(room_id.to_string()), message).map_err(JsError::from)
+    pub fn decrypt_js(&self, room_id: &str, message: EncryptedMessage) -> Result<Option<Vec<u8>>, JsError> {
+        let decrypted = self.decrypt_message(&RoomId(room_id.to_string()), message);
+        match decrypted {
+            Ok(decrypted) => Ok(Some(decrypted)),
+            Err(DecryptError::NoKeys) => Ok(None),
+            Err(DecryptError::DecryptionError(err)) => Err(JsError::new(&err.to_string()))
+        }
     }
 
     #[wasm_bindgen(js_name = getOneTimeKeys)]
@@ -90,18 +96,5 @@ impl Machine {
     pub fn mark_one_time_keys_as_published(&self) {
         self.account.mark_keys_as_published();
     }
-
-    #[wasm_bindgen(js_name = "doWork")]
-    pub async fn do_work(&self) {
-        let fut = match self.api.get_devices_for_user(UserId("079e586f-e715-4d5e-8e32-3381075cbe25".to_string())).await {
-            Ok(v) =>v,
-            Err(e) => {
-                gloo::console::error!(format!("error: {:?}", e));
-                return;
-            }
-        };
-        gloo::console::log!(format!("got devices: {:?}", fut));
-    }
-
 
 }

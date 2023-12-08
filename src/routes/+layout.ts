@@ -8,7 +8,7 @@ import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { redirect } from '@sveltejs/kit';
 import { subscribeToNotifications } from '$lib/notifications';
-import { loaded, olmAccount } from '$lib/utils';
+import { loaded, raise } from '$lib/utils';
 import { get } from 'svelte/store';
 import { init } from '$lib/e2ee';
 
@@ -34,7 +34,8 @@ export const load: LayoutLoad = async ({ fetch, data, url, depends }) => {
         data: { session }
     } = await supabase.auth.getSession();
     if (session && browser) {
-        const device_id = session.user.id + 'device_id';
+        console.log(session.user.id);
+        const device_id = localStorage.getItem('deviceId') ?? raise('device_id not found in localStorage')
         console.log('device_id', device_id);
         init(session.user.id, device_id);
     }

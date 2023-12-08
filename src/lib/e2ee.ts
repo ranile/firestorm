@@ -31,7 +31,7 @@ export async function encrypt(roomId: string, plaintext: string) {
 export function decrypt(roomId: string, text: string) {
     const message = JSON.parse(text);
     const bytes = machine.decrypt(roomId, new EncryptedMessage(message.megolm, message.session_id));
-    if (bytes === null) {
+    if (bytes === null || bytes === undefined) {
         return null;
     }
     return decoder.decode(bytes);

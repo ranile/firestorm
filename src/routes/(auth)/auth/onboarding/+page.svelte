@@ -2,12 +2,8 @@
     import { Button, Helper } from 'flowbite-svelte';
     import type { PageData } from './$types';
     import { goto } from '$app/navigation';
-    import { updateProfile } from '$lib/db/users';
     import ProfileUpdate from '$lib/components/ProfileUpdate.svelte';
-    import { olmAccount as olmAccountStore } from '$lib/utils';
     import { init, machine } from '$lib/e2ee';
-    import { page } from '$app/stores';
-    import { trpc } from '$lib/trpc/client';
 
     export let data: PageData;
 
@@ -22,6 +18,7 @@
         const userId = data.session!.user.id;
         try {
             const deviceId = crypto.randomUUID();
+            localStorage.setItem('deviceId', deviceId);
             // await updateProfile(data.supabase, userId, username, avatarFile);
             const { curve25519, ed25519 } = machine.identityKeys;
             init(userId, deviceId);
