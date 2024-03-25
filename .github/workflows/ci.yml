@@ -31,20 +31,20 @@ jobs:
           VERSION=$(cargo pkgid --frozen wasm-bindgen | cut -d "@" -f 2)
           cargo +stable install --version $VERSION wasm-bindgen-cli
 
-      - run: npm install
+      - run: pnpm install
       - run: mv .env.dev .env
 
       - name: svelte-check
-        run: npm run check
+        run: pnpm run check
 
       - name: prettier & eslint
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Setup supabase CLI
-        run: npm run supabase:start
+        run: pnpm run supabase:start
 
       - name: Verify generated types match Postgres schema
         run: |
@@ -61,10 +61,10 @@ jobs:
       - name: setup web-push endpoint
         run: |
           DOCKER_ADDRESS=$(ip address show docker0 | grep -oP 'inet \K(\d{1,3}\.){3}\d{1,3}')
-          nohup npm run preview -- --host $DOCKER_ADDRESS --port 5173 --strictPort &
+          nohup pnpm run preview -- --host $DOCKER_ADDRESS --port 5173 --strictPort &
 
       # run playwright tests
-      - run: npm run test
+      - run: pnpm run test
 
   deploy:
     runs-on: ubuntu-latest
@@ -89,7 +89,7 @@ jobs:
           cargo +stable install --version $VERSION wasm-bindgen-cli
 
       - name: Install Vercel CLI
-        run: npm install --global vercel@latest
+        run: pnpm install --global vercel@latest
 
       # preview deployment
       - name: Pull Vercel Preview Environment Information

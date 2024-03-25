@@ -4,8 +4,8 @@
     "private": true,
     "scripts": {
         "dev": "vite dev --mode dev",
-        "wasm:dev": "cd crates/moe/ && wasm-pack build --dev && pnpm link pkg",
         "wasm": "cd crates/moe/ && wasm-pack build && cd ../../ && pnpm link ./crates/moe/pkg",
+        "wasm:dev": "cd crates/moe/ && wasm-pack build --dev && cd ../../ && pnpm link ./crates/moe/pkg",
         "postinstall": "pnpm run wasm",
         "build:dev": "vite build --mode dev",
         "build": "vite build",
@@ -63,6 +63,7 @@
         "flowbite": "^1.6.5",
         "flowbite-svelte": "^0.39.2",
         "postgres": "^3.3.5",
+        "rxjs": "^7.8.1",
         "supabase": "^1.75.3",
         "svelte-material-icons": "github:hamza1311/svelte-material-icons#dep",
         "svelte-media-queries": "^1.5.4",
