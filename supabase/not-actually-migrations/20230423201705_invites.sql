@@ -1,7 +1,3 @@
-create type "public"."member_join_state" as enum ('invited', 'joined');
-
-alter table "public"."room_members" add column "join_state" member_join_state not null default 'invited'::member_join_state;
-
 alter table "public"."room_members" add column "session_key" text;
 
 create or replace view "public"."room_members_with_users" as  SELECT room_members.room_id,

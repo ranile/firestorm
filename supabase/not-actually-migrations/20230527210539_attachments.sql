@@ -1,15 +1,3 @@
-create table "public"."attachments" (
-    "id" uuid not null,
-    "message_id" uuid,
-    "name" text not null,
-    "type" text not null,
-    "key_ciphertext" text not null,
-    "hashes" jsonb not null
-);
-
-
-alter table "public"."attachments" enable row level security;
-
 CREATE UNIQUE INDEX attachments_pkey ON public.attachments USING btree (id);
 
 alter table "public"."attachments" add constraint "attachments_pkey" PRIMARY KEY using index "attachments_pkey";

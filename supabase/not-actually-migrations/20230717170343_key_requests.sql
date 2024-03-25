@@ -1,11 +1,3 @@
-create table "public"."room_session_key_request"
-(
-    "room_id"        uuid not null REFERENCES rooms (id) ON DELETE CASCADE,
-    "requested_by"   uuid not null REFERENCES auth.users (id) ON DELETE CASCADE,
-    "requested_from" uuid not null REFERENCES auth.users (id) ON DELETE CASCADE,
-    primary key ("room_id", "requested_by", "requested_from")
-);
-
 
 alter table "public"."room_session_key_request"
     enable row level security;

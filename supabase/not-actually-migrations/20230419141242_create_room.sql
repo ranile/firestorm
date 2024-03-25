@@ -1,26 +1,4 @@
-create table "public"."user_identity_keys" (
-    "id" uuid not null,
-    "identity_key" text not null
-);
 
-
-alter table "public"."user_identity_keys" enable row level security;
-
-create table "public"."user_one_time_keys" (
-    "id" uuid not null,
-    "one_time_key" text not null
-);
-
-
-alter table "public"."user_one_time_keys" enable row level security;
-
-alter table "public"."messages" enable row level security;
-
-alter table "public"."rooms" add column "created_by" uuid;
-
-CREATE UNIQUE INDEX user_identity_keys_pkey ON public.user_identity_keys USING btree (id);
-
-CREATE UNIQUE INDEX user_one_time_keys_pkey ON public.user_one_time_keys USING btree (one_time_key, id);
 
 alter table "public"."user_identity_keys" add constraint "user_identity_keys_pkey" PRIMARY KEY using index "user_identity_keys_pkey";
 

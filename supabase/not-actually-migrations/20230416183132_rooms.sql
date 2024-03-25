@@ -1,18 +1,3 @@
-create table "public"."room_members" (
-    "room_id" uuid not null,
-    "joined_at" timestamp with time zone not null default now(),
-    "member_id" uuid not null
-);
-
-
-alter table "public"."room_members" enable row level security;
-
-create table "public"."rooms" (
-    "id" uuid not null default uuid_generate_v4(),
-    "created_at" timestamp with time zone not null default now(),
-    "name" text not null
-);
-
 
 alter table "public"."rooms" enable row level security;
 
@@ -32,21 +17,7 @@ alter table "public"."room_members" add constraint "room_members_room_id_fkey" F
 
 alter table "public"."room_members" validate constraint "room_members_room_id_fkey";
 
-set check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION public.is_member_of(_user_id uuid, _room_id uuid)
- RETURNS boolean
- LANGUAGE sql
- SECURITY DEFINER
-AS $function$
-SELECT EXISTS (
-    SELECT 1
-    FROM room_members rm
-    WHERE rm.member_id = _user_id
-      AND rm.room_id = _room_id
-);
-$function$
-;
 
 create policy "users can read rooms members for rooms they are in"
 on "public"."room_members"
